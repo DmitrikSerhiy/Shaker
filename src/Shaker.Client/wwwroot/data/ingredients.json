@@ -1,0 +1,14 @@
+[
+  { "id": 1, "name": "Gin" },
+  { "id": 2, "name": "Campari" },
+  { "id": 3, "name": "Sweet Vermouth" },
+  { "id": 4, "name": "Bourbon" },
+  { "id": 5, "name": "Bitters" },
+  { "id": 6, "name": "Sugar" },
+  { "id": 7, "name": "Rum" },
+  { "id": 8, "name": "Mint Leaves" },
+  { "id": 9, "name": "Lime Juice" },
+  { "id": 10, "name": "Club Soda" },
+  { "id": 11, "name": "Simple Syrup" },
+  { "id": 12, "name": "Vodka" }
+]

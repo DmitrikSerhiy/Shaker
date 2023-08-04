@@ -1,55 +1,109 @@
 ﻿@page "/cocktails"
+@using Shaker.Client.Services
+@using Shaker.Client.Dtos
 @inject HttpClient Http
+@inject CocktailService CocktailService
 
 <PageTitle>Available cocktails</PageTitle>
 
 <h1>Available cocktails</h1>
 
-<p>This is the list of available cocktails</p>
-
-@if (cocktails == null) {
+@if(_loading) {
     <p>
         <em>Loading...</em>
     </p>
 }
 else {
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var cocktail in cocktails) {
+    if (_ingredientsEmpty) {
+        <p>
+            <em>Ingredients are not set</em>
+        </p>
+    }
+    else if(_cocktailsEmpty) {
+        <p>
+            <em>Cocktail recipes are not set</em>
+        </p>
+    } else if (_availableCocktails.Count == 0) {
+        <p>
+            <em>No cocktails can be made with available ingredients</em>
+        </p>
+    } else if (_failed) {
+        <p>
+            <em>@_errorMessage</em>
+        </p>
+    }
+    else {
+        <table class="table">
+            <thead>
             <tr>
-                <td>@cocktail.Date.ToShortDateString()</td>
-                <td>@cocktail.TemperatureC</td>
-                <td>@cocktail.TemperatureF</td>
-                <td>@cocktail.Summary</td>
+                <th>Cocktail</th>
+                <th>Ingredients</th>
+                <th>Recipe</th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var cocktail in _availableCocktails) {
+                <tr>
+                    <td>@cocktail.Name</td>
+                    <td>@string.Join(", ", cocktail.Ingredients.Select(i => i.Name))</td>
+                    <td>@cocktail.Recipe</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
 }
 
 @code {
-    private WeatherForecast[]? cocktails;
+    private List<Cocktail> _availableCocktails = new();
+    
+    private string _ingredientsUrl = "data/ingredients.json";
+    private string _cocktailsUrl = "data/cocktails.json";
+
+    private bool _ingredientsEmpty = false;
+    private bool _cocktailsEmpty = false;
+    private bool _loading = true;
+    
+    private bool _failed = false;
+    private string _errorMessage = "";
 
     protected override async Task OnInitializedAsync() {
-        cocktails = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        var allCocktails = new List<Cocktail>();
+        var allIngredients = new List<Ingredient>();
+        
+        try {
+            var cocktails = await Http.GetFromJsonAsync<List<Cocktail?>>(_cocktailsUrl);
+            allCocktails = cocktails?.Where(c => c != null).Select(c => c!).ToList() ?? new List<Cocktail>();
+            if (allCocktails.Count == 0) {
+                _cocktailsEmpty = true;
+                _loading = false;
+                return;
+            }
+        }
+        catch {
+            _failed = true;
+            _errorMessage = "Failed to load cocktail recipes";
+            _loading = false;
+            return;
+        }
+        
+        try {
+            var ingredients = await Http.GetFromJsonAsync<List<Ingredient?>>(_ingredientsUrl);
+            allIngredients = ingredients?.Where(i => i != null).Select(i => i!).ToList() ?? new List<Ingredient>();
+            if (allIngredients.Count == 0) {
+                _ingredientsEmpty = true;
+                _loading = false;
+                return;
+            }
+        }
+        catch {
+            _failed = true;
+            _errorMessage = "Failed to load ingredients";
+            _loading = false;
+            return;
+        }
+
+        _availableCocktails = CocktailService.GetAvailableCocktails(allIngredients, allCocktails).ToList();
+        _loading = false;
     }
-
-    public class WeatherForecast {
-        public DateOnly Date { get; set; }
-
-        public int TemperatureC { get; set; }
-
-        public string? Summary { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-    }
-
 }
