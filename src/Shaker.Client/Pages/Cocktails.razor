@@ -14,9 +14,19 @@
     </p>
 }
 else {
-    if (_ingredientsEmpty) {
+    if (_failed) {
+        <p>
+            <em>@_errorMessage</em>
+        </p>
+    }
+    else if (_ingredientsEmpty) {
         <p>
             <em>Ingredients are not set</em>
+        </p>
+    }
+    else if (_myIngredientsEmpty) {
+        <p>
+            <em>Bar is empty. Add some ingredients.</em>
         </p>
     }
     else if(_cocktailsEmpty) {
@@ -26,10 +36,6 @@ else {
     } else if (_availableCocktails.Count == 0) {
         <p>
             <em>No cocktails can be made with available ingredients</em>
-        </p>
-    } else if (_failed) {
-        <p>
-            <em>@_errorMessage</em>
         </p>
     }
     else {
@@ -59,9 +65,11 @@ else {
     
     private string _ingredientsUrl = "data/ingredients.json";
     private string _cocktailsUrl = "data/cocktails.json";
+    private string _barUrl = "data/bar.json";
 
     private bool _ingredientsEmpty = false;
     private bool _cocktailsEmpty = false;
+    private bool _myIngredientsEmpty = false;
     private bool _loading = true;
     
     private bool _failed = false;
@@ -70,7 +78,8 @@ else {
     protected override async Task OnInitializedAsync() {
         var allCocktails = new List<Cocktail>();
         var allIngredients = new List<Ingredient>();
-        
+        var bar = new Bar();
+
         try {
             var cocktails = await Http.GetFromJsonAsync<List<Cocktail?>>(_cocktailsUrl);
             allCocktails = cocktails?.Where(c => c != null).Select(c => c!).ToList() ?? new List<Cocktail>();
@@ -79,8 +88,7 @@ else {
                 _loading = false;
                 return;
             }
-        }
-        catch {
+        } catch {
             _failed = true;
             _errorMessage = "Failed to load cocktail recipes";
             _loading = false;
@@ -95,15 +103,45 @@ else {
                 _loading = false;
                 return;
             }
-        }
-        catch {
+        } catch {
             _failed = true;
             _errorMessage = "Failed to load ingredients";
             _loading = false;
             return;
         }
 
-        _availableCocktails = CocktailService.GetAvailableCocktails(allIngredients, allCocktails).ToList();
+
+        try {
+            foreach(var cocktail in allCocktails) {
+                cocktail.Ingredients = allIngredients
+                    .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
+                    .ToList();
+            }
+        } catch {
+            _failed = true;
+            _errorMessage = "Failed to load cocktails ingredients";
+            _loading = false;
+            return;
+        }
+
+        try {
+            bar = await Http.GetFromJsonAsync<Bar>(_barUrl);
+            if (bar == null || bar.Ingredients.Count == 0) {
+                _loading = false;
+                _myIngredientsEmpty = true;
+                return;
+            }
+            bar.Ingredients = allIngredients
+                .Where(ingredient => bar.Ingredients.Any(i => i.Id == ingredient.Id))
+                .ToList();
+        } catch {
+            _failed = true;
+            _errorMessage = "Failed to load your bar ingredients";
+            _loading = false;
+            return;
+        }
+
+        _availableCocktails = CocktailService.GetAvailableCocktails(bar.Ingredients, allCocktails).ToList();
         _loading = false;
     }
 }
