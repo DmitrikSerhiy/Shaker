@@ -1,8 +1,8 @@
 ﻿@page "/cocktails"
 @using Shaker.Client.Services
 @using Shaker.Client.Dtos
-@inject HttpClient Http
 @inject CocktailService CocktailService
+@inject DataService DataService
 
 <PageTitle>Available cocktails</PageTitle>
 
@@ -63,26 +63,21 @@ else {
 @code {
     private List<Cocktail> _availableCocktails = new();
     
-    private string _ingredientsUrl = "data/ingredients.json";
-    private string _cocktailsUrl = "data/cocktails.json";
-    private string _barUrl = "data/bar.json";
-
-    private bool _ingredientsEmpty = false;
-    private bool _cocktailsEmpty = false;
-    private bool _myIngredientsEmpty = false;
-    private bool _loading = true;
+    private bool _ingredientsEmpty;
+    private bool _cocktailsEmpty;
+    private bool _myIngredientsEmpty;
     
-    private bool _failed = false;
+    private bool _loading = true;
+    private bool _failed;
     private string _errorMessage = "";
 
     protected override async Task OnInitializedAsync() {
-        var allCocktails = new List<Cocktail>();
-        var allIngredients = new List<Ingredient>();
-        var bar = new Bar();
+        List<Cocktail> allCocktails;
+        List<Ingredient> allIngredients;
+        Bar? bar;
 
         try {
-            var cocktails = await Http.GetFromJsonAsync<List<Cocktail?>>(_cocktailsUrl);
-            allCocktails = cocktails?.Where(c => c != null).Select(c => c!).ToList() ?? new List<Cocktail>();
+            allCocktails = await DataService.LoadCocktailsAsync();
             if (allCocktails.Count == 0) {
                 _cocktailsEmpty = true;
                 _loading = false;
@@ -96,8 +91,7 @@ else {
         }
         
         try {
-            var ingredients = await Http.GetFromJsonAsync<List<Ingredient?>>(_ingredientsUrl);
-            allIngredients = ingredients?.Where(i => i != null).Select(i => i!).ToList() ?? new List<Ingredient>();
+            allIngredients = await DataService.LoadIngredientsAsync();
             if (allIngredients.Count == 0) {
                 _ingredientsEmpty = true;
                 _loading = false;
@@ -109,7 +103,6 @@ else {
             _loading = false;
             return;
         }
-
 
         try {
             foreach(var cocktail in allCocktails) {
@@ -125,7 +118,7 @@ else {
         }
 
         try {
-            bar = await Http.GetFromJsonAsync<Bar>(_barUrl);
+            bar = await DataService.LoadBarAsync();
             if (bar == null || bar.Ingredients.Count == 0) {
                 _loading = false;
                 _myIngredientsEmpty = true;

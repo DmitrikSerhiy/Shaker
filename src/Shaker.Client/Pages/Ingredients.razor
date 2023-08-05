@@ -1,1 +1,117 @@
 ﻿@page "/ingredients"
+@using Shaker.Client.Services
+@using Shaker.Client.Dtos
+@inject DataService DataService
+@inject BarService BarService
+
+
+<PageTitle>Ingredients</PageTitle>
+
+<h1>Available ingredients</h1>
+
+@if(_loading) {
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else {
+    if (_failed) {
+        <p>
+            <em>@_errorMessage</em>
+        </p>
+    }
+    else if (_ingredientsEmpty) {
+        <p>
+            <em>Ingredients are not set</em>
+        </p>
+    }
+    else if (_myIngredientsEmpty) {
+        <p>
+            <em>Bar is empty. Add some ingredients.</em>
+        </p>
+    }
+    else {
+        <div>
+            <select @bind="_selectedIngredientId">
+                @foreach (var ingredient in _allIngredients.Except(_bar!.Ingredients)) {
+                    <option value="@ingredient.Id">@ingredient.Name</option>
+                }
+            </select>
+            <button @onclick="async () => { await BarService.AddToBarAsync(new Ingredient { Id = _selectedIngredientId }); await Refresh(); }">Add to Bar</button>
+        </div>
+
+        <div>
+            <ul>
+                @foreach (var ingredient in _bar.Ingredients) {
+                    <li>
+                        @ingredient.Name <button @onclick="async () => { await BarService.RemoveFromBarAsync(ingredient); await Refresh(); }">Remove</button>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+}
+
+@code {
+    private bool _ingredientsEmpty;
+    private bool _myIngredientsEmpty;
+
+    private bool _loading = true;
+    private bool _failed;
+    private string _errorMessage = "";
+    
+    private int _selectedIngredientId;
+    private List<Ingredient>_allIngredients = new();
+    private Bar? _bar;
+
+    protected override async Task OnInitializedAsync() {
+        try {
+            _allIngredients = await DataService.LoadIngredientsAsync();
+            if (_allIngredients.Count == 0) {
+                _ingredientsEmpty = true;
+                _loading = false;
+                return;
+            }
+        }
+        catch {
+            _failed = true;
+            _errorMessage = "Failed to load ingredients";
+            _loading = false;
+            return;
+        }
+
+
+        await LoadBarAsync();
+        _loading = false;
+    }
+
+    private async Task Refresh() {
+        _loading = true;
+        _selectedIngredientId = 0;
+        _ingredientsEmpty = false;
+        _myIngredientsEmpty = false;
+        _failed = false;
+        _errorMessage = "";
+        await LoadBarAsync();
+        _loading = false;
+    }
+    
+    private async Task LoadBarAsync() {
+        try {
+            _bar = await DataService.LoadBarAsync();
+            if (_bar == null || _bar.Ingredients.Count == 0) {
+                _loading = false;
+                _myIngredientsEmpty = true;
+                return;
+            }
+            _bar.Ingredients = _allIngredients
+                .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
+                .ToList();
+        }
+        catch {
+            _failed = true;
+            _errorMessage = "Failed to load your bar ingredients";
+            _loading = false;
+        }
+    }
+}

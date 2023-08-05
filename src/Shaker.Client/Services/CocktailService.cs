@@ -3,8 +3,8 @@
 namespace Shaker.Client.Services; 
 
 public sealed class CocktailService {
-    public IEnumerable<Cocktail> GetAvailableCocktails(List<Ingredient> availableIngredients, List<Cocktail> allCocktails)
+    public IEnumerable<Cocktail> GetAvailableCocktails(List<Ingredient> availableIngredients, List<Cocktail> knownCocktails)
     {
-        return allCocktails.Where(cocktail => cocktail.Ingredients.All(availableIngredients.Contains));
+        return knownCocktails.Where(cocktail => cocktail.Ingredients.All(availableIngredients.Contains));
     }
 }
