@@ -10,18 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bfdc1d25-7efb-40fc-8b6b-2aa96f6263e4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Shaker.Client/Common/Constants.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Shaker.Client/Services/BarService.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Shaker.Client/Services/DataService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shaker/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shaker/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Pages/Cocktails.razor" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Pages/Cocktails.razor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Pages/Ingredients.razor" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Pages/Ingredients.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Services/CocktailService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Services/CocktailService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Shaker.Client.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Shaker.Client.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/wwwroot/data/bar.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/wwwroot/data/cocktails.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/wwwroot/data/ingredients.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Services/DataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Services/DataService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Shared/NavMenu.razor" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Shared/NavMenu.razor" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +64,44 @@
     ]
   }
 }</component>
-  <component name="RunManager">
+  <component name="RunManager" selected=".NET Launch Settings Profile.Shaker.Client: https">
+    <configuration name="Publish Shaker.Client to Azure" type="AzureDotNetWebAppPublish" factoryName="Azure Web App">
+      <option name="AZURE_WEB_APP_PROJECT" value="$PROJECT_DIR$/src/Shaker.Client/Shaker.Client.csproj" />
+      <option name="AZURE_WEB_APP_CONFIGURATION" value="Release" />
+      <option name="AZURE_WEB_APP_PLATFORM" value="Any CPU" />
+      <option name="AZURE_WEB_APP_SUBSCRIPTION_ID" value="afa157fa-7c3a-4545-abda-fef628101ed9" />
+      <option name="AZURE_WEB_APP_IS_CREATE_APP" value="0" />
+      <option name="AZURE_WEB_APP_ID" value="/subscriptions/afa157fa-7c3a-4545-abda-fef628101ed9/resourceGroups/OwlGroup/providers/Microsoft.Web/sites/shaker" />
+      <option name="AZURE_WEB_APP_NAME" value="" />
+      <option name="AZURE_WEB_APP_IS_CREATE_RESOURCE_GROUP" value="0" />
+      <option name="AZURE_WEB_APP_RESOURCE_GROUP_NAME" value="" />
+      <option name="AZURE_WEB_APP_OPERATING_SYSTEM" value="WINDOWS" />
+      <option name="AZURE_WEB_APP_IS_CREATE_APP_SERVICE_PLAN" value="0" />
+      <option name="AZURE_WEB_APP_SERVICE_PLAN_ID" value="" />
+      <option name="AZURE_WEB_APP_SERVICE_PLAN_NAME" value="" />
+      <option name="AZURE_WEB_APP_LOCATION" value="eastus" />
+      <option name="AZURE_WEB_APP_PRICING_TIER" value="" />
+      <option name="AZURE_WEB_APP_NET_FRAMEWORK" value="4.7" />
+      <option name="AZURE_WEB_APP_NET_CORE_RUNTIME" value="DOTNETCORE 2.1" />
+      <option name="AZURE_WEB_APP_IS_DEPLOY_TO_SLOT" value="0" />
+      <option name="AZURE_WEB_APP_SLOT_NAME" value="" />
+      <option name="AZURE_WEB_APP_OPEN_BROWSER_PUBLISH" value="0" />
+      <option name="AZURE_SQL_DATABASE_SUBSCRIPTION_ID" value="afa157fa-7c3a-4545-abda-fef628101ed9" />
+      <option name="AZURE_SQL_DATABASE_IS_ENABLED" value="0" />
+      <option name="AZURE_SQL_DATABASE_CONNECTION_STRING_NAME" value="" />
+      <option name="AZURE_SQL_DATABASE_IS_CREATE" value="0" />
+      <option name="AZURE_SQL_DATABASE_ID" value="" />
+      <option name="AZURE_SQL_DATABASE_NAME" value="" />
+      <option name="AZURE_SQL_DATABASE_IS_CREATE_RESOURCE_GROUP" value="0" />
+      <option name="AZURE_SQL_DATABASE_RESOURCE_GROUP_NAME" value="" />
+      <option name="AZURE_SQL_DATABASE_IS_CREATE_SQL_SERVER" value="0" />
+      <option name="AZURE_SQL_DATABASE_SQL_SERVER_ID" value="" />
+      <option name="AZURE_SQL_DATABASE_SQL_SERVER_NAME" value="" />
+      <option name="AZURE_SQL_DATABASE_SQL_SERVER_ADMIN_LOGIN" value="N/A" />
+      <option name="AZURE_SQL_DATABASE_LOCATION" value="eastus" />
+      <option name="AZURE_SQL_DATABASE_COLLATION" value="SQL_Latin1_General_CP1_CI_AS" />
+      <method v="2" />
+    </configuration>
     <configuration name="Shaker.Client: https" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/src/Shaker.Client/Shaker.Client.csproj" />
       <option name="LAUNCH_PROFILE_TFM" value="net7.0" />
@@ -98,7 +128,9 @@
       <updated>1691154577549</updated>
       <workItem from="1691154578624" duration="5828000" />
       <workItem from="1691172208151" duration="4177000" />
-      <workItem from="1691228603269" duration="16389000" />
+      <workItem from="1691228603269" duration="17595000" />
+      <workItem from="1691318831427" duration="732000" />
+      <workItem from="1691423806706" duration="1529000" />
     </task>
     <task id="LOCAL-00001" summary="add basic web app">
       <option name="closed" value="true" />
@@ -124,7 +156,15 @@
       <option name="project" value="LOCAL" />
       <updated>1691175754004</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Add blob storage;&#10;Finalize basic functionality">
+      <option name="closed" value="true" />
+      <created>1691248859643</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1691248859643</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -146,7 +186,8 @@
     <MESSAGE value="add basic web app" />
     <MESSAGE value="implement basic logic for cocktails" />
     <MESSAGE value="add bar.json. And fix cocktails page." />
-    <option name="LAST_COMMIT_MESSAGE" value="add bar.json. And fix cocktails page." />
+    <MESSAGE value="Add blob storage;&#10;Finalize basic functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add blob storage;&#10;Finalize basic functionality" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

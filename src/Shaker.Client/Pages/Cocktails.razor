@@ -6,11 +6,11 @@
 
 <PageTitle>Available cocktails</PageTitle>
 
-<h1>Available cocktails</h1>
+<h1>Доступні коктейлі</h1>
 
 @if(_loading) {
     <p>
-        <em>Loading...</em>
+        <em>Завантаження...</em>
     </p>
 }
 else {
@@ -21,30 +21,30 @@ else {
     }
     else if (_ingredientsEmpty) {
         <p>
-            <em>Ingredients are not set</em>
+            <em>Інгрідієнти недоступні</em>
         </p>
     }
     else if (_myIngredientsEmpty) {
         <p>
-            <em>Bar is empty. Add some ingredients.</em>
+            <em>Бар порожній. Додайте інгрідієнти.</em>
         </p>
     }
     else if(_cocktailsEmpty) {
         <p>
-            <em>Cocktail recipes are not set</em>
+            <em>Коктейлі недоступні</em>
         </p>
     } else if (_availableCocktails.Count == 0) {
         <p>
-            <em>No cocktails can be made with available ingredients</em>
+            <em>Із наявних інгрідієнтів неможливо створити коктейль</em>
         </p>
     }
     else {
         <table class="table">
             <thead>
             <tr>
-                <th>Cocktail</th>
-                <th>Ingredients</th>
-                <th>Recipe</th>
+                <th>Коктейль</th>
+                <th>Інгрідієнти</th>
+                <th>Рецепт</th>
             </tr>
             </thead>
             <tbody>

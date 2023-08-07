@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Azure.Storage.Blobs;
 using Shaker.Client.Common;
 using Shaker.Client.Dtos;
@@ -40,7 +41,11 @@ public sealed class DataService {
     
     private async Task UpdateJsonAsync<T>(string jsonName, T data) {
         var blobContainerClient = _blobServiceClient.GetBlobContainerClient(Constants.ContainerName);
-        var json = JsonSerializer.Serialize(data);
+        var serializeOptions = new JsonSerializerOptions(JsonSerializerOptions.Default)
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+        var json = JsonSerializer.Serialize(data, serializeOptions);
         var bytes = Encoding.UTF8.GetBytes(json);
 
         using var memoryStream = new MemoryStream(bytes);

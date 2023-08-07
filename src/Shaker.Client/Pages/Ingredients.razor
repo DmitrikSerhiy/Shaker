@@ -7,11 +7,11 @@
 
 <PageTitle>Ingredients</PageTitle>
 
-<h1>Available ingredients</h1>
+<h1>Інгрідієнти</h1>
 
 @if(_loading) {
     <p>
-        <em>Loading...</em>
+        <em>Завантаження...</em>
     </p>
 }
 else {
@@ -22,33 +22,36 @@ else {
     }
     else if (_ingredientsEmpty) {
         <p>
-            <em>Ingredients are not set</em>
-        </p>
-    }
-    else if (_myIngredientsEmpty) {
-        <p>
-            <em>Bar is empty. Add some ingredients.</em>
+            <em>Інгрідієнти недоступні</em>
         </p>
     }
     else {
         <div>
             <select @bind="_selectedIngredientId">
+                <option value="-1">Обрати інгрідієнт</option>
                 @foreach (var ingredient in _allIngredients.Except(_bar!.Ingredients)) {
                     <option value="@ingredient.Id">@ingredient.Name</option>
                 }
             </select>
-            <button @onclick="async () => { await BarService.AddToBarAsync(new Ingredient { Id = _selectedIngredientId }); await Refresh(); }">Add to Bar</button>
+            <button @onclick="async () => { if (_selectedIngredientId == -1) {return;} await BarService.AddToBarAsync(new Ingredient { Id = _selectedIngredientId }); await Refresh(); }">Додати до бару</button>
         </div>
 
-        <div>
-            <ul>
-                @foreach (var ingredient in _bar.Ingredients) {
-                    <li>
-                        @ingredient.Name <button @onclick="async () => { await BarService.RemoveFromBarAsync(ingredient); await Refresh(); }">Remove</button>
-                    </li>
-                }
-            </ul>
-        </div>
+        @if (_myIngredientsEmpty) {
+            <p>
+                <em>Бар порожній. Додайте інгрідієнти.</em>
+            </p>
+        }
+        else {
+            <div>
+                <ul>
+                    @foreach (var ingredient in _bar.Ingredients) {
+                        <li>
+                            @ingredient.Name <button @onclick="async () => { await BarService.RemoveFromBarAsync(ingredient); await Refresh(); }">Прибрати</button>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
     }
 }
 
@@ -60,7 +63,7 @@ else {
     private bool _failed;
     private string _errorMessage = "";
     
-    private int _selectedIngredientId;
+    private int _selectedIngredientId = -1;
     private List<Ingredient>_allIngredients = new();
     private Bar? _bar;
 
@@ -87,7 +90,7 @@ else {
 
     private async Task Refresh() {
         _loading = true;
-        _selectedIngredientId = 0;
+        _selectedIngredientId = -1;
         _ingredientsEmpty = false;
         _myIngredientsEmpty = false;
         _failed = false;
