@@ -9,12 +9,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bfdc1d25-7efb-40fc-8b6b-2aa96f6263e4" name="Changes" comment="">
+    <list default="true" id="bfdc1d25-7efb-40fc-8b6b-2aa96f6263e4" name="Changes" comment="fix layout;&#10;add ua language;">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Shaker/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Shaker/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Pages/Cocktails.razor" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Pages/Cocktails.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Pages/Ingredients.razor" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Pages/Ingredients.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Dtos/Cocktail.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Dtos/Cocktail.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Dtos/Ingredient.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Dtos/Ingredient.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Services/DataService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Services/DataService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Shaker.Client/Shared/NavMenu.razor" beforeDir="false" afterPath="$PROJECT_DIR$/src/Shaker.Client/Shared/NavMenu.razor" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +33,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/22a005fa64e6f24e7e2cf5ffcdb7cc513145cf3c87aaa1741a7290bac4bde9/HttpClientJsonExtensions.Get.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6356ae73dd3569b18875c1ca487c878c7f4523b524d58e1adf71e9aed9cc9a/BlobUploadOptions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://E:/projects/Shaker/src/Shaker.Client/App.razor" root0="SKIP_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" root2="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -130,7 +130,7 @@
       <workItem from="1691172208151" duration="4177000" />
       <workItem from="1691228603269" duration="17595000" />
       <workItem from="1691318831427" duration="732000" />
-      <workItem from="1691423806706" duration="1529000" />
+      <workItem from="1691423806706" duration="3264000" />
     </task>
     <task id="LOCAL-00001" summary="add basic web app">
       <option name="closed" value="true" />
@@ -164,7 +164,15 @@
       <option name="project" value="LOCAL" />
       <updated>1691248859643</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="fix layout;&#10;add ua language;">
+      <option name="closed" value="true" />
+      <created>1691425581034</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1691425581034</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -187,7 +195,8 @@
     <MESSAGE value="implement basic logic for cocktails" />
     <MESSAGE value="add bar.json. And fix cocktails page." />
     <MESSAGE value="Add blob storage;&#10;Finalize basic functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add blob storage;&#10;Finalize basic functionality" />
+    <MESSAGE value="fix layout;&#10;add ua language;" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix layout;&#10;add ua language;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

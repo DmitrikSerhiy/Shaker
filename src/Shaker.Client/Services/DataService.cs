@@ -9,19 +9,45 @@ namespace Shaker.Client.Services;
 
 public sealed class DataService {
     private readonly BlobServiceClient _blobServiceClient;
+    
+    private List<Cocktail>? _cachedCocktails;
+    private List<Ingredient>? _cachedIngredients;
 
      public DataService(string connectionString) {
          _blobServiceClient = new BlobServiceClient(connectionString);
      }
     
     public async Task<List<Cocktail>> LoadCocktailsAsync() {
+        if (_cachedCocktails != null)
+        {
+            return _cachedCocktails;
+        }
+        
         var loadedCocktails = await GetJsonAsync<List<Cocktail?>>(Constants.CocktailsUrl);
-        return loadedCocktails?.Where(c => c != null).Select(c => c!).ToList() ?? new List<Cocktail>();
+        _cachedCocktails = loadedCocktails?.Where(c => c != null).Select(c => c!).ToList() ?? new List<Cocktail>();
+        _cachedCocktails.Sort();
+        return _cachedCocktails;
     }
     
     public async Task<List<Ingredient>> LoadIngredientsAsync() {
+        if (_cachedIngredients != null)
+        {
+            return _cachedIngredients;
+        }
+        
         var loadedIngredients = await GetJsonAsync<List<Ingredient?>>(Constants.IngredientsUrl);
-        return loadedIngredients?.Where(i => i != null).Select(i => i!).ToList() ?? new List<Ingredient>();
+        _cachedIngredients = loadedIngredients?.Where(i => i != null).Select(i => i!).ToList() ?? new List<Ingredient>();
+        _cachedIngredients.Sort();
+        return _cachedIngredients;
+    }
+
+    public async Task SetCocktailsAndIngredientsCache() {
+        var tasks = new List<Task> {
+            LoadCocktailsAsync(),
+            LoadIngredientsAsync()
+        };
+
+        await Task.WhenAll(tasks);
     }
     
     public async Task<Bar?> LoadBarAsync() {
@@ -31,7 +57,6 @@ public sealed class DataService {
     public async Task UpdateBarAsync(Bar bar) { 
         await UpdateJsonAsync(Constants.BarUrl, bar);
     }
-
 
     private async Task<T?> GetJsonAsync<T>(string jsonName) {
         var blobClient = _blobServiceClient.GetBlobContainerClient(Constants.ContainerName).GetBlobClient(jsonName);

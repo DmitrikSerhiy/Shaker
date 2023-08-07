@@ -1,6 +1,9 @@
 ﻿namespace Shaker.Client.Dtos; 
 
-public sealed record Ingredient {
+public sealed record Ingredient : IComparable<Ingredient> {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
+    public int CompareTo(Ingredient? other) {
+        return other == null ? 1 : string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
+    }
 }
