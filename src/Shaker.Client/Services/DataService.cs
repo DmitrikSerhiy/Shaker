@@ -12,6 +12,8 @@ public sealed class DataService {
     
     private List<Cocktail>? _cachedCocktails;
     private List<Ingredient>? _cachedIngredients;
+    private Bar? _cachedBar;
+
 
      public DataService(string connectionString) {
          _blobServiceClient = new BlobServiceClient(connectionString);
@@ -51,11 +53,16 @@ public sealed class DataService {
     }
     
     public async Task<Bar?> LoadBarAsync() {
-        return await GetJsonAsync<Bar?>(Constants.BarUrl);
+        if (_cachedBar != null) {
+            return _cachedBar;
+        }
+        _cachedBar = await GetJsonAsync<Bar?>(Constants.BarUrl);
+        return _cachedBar;
     }
     
-    public async Task UpdateBarAsync(Bar bar) { 
+    public async Task UpdateBarAsync(Bar bar) {
         await UpdateJsonAsync(Constants.BarUrl, bar);
+        _cachedBar = null;
     }
 
     private async Task<T?> GetJsonAsync<T>(string jsonName) {
