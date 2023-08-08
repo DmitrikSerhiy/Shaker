@@ -3,6 +3,8 @@
 @using Shaker.Client.Dtos
 @inject CocktailService CocktailService
 @inject DataService DataService
+@implements IDisposable
+
 
 <PageTitle>Available cocktails</PageTitle>
 
@@ -39,6 +41,8 @@ else {
         </p>
     }
     else {
+        <input type="text" @bind="_searchQuery" @oninput="OnInput" placeholder="Знайти коктейль, інгрідієнт..." />
+        
         <table class="table">
             <thead>
             <tr>
@@ -48,7 +52,7 @@ else {
             </tr>
             </thead>
             <tbody>
-            @foreach (var cocktail in _availableCocktails) {
+            @foreach (var cocktail in _searchedCocktails) {
                 <tr>
                     <td>@cocktail.Name</td>
                     <td>@string.Join(", ", cocktail.Ingredients.Select(i => i.Name))</td>
@@ -62,6 +66,7 @@ else {
 
 @code {
     private List<Cocktail> _availableCocktails = new();
+    private List<Cocktail> _searchedCocktails = new();
     
     private bool _ingredientsEmpty;
     private bool _cocktailsEmpty;
@@ -70,11 +75,16 @@ else {
     private bool _loading = true;
     private bool _failed;
     private string _errorMessage = "";
+    
+    private string _searchQuery = "";
+    private Timer? _debounceSearchTimer;
+
 
     protected override async Task OnInitializedAsync() {
         List<Cocktail> allCocktails;
         List<Ingredient> allIngredients;
         Bar? bar;
+        _debounceSearchTimer = new Timer(Search, null, Timeout.Infinite, Timeout.Infinite);
 
         try {
             allCocktails = await DataService.LoadCocktailsAsync();
@@ -135,6 +145,32 @@ else {
         }
 
         _availableCocktails = CocktailService.GetAvailableCocktails(bar.Ingredients, allCocktails).ToList();
+        _searchedCocktails = _availableCocktails.ToList();
         _loading = false;
     }
+
+    private void OnInput(ChangeEventArgs e)
+    {
+        _searchQuery = e.Value?.ToString() ?? "";
+        _debounceSearchTimer!.Change(250, Timeout.Infinite);
+    }
+    
+    private async void Search(object state)
+    {
+        await InvokeAsync(() => {
+            _searchedCocktails = string.IsNullOrWhiteSpace(_searchQuery) 
+                ? _availableCocktails 
+                : _availableCocktails
+                    .Where(c => 
+                        c.Name.Contains(_searchQuery, StringComparison.InvariantCultureIgnoreCase) || 
+                        c.Ingredients.Any(i => i.Name.Contains(_searchQuery, StringComparison.InvariantCultureIgnoreCase)))
+                    .ToList();
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose() {
+        _debounceSearchTimer?.Dispose();
+    }
+
 }

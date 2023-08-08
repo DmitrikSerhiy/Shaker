@@ -20,6 +20,7 @@ public sealed class BarService {
         }
         
         bar.Ingredients.Add(new Ingredient {Id = ingredient.Id});
+        bar.Ingredients = bar.Ingredients.Select(i => new Ingredient { Id = i.Id }).ToList();
         await _dataService.UpdateBarAsync(bar);
     }
 
