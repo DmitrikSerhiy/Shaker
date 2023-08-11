@@ -6,7 +6,7 @@
 
 <PageTitle>Інгрідієнти</PageTitle>
 <div class="container text-center">
-    <h3>Інгрідієнти</h3>
+    <h2>Інгрідієнти</h2>
 </div>
 
 @if(_loading) {
@@ -27,14 +27,14 @@ else {
     }
     else {
         <div class="container text-center">
-            <select @bind="_selectedIngredientId" class="form-select form-select-lg mb-3" aria-label="Large select example">
+            <select @bind="_selectedIngredientId" class="form-select form-select mb-3" style="padding: 1rem" aria-label="Large select example">
                 <option value="-1">Обрати інгрідієнт</option>
                 @foreach (var ingredient in _allIngredients.Except(_bar!.Ingredients)) {
                     <option value="@ingredient.Id">@ingredient.Name</option>
                 }
             </select>
             
-            <button type="button" class="btn btn-primary" @onclick="async () => await AddToBarAsync(_selectedIngredientId)">Додати до бару</button>
+            <button type="button" class="btn btn-link mb-3" @onclick="async () => await AddToBarAsync(_selectedIngredientId)">Додати до бару</button>
             
             @if (_myIngredientsEmpty) {
                 <p>

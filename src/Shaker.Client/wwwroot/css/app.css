@@ -1,7 +1,24 @@
-@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+@font-face {
+    font-family: 'DynaPuff';
+    src: url('fonts/DynaPuff-VariableFont_wdth,wght.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'DynaPuff', cursive !important;
+}
+
+h1 {
+    font-size: 3em !important;
+}
+
+h2 {
+    font-size: 1.5em !important;
+}
+
+h1, h2, h3, h4 {
+    margin-bottom: 1rem !important;
 }
 
 h1:focus {
