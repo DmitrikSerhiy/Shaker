@@ -6,7 +6,9 @@
 @implements IDisposable
 
 <PageTitle>Коктельна карта</PageTitle>
-<h1>Коктельна карта</h1>
+<div class="container text-center">
+    <h1>Коктельна карта</h1>
+</div>
 
 @if(_loading) {
     <p>
@@ -30,32 +32,18 @@ else {
         </p>
     }
     else {
-        <input type="text" @bind="_searchQuery" @oninput="OnInput" placeholder="Знайти коктейль, інгрідієнт..." />
         
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Коктейль</th>
-                <th>Інгрідієнти</th>
-                <th>Рецепт</th>
-                <th>Шот</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var cocktail in _searchedCocktails) {
-                <tr>
-                    <td>@cocktail.Name</td>
-                    <td>@string.Join(", ", cocktail.Ingredients.Select(i => i.Name))</td>
-                    <td>@cocktail.Recipe</td>
-                    <td>
-                        @if (cocktail.Type == CocktailType.Shot) {
-                            <span>+</span>
-                        }
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
+        <div class="container text-center">
+            <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Знайти"  @bind="_searchQuery" @oninput="OnInput">
+                <div style="text-align: left!important;">назва або інгрідієнт</div>
+            </div>
+            <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
+                @foreach (var cocktail in _searchedCocktails) {
+                    <CocktailCard Cocktail="cocktail"></CocktailCard>
+                }
+            </div>
+        </div>
     }
 }
 
@@ -132,13 +120,7 @@ else {
     private async void Search(object? state)
     {
         await InvokeAsync(() => {
-            _searchedCocktails = string.IsNullOrWhiteSpace(_searchQuery) 
-                ? _allCocktails 
-                : _allCocktails
-                    .Where(c => 
-                        c.Name.Contains(_searchQuery, StringComparison.InvariantCultureIgnoreCase) || 
-                        c.Ingredients.Any(i => i.Name.Contains(_searchQuery, StringComparison.InvariantCultureIgnoreCase)))
-                    .ToList();
+            _searchedCocktails = SearchHelper.Search(_allCocktails, _searchQuery);
             StateHasChanged();
         });
     }
