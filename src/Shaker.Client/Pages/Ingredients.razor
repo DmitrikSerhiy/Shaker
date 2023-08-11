@@ -5,7 +5,9 @@
 @inject BarService BarService
 
 <PageTitle>Інгрідієнти</PageTitle>
-<h1>Інгрідієнти</h1>
+<div class="container text-center">
+    <h1>Інгрідієнти</h1>
+</div>
 
 @if(_loading) {
     <p>
@@ -20,36 +22,36 @@ else {
     }
     else if (_ingredientsEmpty) {
         <p>
-            <em>Інгрідієнти недоступні</em>
+            <em>Інгрідієнти недоступні.</em>
         </p>
     }
     else {
-        <div>
-            <select @bind="_selectedIngredientId">
+        <div class="container text-center">
+            <select @bind="_selectedIngredientId" class="form-select form-select-lg mb-3" aria-label="Large select example">
                 <option value="-1">Обрати інгрідієнт</option>
                 @foreach (var ingredient in _allIngredients.Except(_bar!.Ingredients)) {
                     <option value="@ingredient.Id">@ingredient.Name</option>
                 }
             </select>
-            <button @onclick="async () => { if (_selectedIngredientId == -1) {return;} await BarService.AddToBarAsync(new Ingredient { Id = _selectedIngredientId }); await Refresh(); }">Додати до бару</button>
-        </div>
-
-        @if (_myIngredientsEmpty) {
-            <p>
-                <em>Бар порожній. Додайте інгрідієнти.</em>
-            </p>
-        }
-        else {
-            <div>
-                <ul>
+            
+            <button type="button" class="btn btn-primary" @onclick="async () => await AddToBarAsync(_selectedIngredientId)">Додати до бару</button>
+            
+            @if (_myIngredientsEmpty) {
+                <p>
+                    <em>Бар порожній. Додайте інгрідієнти.</em>
+                </p>
+            }
+            else {
+                <ul class="list-group list-group-flush list-group-item-action">
                     @foreach (var ingredient in _bar.Ingredients) {
-                        <li>
-                            @ingredient.Name <button @onclick="async () => { await BarService.RemoveFromBarAsync(ingredient); await Refresh(); }">Прибрати</button>
+                        <li class="list-group-item list-group-item-action" style="display: flex; justify-content: space-between; align-items: center">
+                            @ingredient.Name 
+                            <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient)">Прибрати</button>
                         </li>
                     }
                 </ul>
-            </div>
-        }
+            }
+        </div>
     }
 }
 
@@ -114,5 +116,18 @@ else {
             _errorMessage = "Failed to load your bar ingredients";
             _loading = false;
         }
+    }
+
+    private async Task AddToBarAsync(int ingredientToAddId) {
+        if (ingredientToAddId == -1) {
+            return;
+        } 
+        await BarService.AddToBarAsync(new Ingredient { Id = ingredientToAddId }); 
+        await Refresh();
+    }
+
+    private async Task RemoveFromBarAsync(Ingredient ingredientToRemove) {
+        await BarService.RemoveFromBarAsync(ingredientToRemove);
+        await Refresh(); 
     }
 }
