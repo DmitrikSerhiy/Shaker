@@ -2,14 +2,11 @@
 @using Shaker.Client.Services
 @using Shaker.Client.Dtos
 @using Shaker.Client.Helpers
-@inject CocktailService CocktailService
 @inject DataService DataService
 @implements IDisposable
 
-
-<PageTitle>Available cocktails</PageTitle>
-
-<h1>Доступні коктейлі</h1>
+<PageTitle>Коктельна карта</PageTitle>
+<h1>Коктельна карта</h1>
 
 @if(_loading) {
     <p>
@@ -24,21 +21,12 @@ else {
     }
     else if (_ingredientsEmpty) {
         <p>
-            <em>Інгрідієнти недоступні</em>
-        </p>
-    }
-    else if (_myIngredientsEmpty) {
-        <p>
-            <em>Бар порожній. Додайте інгрідієнти.</em>
+            <em>Інгрідієнти недоступні.</em>
         </p>
     }
     else if(_cocktailsEmpty) {
         <p>
-            <em>Коктейлі недоступні</em>
-        </p>
-    } else if (_availableCocktails.Count == 0) {
-        <p>
-            <em>Із наявних інгрідієнтів неможливо створити коктейль</em>
+            <em>Коктейлі недоступні.</em>
         </p>
     }
     else {
@@ -72,12 +60,11 @@ else {
 }
 
 @code {
-    private List<Cocktail> _availableCocktails = new();
+    private List<Cocktail> _allCocktails = new();
     private List<Cocktail> _searchedCocktails = new();
     
     private bool _ingredientsEmpty;
     private bool _cocktailsEmpty;
-    private bool _myIngredientsEmpty;
     
     private bool _loading = true;
     private bool _failed;
@@ -88,14 +75,13 @@ else {
 
 
     protected override async Task OnInitializedAsync() {
-        List<Cocktail> allCocktails;
         List<Ingredient> allIngredients;
-        Bar? bar;
         _debounceSearchTimer = new Timer(Search, null, Timeout.Infinite, Timeout.Infinite);
 
         try {
-            allCocktails = await DataService.LoadCocktailsAsync();
-            if (allCocktails.Count == 0) {
+            _allCocktails = await DataService.LoadCocktailsAsync();
+            _searchedCocktails = _allCocktails.ToList();
+            if (_allCocktails.Count == 0) {
                 _cocktailsEmpty = true;
                 _loading = false;
                 return;
@@ -122,7 +108,7 @@ else {
         }
 
         try {
-            foreach(var cocktail in allCocktails) {
+            foreach(var cocktail in _allCocktails) {
                 cocktail.Ingredients = allIngredients
                     .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                     .ToList();
@@ -134,25 +120,6 @@ else {
             return;
         }
 
-        try {
-            bar = await DataService.LoadBarAsync();
-            if (bar == null || bar.Ingredients.Count == 0) {
-                _loading = false;
-                _myIngredientsEmpty = true;
-                return;
-            }
-            bar.Ingredients = allIngredients
-                .Where(ingredient => bar.Ingredients.Any(i => i.Id == ingredient.Id))
-                .ToList();
-        } catch {
-            _failed = true;
-            _errorMessage = "Failed to load your bar ingredients";
-            _loading = false;
-            return;
-        }
-
-        _availableCocktails = CocktailService.GetAvailableCocktails(bar.Ingredients, allCocktails).ToList();
-        _searchedCocktails = _availableCocktails.ToList();
         _loading = false;
     }
 
@@ -162,12 +129,12 @@ else {
         _debounceSearchTimer!.Change(250, Timeout.Infinite);
     }
     
-    private async void Search(object state)
+    private async void Search(object? state)
     {
         await InvokeAsync(() => {
             _searchedCocktails = string.IsNullOrWhiteSpace(_searchQuery) 
-                ? _availableCocktails 
-                : _availableCocktails
+                ? _allCocktails 
+                : _allCocktails
                     .Where(c => 
                         c.Name.Contains(_searchQuery, StringComparison.InvariantCultureIgnoreCase) || 
                         c.Ingredients.Any(i => i.Name.Contains(_searchQuery, StringComparison.InvariantCultureIgnoreCase)))

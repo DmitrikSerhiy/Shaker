@@ -1,10 +1,179 @@
 @page "/"
-<h1>Шейкер</h1>
+@using Shaker.Client.Services
+@using Shaker.Client.Dtos
+@inject CocktailService CocktailService
+@inject DataService DataService
+@implements IDisposable
 
-<p>
-    Мій бар - мої правила.
-</p>
+<PageTitle>Шейкер</PageTitle>
+<h1>Приготувати зараз</h1>
+<h4>Мій бар - мої правила.</h4>
+
+@if(_loading) {
+    <p>
+        <em>Завантаження...</em>
+    </p>
+}
+else {
+    if (_failed) {
+        <p>
+            <em>@_errorMessage</em>
+        </p>
+    }
+    else if (_ingredientsEmpty) {
+        <p>
+            <em>Інгрідієнти недоступні.</em>
+        </p>
+    }
+    else if (_myIngredientsEmpty) {
+        <p>
+            <em>Бар порожній. Додайте інгрідієнти.</em>
+        </p>
+    }
+    else if(_cocktailsEmpty) {
+        <p>
+            <em>Коктейлі недоступні.</em>
+        </p>
+    } else if (_availableCocktails.Count == 0) {
+        <p>
+            <em>Неможливо створити коктейль із наявних інгрідієнтів.</em>
+        </p>
+    }
+    else {
+        
+        <div class="container text-center">
+            <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Знайти"  @bind="_searchQuery" @oninput="OnInput">
+                <div style="text-align: left!important;">назва або інгрідієнт</div>
+            </div>
+            <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
+                @foreach (var cocktail in _searchedCocktails) {
+                    <div class="col mb-3">
+                        <div class="card mx-auto">
+                            @* <img src="..." class="card-img-top" alt="..."> *@
+                            <div class="card-body">
+                                <h5 class="card-title">@cocktail.Name</h5>
+                                <p class="card-text">@cocktail.Recipe</p>
+                            </div>
+                            <ul class="list-group list-group-flush text-left">
+                                @foreach (var ingredient in cocktail.Ingredients) {
+                                    <li class="list-group-item">@ingredient.Name</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
 
 @code {
+    private List<Cocktail> _availableCocktails = new();
+    private List<Cocktail> _searchedCocktails = new();
     
+    private bool _ingredientsEmpty;
+    private bool _cocktailsEmpty;
+    private bool _myIngredientsEmpty;
+    
+    private bool _loading = true;
+    private bool _failed;
+    private string _errorMessage = "";
+    
+    private string _searchQuery = "";
+    private Timer? _debounceSearchTimer;
+
+
+    protected override async Task OnInitializedAsync() {
+        List<Cocktail> allCocktails;
+        List<Ingredient> allIngredients;
+        Bar? bar;
+        _debounceSearchTimer = new Timer(Search, null, Timeout.Infinite, Timeout.Infinite);
+
+        try {
+            allCocktails = await DataService.LoadCocktailsAsync();
+            if (allCocktails.Count == 0) {
+                _cocktailsEmpty = true;
+                _loading = false;
+                return;
+            }
+        } catch {
+            _failed = true;
+            _errorMessage = "Failed to load cocktail recipes";
+            _loading = false;
+            return;
+        }
+        
+        try {
+            allIngredients = await DataService.LoadIngredientsAsync();
+            if (allIngredients.Count == 0) {
+                _ingredientsEmpty = true;
+                _loading = false;
+                return;
+            }
+        } catch {
+            _failed = true;
+            _errorMessage = "Failed to load ingredients";
+            _loading = false;
+            return;
+        }
+
+        try {
+            foreach(var cocktail in allCocktails) {
+                cocktail.Ingredients = allIngredients
+                    .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
+                    .ToList();
+            }
+        } catch {
+            _failed = true;
+            _errorMessage = "Failed to load cocktails ingredients";
+            _loading = false;
+            return;
+        }
+
+        try {
+            bar = await DataService.LoadBarAsync();
+            if (bar == null || bar.Ingredients.Count == 0) {
+                _loading = false;
+                _myIngredientsEmpty = true;
+                return;
+            }
+            bar.Ingredients = allIngredients
+                .Where(ingredient => bar.Ingredients.Any(i => i.Id == ingredient.Id))
+                .ToList();
+        } catch {
+            _failed = true;
+            _errorMessage = "Failed to load your bar ingredients";
+            _loading = false;
+            return;
+        }
+
+        _availableCocktails = CocktailService.GetAvailableCocktails(bar.Ingredients, allCocktails).ToList();
+        _searchedCocktails = _availableCocktails.ToList();
+        _loading = false;
+    }
+
+    private void OnInput(ChangeEventArgs e)
+    {
+        _searchQuery = e.Value?.ToString() ?? "";
+        _debounceSearchTimer!.Change(250, Timeout.Infinite);
+    }
+    
+    private async void Search(object? state)
+    {
+        await InvokeAsync(() => {
+            _searchedCocktails = string.IsNullOrWhiteSpace(_searchQuery) 
+                ? _availableCocktails 
+                : _availableCocktails
+                    .Where(c => 
+                        c.Name.Contains(_searchQuery, StringComparison.InvariantCultureIgnoreCase) || 
+                        c.Ingredients.Any(i => i.Name.Contains(_searchQuery, StringComparison.InvariantCultureIgnoreCase)))
+                    .ToList();
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose() {
+        _debounceSearchTimer?.Dispose();
+    }
 }

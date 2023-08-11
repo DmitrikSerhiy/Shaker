@@ -12,10 +12,4 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.5" PrivateAssets="all" />
     </ItemGroup>
 
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\data\bar.json" />
-      <_ContentIncludedByDefault Remove="wwwroot\data\cocktails.json" />
-      <_ContentIncludedByDefault Remove="wwwroot\data\ingredients.json" />
-    </ItemGroup>
-
 </Project>
