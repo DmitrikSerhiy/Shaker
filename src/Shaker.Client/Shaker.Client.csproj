@@ -12,4 +12,12 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.5" PrivateAssets="all" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\FixelVariable.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\Pomidorko_cyr.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\ReImagineUAMalevichVF.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\ReImagineUAMalevichVF.woff" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\ReImagineUAMalevichVF.woff2" />
+    </ItemGroup>
+
 </Project>
