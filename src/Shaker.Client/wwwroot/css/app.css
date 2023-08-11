@@ -1,5 +1,12 @@
+@font-face {
+    font-family: 'Pomidorko';
+    src: url('fonts/Pomidorko_cyr.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
 html, body {
-    font-family: 'DynaPuff', cursive !important;
+    font-family: 'Pomidorko', cursive !important;
 }
 
 h1 {
