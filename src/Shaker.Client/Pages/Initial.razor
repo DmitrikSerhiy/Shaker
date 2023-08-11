@@ -8,8 +8,7 @@
 
 <PageTitle>Шейкер</PageTitle>
 <div class="container text-center">
-    <h1>Приготувати зараз</h1>
-    <h4>Мій бар - мої правила.</h4>
+    <h3>Приготувати зараз</h3>
 </div>
 
 @if(_loading) {
@@ -46,7 +45,7 @@ else {
         <div class="container text-center">
             <div class="mb-3">
                 <input type="text" class="form-control" placeholder="Знайти"  @bind="_searchQuery" @oninput="OnInput">
-                <div style="text-align: left!important;">назва або інгрідієнт</div>
+                <div class="text-secondary" style="text-align: left!important;">назва або інгрідієнт</div>
             </div>
             <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
                 @foreach (var cocktail in _searchedCocktails) {
