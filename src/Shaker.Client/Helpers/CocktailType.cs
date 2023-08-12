@@ -1,6 +1,7 @@
 namespace Shaker.Client.Helpers; 
 
 public enum CocktailType {
-    Shot = 0,
-    LongDrink
+    None = 0,
+    LongDrink = 1,
+    Shot = 2
 }

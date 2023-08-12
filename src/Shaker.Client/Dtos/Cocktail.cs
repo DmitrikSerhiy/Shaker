@@ -9,7 +9,10 @@ public sealed record Cocktail : IComparable<Cocktail> {
     public CocktailType Type { get; set; }
     public bool IsClassic { get; set; }
     public bool IsMine { get; set; }
+    public GlassType GlassType { get; set; }
     public List<Ingredient> Ingredients { get; set; } = new();
+    public List<Ingredient>? OptionalIngredients { get; set; }
+
     public int CompareTo(Cocktail? other) {
         return other == null ? 1 : string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
     }
