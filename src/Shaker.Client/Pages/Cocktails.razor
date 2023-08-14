@@ -8,43 +8,34 @@
 <PageTitle>Коктельна карта</PageTitle>
 <div class="container text-center">
     <h2>Коктельна карта</h2>
-</div>
-
-@if(_loading) {
-    <p>
-        <em>Завантаження...</em>
-    </p>
-}
-else {
-    if (_failed) {
-        <p>
-            <em>@_errorMessage</em>
-        </p>
-    }
-    else if (_ingredientsEmpty) {
-        <p>
-            <em>Інгрідієнти недоступні.</em>
-        </p>
-    }
-    else if(_cocktailsEmpty) {
-        <p>
-            <em>Коктейлі недоступні.</em>
-        </p>
+    
+    @if(_loading) {
+        <p>Завантаження...</p>
     }
     else {
-        
-        <div class="container text-center">
+        if (_failed) {
+            <p>@_errorMessage</p>
+        }
+        else if (_ingredientsEmpty) {
+            <p>Інгрідієнти недоступні.</p>
+        }
+        else if(_cocktailsEmpty) {
+            <p>Коктейлі недоступні.</p>
+        }
+        else {
+
             <div class="mb-3">
                 <input type="text" class="form-control" placeholder="Знайти за назвою або рецептом"  @bind="_searchQuery" @oninput="OnInput">
             </div>
             <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
                 @foreach (var cocktail in _searchedCocktails) {
-                    <CocktailCard Cocktail="cocktail"></CocktailCard>
+                    <CocktailCard Cocktail="cocktail" IgnoreFavorites=true></CocktailCard>
                 }
             </div>
-        </div>
+ 
+        }
     }
-}
+</div>
 
 @code {
     private List<Cocktail> _allCocktails = new();

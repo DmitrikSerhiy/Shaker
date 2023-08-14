@@ -1,23 +1,19 @@
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Azure.Storage.Blobs;
 using Shaker.Client.Common;
 using Shaker.Client.Dtos;
 
 namespace Shaker.Client.Services; 
 
 public sealed class DataService {
-    private readonly BlobServiceClient _blobServiceClient;
-    
+    private readonly IRepository _repository;
+
     private List<Cocktail>? _cachedCocktails;
     private List<Ingredient>? _cachedIngredients;
     private Bar? _cachedBar;
 
 
-     public DataService(string connectionString) {
-         _blobServiceClient = new BlobServiceClient(connectionString);
-     }
+    public DataService(IRepository repository) {
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+    }
     
     public async Task<List<Cocktail>> LoadCocktailsAsync() {
         if (_cachedCocktails != null)
@@ -25,7 +21,7 @@ public sealed class DataService {
             return _cachedCocktails;
         }
         
-        var loadedCocktails = await GetJsonAsync<List<Cocktail?>>(Constants.CocktailsUrl);
+        var loadedCocktails = await _repository.GetData<List<Cocktail?>>(ShakerConstants.CocktailsUrl);
         _cachedCocktails = loadedCocktails?.Where(c => c != null).Select(c => c!).ToList() ?? new List<Cocktail>();
         _cachedCocktails.Sort();
         return _cachedCocktails;
@@ -37,7 +33,7 @@ public sealed class DataService {
             return _cachedIngredients;
         }
         
-        var loadedIngredients = await GetJsonAsync<List<Ingredient?>>(Constants.IngredientsUrl);
+        var loadedIngredients = await _repository.GetData<List<Ingredient?>>(ShakerConstants.IngredientsUrl);
         _cachedIngredients = loadedIngredients?.Where(i => i != null).Select(i => i!).ToList() ?? new List<Ingredient>();
         _cachedIngredients.Sort();
         return _cachedIngredients;
@@ -56,32 +52,14 @@ public sealed class DataService {
         if (_cachedBar != null) {
             return _cachedBar;
         }
-        _cachedBar = await GetJsonAsync<Bar?>(Constants.BarUrl);
+        _cachedBar = await _repository.GetData<Bar?>(ShakerConstants.BarUrl);
         return _cachedBar;
     }
     
     public async Task UpdateBarAsync(Bar bar) {
-        await UpdateJsonAsync(Constants.BarUrl, bar);
+        await _repository.UpdateData(ShakerConstants.BarUrl, bar);
         _cachedBar = null;
     }
 
-    private async Task<T?> GetJsonAsync<T>(string jsonName) {
-        var blobClient = _blobServiceClient.GetBlobContainerClient(Constants.ContainerName).GetBlobClient(jsonName);
-        var response = await blobClient.DownloadContentAsync();
-        return JsonSerializer.Deserialize<T>(response.Value.Content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-    }
-    
-    private async Task UpdateJsonAsync<T>(string jsonName, T data) {
-        var blobContainerClient = _blobServiceClient.GetBlobContainerClient(Constants.ContainerName);
-        var serializeOptions = new JsonSerializerOptions(JsonSerializerOptions.Default)
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
-        var json = JsonSerializer.Serialize(data, serializeOptions);
-        var bytes = Encoding.UTF8.GetBytes(json);
 
-        using var memoryStream = new MemoryStream(bytes);
-        var blobClient = blobContainerClient.GetBlobClient(jsonName);
-        await blobClient.UploadAsync(memoryStream, true);
-    }
 }

@@ -7,26 +7,18 @@
 <PageTitle>Інгрідієнти</PageTitle>
 <div class="container text-center">
     <h2>Інгрідієнти</h2>
-</div>
 
-@if(_loading) {
-    <p>
-        <em>Завантаження...</em>
-    </p>
-}
-else {
-    if (_failed) {
-        <p>
-            <em>@_errorMessage</em>
-        </p>
-    }
-    else if (_ingredientsEmpty) {
-        <p>
-            <em>Інгрідієнти недоступні.</em>
-        </p>
+    @if(_loading) {
+        <p>Завантаження...</p>
     }
     else {
-        <div class="container text-center">
+        if (_failed) {
+            <p>@_errorMessage</p>
+        }
+        else if (_ingredientsEmpty) {
+            <p>Інгрідієнти недоступні.</p>
+        }
+        else {
             <select @bind="_selectedIngredientId" class="form-select form-select mb-3" style="padding: 1rem" aria-label="Large select example">
                 <option value="-1">Обрати інгрідієнт</option>
                 @foreach (var ingredient in _allIngredients.Except(_bar!.Ingredients)) {
@@ -37,9 +29,7 @@ else {
             <button type="button" class="btn btn-link mb-3" @onclick="async () => await AddToBarAsync(_selectedIngredientId)">Додати до бару</button>
             
             @if (_myIngredientsEmpty) {
-                <p>
-                    <em>Бар порожній. Додайте інгрідієнти.</em>
-                </p>
+                <p>Бар порожній. Додайте інгрідієнти.</p>
             }
             else {
                 <ul class="list-group list-group-flush list-group-item-action">
@@ -51,10 +41,9 @@ else {
                     }
                 </ul>
             }
-        </div>
+        }
     }
-}
-
+</div>
 @code {
     private bool _ingredientsEmpty;
     private bool _myIngredientsEmpty;

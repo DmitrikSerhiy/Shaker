@@ -10,7 +10,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped<CocktailService>();
 builder.Services.AddScoped<BarService>();
 builder.Services.AddScoped<DataService>();
-builder.Services.AddSingleton(_ => new DataService("DefaultEndpointsProtocol=https;AccountName=myshaker;AccountKey=l4MNuLavCOal6Y5HnkabSYibXo3n6M2GuoWlAJ1CfZrvkL9pF12BAxAiUT7GOl3Vg+y1KAjChyCq+AStLid1UQ==;EndpointSuffix=core.windows.net"));
+builder.Services.AddSingleton<IRepository, BlobRepository>();
+
 
 var host = builder.Build();
 

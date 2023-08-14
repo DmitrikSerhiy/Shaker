@@ -22,6 +22,12 @@ h1, h2, h3, h4 {
     margin-bottom: 1rem !important;
 }
 
+.favorite-icon {
+    position: absolute;
+    right: 1rem;
+    cursor: pointer;
+}
+
 h1:focus {
     outline: none;
 }
