@@ -1,4 +1,4 @@
-const latestVersion = 7;
+const latestVersion = 3;
 const VERSION = 'v' + latestVersion;
 const baseUrl = 'https://myshaker.blob.core.windows.net/shaker-img/';
 
@@ -64,11 +64,17 @@ const deleteOldCaches = async () => {
     await Promise.all(cachesToDelete.map(deleteCache));
 };
 
-
-const cacheFirst = async ({ request, fallbackUrl }) => {
+const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
     const responseFromCache = await caches.match(request);
     if (responseFromCache) {
         return responseFromCache;
+    }
+
+    const preloadResponse = await preloadResponsePromise;
+    if (preloadResponse) {
+        console.info("using preload response", preloadResponse);
+        putInCache(request, preloadResponse.clone());
+        return preloadResponse;
     }
 
     try {
@@ -80,7 +86,6 @@ const cacheFirst = async ({ request, fallbackUrl }) => {
         if (fallbackResponse) {
             return fallbackResponse;
         }
-
         return new Response("Network error happened", {
             status: 408,
             headers: { "Content-Type": "text/plain" },
@@ -99,17 +104,21 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener("fetch", (event) => {
-    if (defaultFilesToCacheUrls.includes(event.request.url)) {
-        event.respondWith(cacheFirst({
-            request: event.request,
-            fallbackUrl: "/logo-centred.svg",
-        }));
+    if (defaultFilesToCacheUrls.includes(event.request.url) || imagesToCacheUrls.includes(event.request.url)) {
+        event.respondWith(
+            cacheFirst({
+                request: event.request,
+                preloadResponsePromise: event.preloadResponse,
+                fallbackUrl: "/logo-centred.svg",
+            }),
+        );
     } else {
         event.respondWith(fetch(event.request));
     }
 });
 
 self.addEventListener("activate", (event) => {
-    event.waitUntil(enableNavigationPreload());
-    event.waitUntil(deleteOldCaches());
+    event.waitUntil(
+        Promise.all([enableNavigationPreload(), deleteOldCaches()])
+    );
 });
