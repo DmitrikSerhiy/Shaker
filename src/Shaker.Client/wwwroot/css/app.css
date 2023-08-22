@@ -23,9 +23,14 @@ h1, h2, h3, h4 {
 }
 
 .favorite-icon {
+    cursor: pointer;
+}
+
+.favorite-icon-container {
     position: absolute;
     right: 1rem;
-    cursor: pointer;
+    top: 1rem;
+    z-index: 100;
 }
 
 h1:focus {
