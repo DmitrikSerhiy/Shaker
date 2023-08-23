@@ -74,7 +74,7 @@
     
     private async void Search(object? state) {
         await InvokeAsync(() => {
-            _searchedCocktails = SearchHelper.Search(_availableCocktails, _searchQuery);
+            _searchedCocktails = SearchHelper.SearchCocktails(_availableCocktails, _searchQuery);
             StateHasChanged();
         });
     }

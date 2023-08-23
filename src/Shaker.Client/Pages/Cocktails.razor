@@ -109,7 +109,7 @@
     private async void Search(object? state)
     {
         await InvokeAsync(() => {
-            _searchedCocktails = SearchHelper.Search(_allCocktails, _searchQuery);
+            _searchedCocktails = SearchHelper.SearchCocktails(_allCocktails, _searchQuery);
             StateHasChanged();
         });
     }

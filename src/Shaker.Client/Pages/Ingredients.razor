@@ -1,6 +1,7 @@
 ﻿@page "/ingredients"
 @using Shaker.Client.Services
 @using Shaker.Client.Dtos
+@using Shaker.Client.Helpers
 @inject DataService DataService
 @inject BarService BarService
 
@@ -25,14 +26,18 @@
                 }
             </select>
             
-            <button type="button" class="btn btn-link mb-3" @onclick="async () => await AddToBarAsync(_selectedIngredientId)">Додати до бару</button>
+            <button type="button" class="btn btn-link mb-3 @(_selectedIngredientId == -1 ? "disabled" : "")"  @onclick="async () => await AddToBarAsync(_selectedIngredientId)">Додати до бару</button>
+            
+            <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
+            </div>
             
             @if (_myIngredientsEmpty) {
                 <p>Бар порожній. Додайте інгрідієнти.</p>
             }
             else {
                 <ul class="list-group list-group-flush list-group-item-action">
-                    @foreach (var ingredient in _bar.Ingredients) {
+                    @foreach (var ingredient in _searchedIngredients) {
                         <li class="list-group-item list-group-item-action" style="display: flex; justify-content: space-between; align-items: center">
                             @ingredient.Name 
                             <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient)">Прибрати</button>
@@ -52,10 +57,16 @@
     private string _errorMessage = "";
     
     private int _selectedIngredientId = -1;
-    private List<Ingredient>_allIngredients = new();
+    private List<Ingredient> _allIngredients = new();
+    private List<Ingredient> _searchedIngredients = new();
     private Bar? _bar;
+    
+    private string _searchQuery = "";
+    private Timer? _debounceSearchTimer;
 
     protected override async Task OnInitializedAsync() {
+        _debounceSearchTimer = new Timer(Search, null, Timeout.Infinite, Timeout.Infinite);
+
         try {
             _allIngredients = await DataService.LoadIngredientsAsync();
             if (_allIngredients.Count == 0) {
@@ -84,6 +95,7 @@
         _failed = false;
         _errorMessage = "";
         await LoadBarAsync();
+        ResetSearch();
         _loading = false;
     }
     
@@ -98,12 +110,19 @@
             _bar.Ingredients = _allIngredients
                 .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
+
+            _searchedIngredients = _bar.Ingredients.ToList();
         }
         catch {
             _failed = true;
             _errorMessage = "Failed to load your bar ingredients";
             _loading = false;
         }
+    }
+
+    private void ResetSearch() {
+        _searchQuery = "";
+        _searchedIngredients = _bar!.Ingredients;
     }
 
     private async Task AddToBarAsync(int ingredientToAddId) {
@@ -117,5 +136,20 @@
     private async Task RemoveFromBarAsync(Ingredient ingredientToRemove) {
         await BarService.RemoveFromBarAsync(ingredientToRemove);
         await Refresh(); 
+    }
+    
+    
+    private void OnInput(ChangeEventArgs e)
+    {
+        _searchQuery = e.Value?.ToString() ?? "";
+        _debounceSearchTimer!.Change(250, Timeout.Infinite);
+    }
+    
+    private async void Search(object? state)
+    {
+        await InvokeAsync(() => {
+            _searchedIngredients = SearchHelper.SearchIngredients(_bar!.Ingredients, _searchQuery);
+            StateHasChanged();
+        });
     }
 }
