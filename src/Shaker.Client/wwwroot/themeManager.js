@@ -1,5 +1,5 @@
 function setThemeManager() {
-    function setTheme(theme) {
+    const setTheme = theme => {
         if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.setAttribute('data-bs-theme', 'dark')
         } else {
@@ -9,7 +9,7 @@ function setThemeManager() {
 
     setTheme(getPreferredTheme())
 
-    function showActiveTheme(theme, focus = false){
+    const showActiveTheme = (theme, focus = false) => {
         const themeSwitcher = document.querySelector('#dark-switch')
         const themeSwitcherLabel = document.querySelector('#dark-switch-label')
 
@@ -49,9 +49,9 @@ function setThemeManager() {
 }
 
 
-function getStoredTheme() { localStorage.getItem('theme'); }
-function setStoredTheme(theme){ localStorage.setItem('theme', theme); }
-function getPreferredTheme() {
+const getStoredTheme = () => localStorage.getItem('theme');
+const setStoredTheme = theme => localStorage.setItem('theme', theme);
+const getPreferredTheme = () => {
     const storedTheme = getStoredTheme()
     if (storedTheme) {
         return storedTheme
@@ -60,14 +60,14 @@ function getPreferredTheme() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function muteImages() {
+const muteImages = () => {
     document.querySelectorAll('.cocktail-image')
         .forEach(image => {
             image.classList.add('cocktail-image-dark');
         });
 }
 
-function unmuteImages() {
+const unmuteImages = () => {
     document.querySelectorAll('.cocktail-image')
         .forEach(image => {
             image.classList.remove('cocktail-image-dark')
