@@ -1,4 +1,4 @@
-const latestVersion = 3;
+const latestVersion = 4;
 const VERSION = 'v' + latestVersion;
 const baseUrl = 'https://myshaker.blob.core.windows.net/shaker-img/';
 

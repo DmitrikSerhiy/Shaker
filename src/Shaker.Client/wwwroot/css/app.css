@@ -37,6 +37,23 @@ h1:focus {
     outline: none;
 }
 
+.cocktail-image-dark {
+    filter: brightness(0.8);
+    position: relative;
+    display: inline-block;
+}
+
+.cocktail-image-dark::before  {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+}
+
 a, .btn-link {
     color: #0071c1;
 }

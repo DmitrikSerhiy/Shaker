@@ -1,10 +1,11 @@
 ﻿@using Shaker.Client.Dtos
 @using Shaker.Client.Services
+@inject IJSRuntime JSRuntime
 @inject BarService BarService
 
 <div class="col mb-3">
     <div class="card mx-auto">
-        <img src="@Cocktail.ImageUrl" class="card-img-top" alt="cocktail">
+        <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image" alt="cocktail">
             @if (!IgnoreFavorites) {
                 <div class="favorite-icon-container" @onclick="async () => await ToggleFavoriteAsync()">
                     @if (Cocktail.IsFavorite) {
@@ -54,5 +55,9 @@
         
         Cocktail.IsFavorite = !Cocktail.IsFavorite;
         await OnFavoriteToggled.InvokeAsync();
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        await JSRuntime.InvokeVoidAsync("muteUnmuteImages");
     }
 }

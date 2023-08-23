@@ -1,4 +1,6 @@
-﻿@inherits LayoutComponentBase
+﻿@inject IJSRuntime JSRuntime
+
+@inherits LayoutComponentBase
 
 <TopMenu/>
 <div class="page">
@@ -8,3 +10,13 @@
         </article>
     </main>
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("setThemeManager");
+        }
+    }
+}
