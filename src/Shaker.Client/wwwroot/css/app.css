@@ -37,6 +37,11 @@ h1:focus {
     outline: none;
 }
 
+.cocktail-popup {
+    padding-left: unset !important;
+    padding-right: unset !important;
+}
+
 .cocktail-popup-header {
     justify-content: center !important;
 }
