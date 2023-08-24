@@ -74,7 +74,15 @@ public sealed class DataService {
         var profiles = await _repository.GetData<List<Profile>>(ShakerConstants.ProfilesUrl);
         return profiles ?? new List<Profile>();
     }
-    
+
+    public async Task UpdateProfilesAsync(List<Profile> profiles) {
+        await _repository.UpdateData(ShakerConstants.ProfilesUrl, profiles);
+    }
+
+    public async Task CreateBarAsync(Bar bar) {
+        await _repository.AddDataAsync($"bar_{bar.Id}", bar);
+    }
+
     private string GetBarUrl(int barId) {
         var urlParts = ShakerConstants.BarUrl.Split('.');
         return $"{urlParts[0]}_{barId}.{urlParts[1]}"; 

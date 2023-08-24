@@ -1,18 +1,48 @@
 @using Shaker.Client.Dtos
 @using Shaker.Client.Services
+@inject IJSRuntime JSRuntime
 @inject DataService DataService
+@inject ProfileService ProfileService
 
 @if (!Loading) {
     <div class="input-group mb-3">
         <label class="input-group-text" for="select-profile">Бар:</label>
-        <select id="select-profile" @onchange="OnBarPick" class="form-select form-select" style="padding: 1rem" aria-label="Обери бар">
+        <select id="select-profile" @onchange="OnBarPick" class="form-select form-select cocktails-select" style="padding: 1rem" aria-label="Обери бар">
             <option value="-1">Обери бар</option>
             @foreach (var profile in _profiles) {
                 <option value="@profile.Id" selected=@(profile.Id == BarId)>@profile.Name</option>
             }
         </select>
+        <button class="btn btn-outline-secondary inline-cocktails-button add-bar-button" type="button" data-bs-toggle="modal" data-bs-target="#add-bar"></button>
+    </div>
+    
+    <div class="modal fade cocktail-popup" id="add-bar" tabindex="-1" aria-labelledby="Новий бар" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down">
+            <div class="modal-content">
+                <div class="modal-header cocktail-popup-header">
+                    <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">Новий бар</h2>
+                    <button id="close-add-bar-popup" type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body add-bar-form mb-3">  
+                    <label for="bar-name" class="form-label">Назва бару</label>
+                    <input type="text" class="form-control" id="bar-name" @bind="_barName">
+                    @if (_invalid) {
+                        <p class="text-danger mt-3">@_validationMessage</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary inline-cocktails-button" @onclick="async () => await AddProfileAsync()">Гайда!</button>
+                </div>
+            </div>
+        </div>
     </div>
 }
+
+<script>
+    function closeAddBarPopup() {
+        document.getElementById("close-add-bar-popup").click();
+    }
+</script>
 
 @code {
     [Parameter] 
@@ -20,9 +50,10 @@
 
     [Parameter] 
     public EventCallback<int> OnBarPicked { get; set; }
-    
+
     private List<Profile> _profiles = null!;
     private bool Loading { get; set; } = true;
+    private string _barName { get; set; } = "";
 
     protected override async Task OnInitializedAsync() {
         _profiles = await DataService.LoadProfilesAsync();
@@ -34,4 +65,34 @@
         await OnBarPicked.InvokeAsync(barId);
     }
 
+    private string _validationMessage = "";
+    private bool _invalid = false;
+
+    private async Task AddProfileAsync() {
+        if (string.IsNullOrWhiteSpace(_barName)) {
+            _invalid = true;
+            _validationMessage = "Введи назву бару.";
+            return;
+        }
+
+        if (_profiles.Any(p => p.Name.Equals(_barName, StringComparison.InvariantCultureIgnoreCase))) {
+            _invalid = true;
+            _validationMessage = "Придумай креативнішу назву.";
+            return;
+        }
+
+        _invalid = false;
+        _validationMessage = "";
+        
+        await ProfileService.AddProfileAsync(_barName);
+        _profiles = await DataService.LoadProfilesAsync();
+        await ClosePopup();
+    }
+    
+    private async Task ClosePopup() {
+        _barName = "";
+        _invalid = false;
+        _validationMessage = "";
+        await JSRuntime.InvokeVoidAsync("closeAddBarPopup");
+    }
 }

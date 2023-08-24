@@ -27,7 +27,7 @@
             <p>Інгрідієнти недоступні.</p>
         }
         else {
-            <select id="select-ingredient" @bind="_selectedIngredientId" class="form-select form-select mb-3" style="padding: 1rem" aria-label="Обрати інгрідієнт">
+            <select id="select-ingredient" @bind="_selectedIngredientId" class="form-select form-select mb-3 cocktails-select" style="padding: 1rem" aria-label="Обрати інгрідієнт">
                 <option value="-1">Обрати інгрідієнт</option>
                 @foreach (var ingredient in _allIngredients.Except(_bar!.Ingredients)) {
                     <option value="@ingredient.Id">@ingredient.Name</option>

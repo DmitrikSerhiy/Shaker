@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Shaker.Client.Common;
 
 namespace Shaker.Client.Services; 
@@ -40,5 +41,29 @@ public sealed class BlobRepository : IRepository {
         using var memoryStream = new MemoryStream(bytes);
         var blobClient = blobContainerClient.GetBlobClient(jsonName);
         await blobClient.UploadAsync(memoryStream, true);
+    }
+
+    public async Task AddDataAsync<T>(string jsonName, T data) {
+        var blobContainerClient = _blobServiceClient.GetBlobContainerClient(ShakerConstants.ContainerName);
+        var serializeOptions = new JsonSerializerOptions(JsonSerializerOptions.Default)
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNameCaseInsensitive = true
+        };
+
+        var json = JsonSerializer.Serialize(data, serializeOptions);
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+        
+        var uploadOptions = new BlobUploadOptions
+        {
+            HttpHeaders = new BlobHttpHeaders
+            {
+                ContentType = "application/json;charset=utf-8"
+            },
+            AccessTier = AccessTier.Hot
+        };
+        
+        var blobClient =blobContainerClient.GetBlobClient(jsonName + ".json");
+        await blobClient.UploadAsync(stream, uploadOptions);
     }
 }

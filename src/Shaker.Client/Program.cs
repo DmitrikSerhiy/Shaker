@@ -9,6 +9,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddBlazoredLocalStorage();
 
+builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<CocktailService>();
 builder.Services.AddScoped<BarService>();
 builder.Services.AddScoped<DataService>();

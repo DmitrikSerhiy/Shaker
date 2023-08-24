@@ -108,14 +108,25 @@ a, .btn-link {
     color: red;
 }
 
-#filter-button {
+.inline-cocktails-button {
     border-color: #dee2e6;
     outline: none;
+    color: #6c757d;
 }
 
-#filter-button:hover {
+.inline-cocktails-button:active, .inline-cocktails-button:focus {
+    color: #6c757d !important;
+    background-color: unset !important;
+}
+
+.inline-cocktails-button:hover {
     background-color: unset !important;
     outline: none;
+    color: #6c757d;
+}
+
+.add-bar-form {
+    text-align: left !important;
 }
 
 .cocktails-filters {
@@ -138,6 +149,26 @@ a, .btn-link {
 
 .form-check.form-check-inline.cocktail-filter-form-check {
     margin-right: 0.5rem;
+}
+
+.cocktails-select {
+    height: 46px;
+    padding-top: unset !important;
+    padding-bottom: unset !important;
+}
+
+.add-bar-button {
+    min-width: 58px;
+}
+
+.add-bar-button::after {
+   content: "Створити бар";
+}
+
+@media (max-width: 400px) {
+    .add-bar-button::after {
+        content: "+";
+    }
 }
 
 @media (max-width: 800px) {
