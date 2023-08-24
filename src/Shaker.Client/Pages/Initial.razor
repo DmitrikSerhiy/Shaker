@@ -220,6 +220,7 @@
             }
             catch {
                 _failed = true;
+                await ResetCurrentBarAsync();
                 _errorMessage = "Не вдалося завантажити бар.";
                 _loading = false;
                 return;
@@ -274,6 +275,11 @@
             _filteredByType = 0;
             FilterCocktails();
         }
+    }
+    
+    private async Task ResetCurrentBarAsync() {
+        _currentBarId = -1;
+        await LocalStorage.RemoveItemAsync("currentBar");
     }
     
     public void Dispose() {

@@ -149,6 +149,7 @@
             catch {
                 _failed = true;
                 _errorMessage = "Не вдалося завантажити бар";
+                await ResetCurrentBarAsync();
                 _loading = false;
             }
         }
@@ -157,6 +158,11 @@
     private void ResetSearch() {
         _searchQuery = "";
         _searchedIngredients = _bar!.Ingredients;
+    }
+
+    private async Task ResetCurrentBarAsync() {
+        _currentBarId = -1;
+        await LocalStorage.RemoveItemAsync("currentBar");
     }
 
     private async Task AddToBarAsync(int ingredientToAddId, int barId) {
