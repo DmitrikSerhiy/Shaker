@@ -39,16 +39,16 @@
             <div class="input-group mb-3 cocktails-filters" style="@(_showFilters ? "display:flex;" : "display:none;")">
                 <div class="cocktails-filter-input-group">
                     <div class="form-check form-check-inline">
-                        <input id="all-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==0) value="0" @onchange="FilterCocktailsByType">
+                        <input id="all-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==0) value="0" @onchange="@(_ => FilterCocktailsByType(0))">
                         <label class="form-check-label" for="all-source">Всі</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input id="classic-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==1) value="1" @onchange="FilterCocktailsByType">
-                        <label class="form-check-label" for="classic-source">Класичні</label>
+                        <input id="classic-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==1) value="1" @onchange="@(_ => FilterCocktailsByType(1))">
+                        <label class="form-check-label" for="classic-source">Лонг</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input id="my-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==2) value="2" @onchange="FilterCocktailsByType">
-                        <label class="form-check-label" for="my-source">Кастомні</label>
+                        <input id="my-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==2) value="2" @onchange="@(_ => FilterCocktailsByType(2))">
+                        <label class="form-check-label" for="my-source">Шот</label>
                     </div>
                 </div>
 
@@ -56,16 +56,16 @@
                 
                 <div class="cocktails-filter-input-group">
                     <div class="form-check form-check-inline">
-                        <input id="all-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==0) value="0" @onchange="FilterCocktailsBySource">
+                        <input id="all-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==0) value="0" @onchange="@(_ => FilterCocktailsBySource(0))">
                         <label class="form-check-label" for="all-type">Всі</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input id="long-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==1) value="1" @onchange="FilterCocktailsBySource">
-                        <label class="form-check-label" for="long-type">Лонг</label>
+                        <input id="long-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==1) value="1" @onchange="@(_ => FilterCocktailsBySource(1))">
+                        <label class="form-check-label" for="long-type">Класичні</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input id="shot-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==2) value="2" @onchange="FilterCocktailsBySource">
-                        <label class="form-check-label" for="shot-type">Шот</label>
+                        <input id="shot-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==2) value="2" @onchange="@(_ => FilterCocktailsBySource(2))">
+                        <label class="form-check-label" for="shot-type">Кастомні</label>
                     </div>
                 </div>
             </div>
@@ -216,13 +216,13 @@
     }
     
 
-    private void FilterCocktailsByType(ChangeEventArgs e) {
-        _filteredByType = int.Parse(e.Value!.ToString()!);
+    private void FilterCocktailsByType(int type) {
+        _filteredByType = type;
         FilterCocktails();
     }
     
-    private void FilterCocktailsBySource(ChangeEventArgs e) {
-        _filteredBySource = int.Parse(e.Value!.ToString()!);
+    private void FilterCocktailsBySource(int source) {
+        _filteredBySource = source;
         FilterCocktails();
     }
     
