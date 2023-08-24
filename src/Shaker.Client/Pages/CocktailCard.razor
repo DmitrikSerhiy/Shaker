@@ -3,9 +3,24 @@
 @inject IJSRuntime JSRuntime
 @inject BarService BarService
 
+<div class="modal fade" id=@($"{Cocktail.Id}-cocktail-modal") tabindex="-1" aria-labelledby="@Cocktail.Name" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-lg">
+    <div class="modal-content">
+      <div class="modal-header cocktail-popup-header">
+        <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">@Cocktail.Name</h2>
+        <button type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image" alt="cocktail">
+          <p class="card-text my-3">@Cocktail.Recipe</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="col mb-3">
-    <div class="card mx-auto">
-        <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image" alt="cocktail">
+    <div class="card mx-auto cocktail-card">
+        <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image cocktail-image-in-card" alt="cocktail" data-bs-toggle="modal" data-bs-target=@($"#{Cocktail.Id}-cocktail-modal")>
             @if (!IgnoreFavorites) {
                 <div class="favorite-icon-container" @onclick="async () => await ToggleFavoriteAsync()">
                     @if (Cocktail.IsFavorite) {
@@ -24,7 +39,6 @@
             <div class="d-flex">
                 <h2 class="card-title" style="margin: auto">@Cocktail.Name</h2>
             </div>
-            <p class="card-text">@Cocktail.Recipe</p>
         </div>
         <ul class="list-group list-group-flush text-left">
             @foreach (var ingredient in Cocktail.Ingredients) {

@@ -1,4 +1,4 @@
-const latestVersion = 4;
+const latestVersion = 5;
 const VERSION = 'v' + latestVersion;
 const baseUrl = 'https://myshaker.blob.core.windows.net/shaker-img/';
 
@@ -11,7 +11,9 @@ const defaultFilesToCacheUrls = [
     '/logo-centred.svg',
     '/css/fonts/ReImagineUAMalevichVF.ttf',
     '/css/bootstrap/bootstrap.min.css',
-    '/css/app.css'
+    '/css/app.css',
+    '/scripts/bootstrap/bootstrap.bundle.min.js',
+    '/scripts/themeManager.js'
 ];
 
 const imagesToCacheUrls = [

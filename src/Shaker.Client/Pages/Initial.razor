@@ -29,9 +29,8 @@
             <p>Неможливо створити коктейль із наявних інгрідієнтів.</p>
         }
         else {
-            
             <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Знайти за назвою або рецептом" aria-label="Знайти за назвою або рецептом" aria-describedby="filter-button" @bind="_searchQuery" @oninput="OnInput">
+                <input id="search-available-cocktails" type="text" class="form-control" placeholder="Знайти за назвою або рецептом" aria-label="Знайти за назвою або рецептом" aria-describedby="filter-button" @bind="_searchQuery" @oninput="OnInput">
                 <button class="btn btn-outline-secondary" type="button" id="filter-button" @onclick="ToggleFilters">
                     <svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960"> <path fill="#6c757d" d="M440-160q-17 0-28.5-11.5T400-200v-240L161-745q-14-17-4-36t31-19h584q21 0 31 19t-4 36L560-440v240q0 17-11.5 28.5T520-160h-80Zm40-276 240-304H240l240 304Zm0 0Z"/></svg>
                 </button>
@@ -40,15 +39,15 @@
             <div class="input-group mb-3 cocktails-filters" style="@(_showFilters ? "display:flex;" : "display:none;")">
                 <div class="cocktails-filter-input-group">
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==0) value="0" @onchange="FilterCocktailsByType">
+                        <input id="all-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==0) value="0" @onchange="FilterCocktailsByType">
                         <label class="form-check-label" for="all-source">Всі</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==1) value="1" @onchange="FilterCocktailsByType">
+                        <input id="classic-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==1) value="1" @onchange="FilterCocktailsByType">
                         <label class="form-check-label" for="classic-source">Класичні</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==2) value="2" @onchange="FilterCocktailsByType">
+                        <input id="my-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==2) value="2" @onchange="FilterCocktailsByType">
                         <label class="form-check-label" for="my-source">Кастомні</label>
                     </div>
                 </div>
@@ -57,15 +56,15 @@
                 
                 <div class="cocktails-filter-input-group">
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==0) value="0" @onchange="FilterCocktailsBySource">
+                        <input id="all-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==0) value="0" @onchange="FilterCocktailsBySource">
                         <label class="form-check-label" for="all-type">Всі</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==1) value="1" @onchange="FilterCocktailsBySource">
+                        <input id="long-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==1) value="1" @onchange="FilterCocktailsBySource">
                         <label class="form-check-label" for="long-type">Лонг</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input id class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==2) value="2" @onchange="FilterCocktailsBySource">
+                        <input id="shot-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==2) value="2" @onchange="FilterCocktailsBySource">
                         <label class="form-check-label" for="shot-type">Шот</label>
                     </div>
                 </div>

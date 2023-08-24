@@ -24,7 +24,7 @@
         else {
 
             <div class="mb-3">
-                <input type="text" class="form-control" placeholder="Знайти за назвою або рецептом"  @bind="_searchQuery" @oninput="OnInput">
+                <input id="search-all-cocktail" type="text" class="form-control" placeholder="Знайти за назвою або рецептом"  @bind="_searchQuery" @oninput="OnInput">
             </div>
             <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
                 @foreach (var cocktail in _searchedCocktails) {

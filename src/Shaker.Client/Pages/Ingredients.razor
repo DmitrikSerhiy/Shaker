@@ -19,7 +19,7 @@
             <p>Інгрідієнти недоступні.</p>
         }
         else {
-            <select @bind="_selectedIngredientId" class="form-select form-select mb-3" style="padding: 1rem" aria-label="Large select example">
+            <select id="select-ingredient" @bind="_selectedIngredientId" class="form-select form-select mb-3" style="padding: 1rem" aria-label="Large select example">
                 <option value="-1">Обрати інгрідієнт</option>
                 @foreach (var ingredient in _allIngredients.Except(_bar!.Ingredients)) {
                     <option value="@ingredient.Id">@ingredient.Name</option>
@@ -29,7 +29,7 @@
             <button type="button" class="btn btn-link mb-3 @(_selectedIngredientId == -1 ? "disabled" : "")"  @onclick="async () => await AddToBarAsync(_selectedIngredientId)">Додати до бару</button>
             
             <div class="mb-3">
-                <input type="text" class="form-control" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
+                <input id="search-ingredient" type="text" class="form-control" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
             </div>
             
             @if (_myIngredientsEmpty) {
