@@ -5,4 +5,5 @@ public static class ShakerConstants {
     public static readonly string IngredientsUrl = "ingredients.json";
     public static readonly string CocktailsUrl = "cocktails.json";
     public static readonly string BarUrl = "bar.json";
+    public static readonly string ProfilesUrl = "profiles.json";
 }

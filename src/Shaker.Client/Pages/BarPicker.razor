@@ -1,0 +1,37 @@
+@using Shaker.Client.Dtos
+@using Shaker.Client.Services
+@inject DataService DataService
+
+@if (!Loading) {
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="select-profile">Бар:</label>
+        <select id="select-profile" @onchange="OnBarPick" class="form-select form-select" style="padding: 1rem" aria-label="Обери бар">
+            <option value="-1">Обери бар</option>
+            @foreach (var profile in _profiles) {
+                <option value="@profile.Id" selected=@(profile.Id == BarId)>@profile.Name</option>
+            }
+        </select>
+    </div>
+}
+
+@code {
+    [Parameter] 
+    public int BarId { get; set; }
+
+    [Parameter] 
+    public EventCallback<int> OnBarPicked { get; set; }
+    
+    private List<Profile> _profiles = null!;
+    private bool Loading { get; set; } = true;
+
+    protected override async Task OnInitializedAsync() {
+        _profiles = await DataService.LoadProfilesAsync();
+        Loading = false;
+    }
+
+    private async Task OnBarPick(ChangeEventArgs e) {
+        var barId = Int32.Parse(e.Value!.ToString()!);
+        await OnBarPicked.InvokeAsync(barId);
+    }
+
+}

@@ -4,9 +4,14 @@
 @using Shaker.Client.Helpers
 @inject DataService DataService
 @inject BarService BarService
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 <div class="container text-center">
     <h2>Інгрідієнти</h2>
+    
+    @if (!_loading && !_failed) {
+        <BarPicker BarId="_currentBarId" OnBarPicked="async barId => { await BarPickedAsync(barId); }"></BarPicker>
+    }
 
     @if(_loading) {
         <p>Завантаження...</p>
@@ -15,32 +20,35 @@
         if (_failed) {
             <p>@_errorMessage</p>
         }
+        else if (_currentBarId == -1) {
+            <p>Бар не обраний</p>
+        }
         else if (_ingredientsEmpty) {
             <p>Інгрідієнти недоступні.</p>
         }
         else {
-            <select id="select-ingredient" @bind="_selectedIngredientId" class="form-select form-select mb-3" style="padding: 1rem" aria-label="Large select example">
+            <select id="select-ingredient" @bind="_selectedIngredientId" class="form-select form-select mb-3" style="padding: 1rem" aria-label="Обрати інгрідієнт">
                 <option value="-1">Обрати інгрідієнт</option>
                 @foreach (var ingredient in _allIngredients.Except(_bar!.Ingredients)) {
                     <option value="@ingredient.Id">@ingredient.Name</option>
                 }
             </select>
             
-            <button type="button" class="btn btn-link mb-3 @(_selectedIngredientId == -1 ? "disabled" : "")"  @onclick="async () => await AddToBarAsync(_selectedIngredientId)">Додати до бару</button>
+            <button type="button" class="btn btn-link mb-3 @(_selectedIngredientId == -1 ? "disabled" : "")"  @onclick="async () => await AddToBarAsync(_selectedIngredientId, _currentBarId)">Додати до бару</button>
             
             <div class="mb-3">
                 <input id="search-ingredient" type="text" class="form-control" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
             </div>
             
             @if (_myIngredientsEmpty) {
-                <p>Бар порожній. Додайте інгрідієнти.</p>
+                <p>Бар порожній. Додай інгрідієнти.</p>
             }
             else {
                 <ul class="list-group list-group-flush list-group-item-action">
                     @foreach (var ingredient in _searchedIngredients) {
                         <li class="list-group-item list-group-item-action" style="display: flex; justify-content: space-between; align-items: center">
                             @ingredient.Name 
-                            <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient)">Прибрати</button>
+                            <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient, _currentBarId)">Прибрати</button>
                         </li>
                     }
                 </ul>
@@ -56,16 +64,24 @@
     private bool _failed;
     private string _errorMessage = "";
     
+    private int _currentBarId = -1;
     private int _selectedIngredientId = -1;
     private List<Ingredient> _allIngredients = new();
     private List<Ingredient> _searchedIngredients = new();
     private Bar? _bar;
-    
+
     private string _searchQuery = "";
     private Timer? _debounceSearchTimer;
 
     protected override async Task OnInitializedAsync() {
         _debounceSearchTimer = new Timer(Search, null, Timeout.Infinite, Timeout.Infinite);
+        
+        _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
+        if (_currentBarId == 0) {
+            _currentBarId = -1;
+            _loading = false;
+            return;
+        }
 
         try {
             _allIngredients = await DataService.LoadIngredientsAsync();
@@ -77,46 +93,64 @@
         }
         catch {
             _failed = true;
-            _errorMessage = "Failed to load ingredients";
+            _errorMessage = "Не вдалося завантажити інгрідієнти.";
             _loading = false;
             return;
         }
 
 
-        await LoadBarAsync();
+        await LoadBarAsync(_currentBarId);
         _loading = false;
     }
 
-    private async Task Refresh() {
+    private async Task RefreshAsync(int barId) {
         _loading = true;
         _selectedIngredientId = -1;
         _ingredientsEmpty = false;
         _myIngredientsEmpty = false;
+        
         _failed = false;
         _errorMessage = "";
-        await LoadBarAsync();
+        
+        _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
+        if (_currentBarId == 0) {
+            _currentBarId = -1;
+        }
+        await LoadBarAsync(barId);
         ResetSearch();
         _loading = false;
     }
     
-    private async Task LoadBarAsync() {
-        try {
-            _bar = await DataService.LoadBarAsync();
-            if (_bar == null || _bar.Ingredients.Count == 0) {
-                _loading = false;
-                _myIngredientsEmpty = true;
-                return;
-            }
-            _bar.Ingredients = _allIngredients
-                .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
-                .ToList();
-
-            _searchedIngredients = _bar.Ingredients.ToList();
+    private async Task BarPickedAsync(int barId) {
+        await LocalStorage.SetItemAsync("currentBar", barId);
+        _currentBarId = barId;
+        DataService.ClearCachedBar();
+        await RefreshAsync(_currentBarId);
+    }
+    
+    private async Task LoadBarAsync(int barId) {
+        if (barId == -1) {
+            _bar = new Bar();
         }
-        catch {
-            _failed = true;
-            _errorMessage = "Failed to load your bar ingredients";
-            _loading = false;
+        else {
+            try {
+                _bar = await DataService.LoadBarAsync(barId);
+                if (_bar == null || _bar.Ingredients.Count == 0) {
+                    _loading = false;
+                    _myIngredientsEmpty = true;
+                    return;
+                }
+                _bar.Ingredients = _allIngredients
+                    .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
+                    .ToList();
+
+                _searchedIngredients = _bar.Ingredients.ToList();
+            }
+            catch {
+                _failed = true;
+                _errorMessage = "Не вдалося завантажити бар";
+                _loading = false;
+            }
         }
     }
 
@@ -125,17 +159,17 @@
         _searchedIngredients = _bar!.Ingredients;
     }
 
-    private async Task AddToBarAsync(int ingredientToAddId) {
+    private async Task AddToBarAsync(int ingredientToAddId, int barId) {
         if (ingredientToAddId == -1) {
             return;
         } 
-        await BarService.AddToBarAsync(new Ingredient { Id = ingredientToAddId }); 
-        await Refresh();
+        await BarService.AddToBarAsync(new Ingredient { Id = ingredientToAddId }, barId); 
+        await RefreshAsync(barId);
     }
 
-    private async Task RemoveFromBarAsync(Ingredient ingredientToRemove) {
-        await BarService.RemoveFromBarAsync(ingredientToRemove);
-        await Refresh(); 
+    private async Task RemoveFromBarAsync(Ingredient ingredientToRemove, int barId) {
+        await BarService.RemoveFromBarAsync(ingredientToRemove, barId);
+        await RefreshAsync(barId); 
     }
     
     

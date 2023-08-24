@@ -9,8 +9,8 @@ public sealed class BarService {
         _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
     }
     
-    public async Task AddToBarAsync(Ingredient ingredient) {
-        var bar = await _dataService.LoadBarAsync() ?? new Bar();
+    public async Task AddToBarAsync(Ingredient ingredient, int barId) {
+        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
 
         if (bar.Ingredients.Select(i => i.Id).Contains(ingredient.Id)) {
             return;
@@ -18,11 +18,11 @@ public sealed class BarService {
         
         bar.Ingredients.Add(new Ingredient {Id = ingredient.Id});
         SelectIds(bar);
-        await _dataService.UpdateBarAsync(bar);
+        await _dataService.UpdateBarAsync(bar, barId);
     }
 
-    public async Task RemoveFromBarAsync(Ingredient ingredient) {
-        var bar = await _dataService.LoadBarAsync() ?? new Bar();
+    public async Task RemoveFromBarAsync(Ingredient ingredient, int barId) {
+        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
 
         if (!bar.Ingredients.Select(i => i.Id).Contains(ingredient.Id)) {
             return;
@@ -30,11 +30,11 @@ public sealed class BarService {
         
         bar.Ingredients.RemoveAll(i => i.Id == ingredient.Id);
         SelectIds(bar);
-        await _dataService.UpdateBarAsync(bar);
+        await _dataService.UpdateBarAsync(bar, barId);
     }
     
-    public async Task AddToFavoritesAsync(int cocktailId) {
-        var bar = await _dataService.LoadBarAsync() ?? new Bar();
+    public async Task AddToFavoritesAsync(int cocktailId, int barId) {
+        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
 
         if (bar.FavoriteCocktails?.Contains(cocktailId) ?? false) {
             return;
@@ -43,12 +43,12 @@ public sealed class BarService {
         bar.FavoriteCocktails ??= new List<int>();
         bar.FavoriteCocktails.Add(cocktailId);
         SelectIds(bar);
-        await _dataService.UpdateBarAsync(bar);
+        await _dataService.UpdateBarAsync(bar, barId);
     }
     
     
-    public async Task RemoveFromFavoritesAsync(int cocktailId) {
-        var bar = await _dataService.LoadBarAsync() ?? new Bar();
+    public async Task RemoveFromFavoritesAsync(int cocktailId, int barId) {
+        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
 
         if (!bar.FavoriteCocktails?.Contains(cocktailId) ?? true) {
             return;
@@ -56,7 +56,7 @@ public sealed class BarService {
         
         bar.FavoriteCocktails.RemoveAll(c => c == cocktailId);
         SelectIds(bar);
-        await _dataService.UpdateBarAsync(bar);
+        await _dataService.UpdateBarAsync(bar, barId);
     }
 
     private void SelectIds(Bar bar) {

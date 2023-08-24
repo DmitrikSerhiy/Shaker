@@ -4,10 +4,15 @@
 @using Shaker.Client.Helpers
 @inject CocktailService CocktailService
 @inject DataService DataService
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 @implements IDisposable
 
 <div class="container text-center">
     <h2>Приготувати зараз</h2>
+
+    @if (!_loading && !_failed) {
+        <BarPicker BarId="_currentBarId" OnBarPicked="async barId => { await BarPickedAsync(barId); }"></BarPicker>
+    }
 
     @if (_loading) {
         <p>Завантаження...</p>
@@ -16,17 +21,20 @@
         if (_failed) {
             <p>@_errorMessage</p>
         }
+        else if (_currentBarId == -1) {
+            <p>Бар не обраний</p>
+        }
         else if (_ingredientsEmpty) {
             <p>Інгрідієнти недоступні.</p>
         }
         else if (_myIngredientsEmpty) {
-            <p>Бар порожній. Додайте інгрідієнти.</p>
+            <p>Бар порожній. Додай інгрідієнти.</p>
         }
         else if (_cocktailsEmpty) {
             <p>Коктейлі недоступні.</p>
         }
         else if (_availableCocktails.Count == 0) {
-            <p>Неможливо створити коктейль із наявних інгрідієнтів.</p>
+            <p>Неможливо приготувати смачний коктейль із наявних інгрідієнтів. Тіко не змішуй все, що є у твоєму барі. Краще випий чаю.</p>
         }
         else {
             <div class="input-group mb-3">
@@ -71,7 +79,7 @@
             </div>
             <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
                 @foreach (var cocktail in _searchedCocktails) {
-                    <CocktailCard Cocktail="cocktail" OnFavoriteToggled="async () => await RefreshAsync()"></CocktailCard>
+                    <CocktailCard Cocktail="cocktail" BarId="_currentBarId" OnFavoriteToggled="async () => await RefreshAsync(_currentBarId)"></CocktailCard>
                 }
             </div>
         }
@@ -93,6 +101,8 @@
     private bool _showFilters;
     private int _filteredBySource = 0;
     private int _filteredByType = 0;
+
+    private int _currentBarId = -1;
     
     private string _searchQuery = "";
     private Timer? _debounceSearchTimer;
@@ -103,7 +113,14 @@
 
     protected override async Task OnInitializedAsync() {
         _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
-        await LoadAndSetDataAsync();
+        _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
+        if (_currentBarId == 0) {
+            _currentBarId = -1;
+            _loading = false;
+            return;
+        }
+        
+        await LoadAndSetBarAsync(_currentBarId);
         _loading = false;
     }
 
@@ -113,7 +130,7 @@
     }
     
 
-    private async Task RefreshAsync() {
+    private async Task RefreshAsync(int barId) {
         _availableCocktails = new();
         _searchedCocktails = new();
         _ingredientsEmpty = false;
@@ -128,12 +145,23 @@
         _filteredByType = 0;
         
         _searchQuery = "";
+        _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
+        if (_currentBarId == 0) {
+            _currentBarId = -1;
+        }
         _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
-        await LoadAndSetDataAsync();
+        await LoadAndSetBarAsync(barId);
         _loading = false;
     }
+    
+    private async Task BarPickedAsync(int barId) {
+        await LocalStorage.SetItemAsync("currentBar", barId);
+        _currentBarId = barId;
+        DataService.ClearCachedBar();
+        await RefreshAsync(_currentBarId);
+    }
 
-    private async Task LoadAndSetDataAsync() {
+    private async Task LoadAndSetBarAsync(int barId) {
         try {
             _allCocktails = await DataService.LoadCocktailsAsync();
             if (_allCocktails.Count == 0) {
@@ -143,7 +171,7 @@
             }
         } catch {
             _failed = true;
-            _errorMessage = "Failed to load cocktail recipes";
+            _errorMessage = "Не вдалося завантажити рецепти коктейлів.";
             _loading = false;
             return;
         }
@@ -157,7 +185,7 @@
             }
         } catch {
             _failed = true;
-            _errorMessage = "Failed to load ingredients";
+            _errorMessage = "Не вдалося завантажити інгрідієнти.";
             _loading = false;
             return;
         }
@@ -170,26 +198,32 @@
             }
         } catch {
             _failed = true;
-            _errorMessage = "Failed to load cocktails ingredients";
+            _errorMessage = "Не вдалося завантажити коктейлі.";
             _loading = false;
             return;
         }
 
-        try {
-            _bar = await DataService.LoadBarAsync();
-            if (_bar == null || _bar.Ingredients.Count == 0) {
+        if (barId == -1) {
+            _bar = new Bar();
+        }
+        else {
+            try {
+                _bar = await DataService.LoadBarAsync(barId);
+                if (_bar == null || _bar.Ingredients.Count == 0) {
+                    _loading = false;
+                    _myIngredientsEmpty = true;
+                    return;
+                }
+                _bar.Ingredients = _allIngredients
+                    .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
+                    .ToList();
+            }
+            catch {
+                _failed = true;
+                _errorMessage = "Не вдалося завантажити бар.";
                 _loading = false;
-                _myIngredientsEmpty = true;
                 return;
             }
-            _bar.Ingredients = _allIngredients
-                .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
-                .ToList();
-        } catch {
-            _failed = true;
-            _errorMessage = "Failed to load your bar ingredients";
-            _loading = false;
-            return;
         }
 
         _availableCocktails = CocktailService.GetAvailableCocktails(_bar, _allCocktails);

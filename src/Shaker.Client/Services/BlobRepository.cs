@@ -31,7 +31,8 @@ public sealed class BlobRepository : IRepository {
         var blobContainerClient = _blobServiceClient.GetBlobContainerClient(ShakerConstants.ContainerName);
         var serializeOptions = new JsonSerializerOptions(JsonSerializerOptions.Default)
         {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNameCaseInsensitive = true
         };
         var json = JsonSerializer.Serialize(data, serializeOptions);
         var bytes = Encoding.UTF8.GetBytes(json);

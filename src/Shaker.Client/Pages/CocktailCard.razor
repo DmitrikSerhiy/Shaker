@@ -57,14 +57,17 @@
     public bool IgnoreFavorites { get; set; }
     
     [Parameter] 
-    public EventCallback OnFavoriteToggled { get; set; }
+    public int BarId { get; set; }
     
+    [Parameter] 
+    public EventCallback OnFavoriteToggled { get; set; }
+
     private async Task ToggleFavoriteAsync() {
         if (Cocktail.IsFavorite) {
-            await BarService.RemoveFromFavoritesAsync(Cocktail.Id);
+            await BarService.RemoveFromFavoritesAsync(Cocktail.Id, BarId);
         }
         else {
-            await BarService.AddToFavoritesAsync(Cocktail.Id);
+            await BarService.AddToFavoritesAsync(Cocktail.Id, BarId);
         }
         
         Cocktail.IsFavorite = !Cocktail.IsFavorite;

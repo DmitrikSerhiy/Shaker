@@ -48,18 +48,35 @@ public sealed class DataService {
         await Task.WhenAll(tasks);
     }
     
-    public async Task<Bar?> LoadBarAsync() {
+    public async Task<Bar?> LoadBarAsync(int barId) {
         if (_cachedBar != null) {
             return _cachedBar;
         }
-        _cachedBar = await _repository.GetData<Bar?>(ShakerConstants.BarUrl);
+
+        if (barId == -1) {
+            return null;
+        }
+        
+        _cachedBar = await _repository.GetData<Bar?>(GetBarUrl(barId));
         return _cachedBar;
     }
     
-    public async Task UpdateBarAsync(Bar bar) {
-        await _repository.UpdateData(ShakerConstants.BarUrl, bar);
+    public async Task UpdateBarAsync(Bar bar, int barId) {
+        await _repository.UpdateData(GetBarUrl(barId), bar);
+        _cachedBar = null;
+    }
+    
+    public void ClearCachedBar() {
         _cachedBar = null;
     }
 
-
+    public async Task<List<Profile>> LoadProfilesAsync() {
+        var profiles = await _repository.GetData<List<Profile>>(ShakerConstants.ProfilesUrl);
+        return profiles ?? new List<Profile>();
+    }
+    
+    private string GetBarUrl(int barId) {
+        var urlParts = ShakerConstants.BarUrl.Split('.');
+        return $"{urlParts[0]}_{barId}.{urlParts[1]}"; 
+    }
 }
