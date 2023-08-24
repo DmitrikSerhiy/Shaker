@@ -84,6 +84,57 @@ a, .btn-link {
     color: red;
 }
 
+#filter-button {
+    border-color: #dee2e6;
+    outline: none;
+}
+
+#filter-button:hover {
+    background-color: unset !important;
+    outline: none;
+}
+
+.cocktails-filters {
+    display: flex;
+    justify-content: center;
+}
+
+.filter-separator {
+    display: inline-block;
+    margin-right: 1.5rem;
+    margin-left: .5rem;
+}
+
+.cocktails-filter-input-group {
+    display: flex;
+    flex-wrap: nowrap;
+    margin-right: 0.5rem;
+    align-items: center;
+}
+
+.form-check.form-check-inline.cocktail-filter-form-check {
+    margin-right: 0.5rem;
+}
+
+@media (max-width: 800px) {
+    .filter-separator {
+        display: none;
+    }
+
+    .cocktails-filter-input-group {
+        flex: 0 0 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .form-check.form-check-inline {
+        margin-right: 1rem;
+        padding-left: 1.2rem;
+    }
+}
+
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;

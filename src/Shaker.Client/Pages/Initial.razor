@@ -29,9 +29,46 @@
             <p>Неможливо створити коктейль із наявних інгрідієнтів.</p>
         }
         else {
+            
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Знайти за назвою або рецептом" aria-label="Знайти за назвою або рецептом" aria-describedby="filter-button" @bind="_searchQuery" @oninput="OnInput">
+                <button class="btn btn-outline-secondary" type="button" id="filter-button" @onclick="ToggleFilters">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960"> <path fill="#6c757d" d="M440-160q-17 0-28.5-11.5T400-200v-240L161-745q-14-17-4-36t31-19h584q21 0 31 19t-4 36L560-440v240q0 17-11.5 28.5T520-160h-80Zm40-276 240-304H240l240 304Zm0 0Z"/></svg>
+                </button>
+            </div>
+            
+            <div class="input-group mb-3 cocktails-filters" style="@(_showFilters ? "display:flex;" : "display:none;")">
+                <div class="cocktails-filter-input-group">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==0) value="0" @onchange="FilterCocktailsByType">
+                        <label class="form-check-label" for="all-source">Всі</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==1) value="1" @onchange="FilterCocktailsByType">
+                        <label class="form-check-label" for="classic-source">Класичні</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==2) value="2" @onchange="FilterCocktailsByType">
+                        <label class="form-check-label" for="my-source">Кастомні</label>
+                    </div>
+                </div>
 
-            <div class="mb-3">
-                <input type="text" class="form-control" placeholder="Знайти за назвою або рецептом" @bind="_searchQuery" @oninput="OnInput">
+                <span class="filter-separator">|</span>
+                
+                <div class="cocktails-filter-input-group">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==0) value="0" @onchange="FilterCocktailsBySource">
+                        <label class="form-check-label" for="all-type">Всі</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==1) value="1" @onchange="FilterCocktailsBySource">
+                        <label class="form-check-label" for="long-type">Лонг</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input id class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==2) value="2" @onchange="FilterCocktailsBySource">
+                        <label class="form-check-label" for="shot-type">Шот</label>
+                    </div>
+                </div>
             </div>
             <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
                 @foreach (var cocktail in _searchedCocktails) {
@@ -54,6 +91,10 @@
     private bool _failed;
     private string _errorMessage = "";
     
+    private bool _showFilters;
+    private int _filteredBySource = 0;
+    private int _filteredByType = 0;
+    
     private string _searchQuery = "";
     private Timer? _debounceSearchTimer;
     
@@ -62,7 +103,7 @@
     private Bar? _bar; 
 
     protected override async Task OnInitializedAsync() {
-        _debounceSearchTimer = new Timer(Search, null, Timeout.Infinite, Timeout.Infinite);
+        _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
         await LoadAndSetDataAsync();
         _loading = false;
     }
@@ -72,12 +113,6 @@
         _debounceSearchTimer!.Change(250, Timeout.Infinite);
     }
     
-    private async void Search(object? state) {
-        await InvokeAsync(() => {
-            _searchedCocktails = SearchHelper.SearchCocktails(_availableCocktails, _searchQuery);
-            StateHasChanged();
-        });
-    }
 
     private async Task RefreshAsync() {
         _availableCocktails = new();
@@ -89,9 +124,12 @@
         _loading = true;
         _failed = false;
         _errorMessage = "";
+
+        _filteredBySource = 0;
+        _filteredByType = 0;
         
         _searchQuery = "";
-        _debounceSearchTimer = new Timer(Search, null, Timeout.Infinite, Timeout.Infinite);
+        _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
         await LoadAndSetDataAsync();
         _loading = false;
     }
@@ -158,6 +196,51 @@
         _availableCocktails = CocktailService.GetAvailableCocktails(_bar, _allCocktails);
         _availableCocktails = CocktailService.MapAndSortFavoriteCocktails(_bar, _availableCocktails);
         _searchedCocktails = _availableCocktails;
+    }
+
+
+    private void FilterCocktails() {
+        var searched = _availableCocktails.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(_searchQuery)) {
+            searched = SearchHelper.FilterCocktailsByName(searched, _searchQuery);
+        }
+
+        if (_filteredBySource != 0) {
+            searched = SearchHelper.FilterCocktailsBySource(searched, _filteredBySource);
+        }
+
+        if (_filteredByType != 0) {
+            searched = SearchHelper.FilterCocktailsByType(searched, (CocktailType)_filteredByType);
+        }
+        
+        _searchedCocktails = searched.ToList();
+    }
+    
+
+    private void FilterCocktailsByType(ChangeEventArgs e) {
+        _filteredByType = int.Parse(e.Value!.ToString()!);
+        FilterCocktails();
+    }
+    
+    private void FilterCocktailsBySource(ChangeEventArgs e) {
+        _filteredBySource = int.Parse(e.Value!.ToString()!);
+        FilterCocktails();
+    }
+    
+    private async void FilterCocktailsByName(object? state) {
+        await InvokeAsync(() => {
+            FilterCocktails();
+            StateHasChanged();
+        });
+    }
+
+    private void ToggleFilters() {
+        _showFilters = !_showFilters;
+        if (!_showFilters) {
+            _filteredBySource = 0;
+            _filteredByType = 0;
+            FilterCocktails();
+        }
     }
     
     public void Dispose() {
