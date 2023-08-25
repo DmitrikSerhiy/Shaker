@@ -21,4 +21,10 @@ public sealed class ProfileService {
         profiles.Add(new Profile {Id = bar.Id, Name = bar.Name});
         await _dataService.UpdateProfilesAsync(profiles);
     }
+
+    public async Task DeleteProfileAsync(Profile profile) {
+        var profiles = await _dataService.LoadProfilesAsync();
+        profiles.Remove(profile);
+        await _dataService.UpdateProfilesAsync(profiles);
+    }
 }

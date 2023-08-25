@@ -63,7 +63,13 @@ public sealed class BlobRepository : IRepository {
             AccessTier = AccessTier.Hot
         };
         
-        var blobClient =blobContainerClient.GetBlobClient(jsonName + ".json");
+        var blobClient = blobContainerClient.GetBlobClient(jsonName);
         await blobClient.UploadAsync(stream, uploadOptions);
+    }
+
+    public async Task DeleteDataAsync(string jsonName) {
+        var blobContainerClient = _blobServiceClient.GetBlobContainerClient(ShakerConstants.ContainerName);
+        var blobClient = blobContainerClient.GetBlobClient(jsonName);
+        await blobClient.DeleteAsync(DeleteSnapshotsOption.IncludeSnapshots);
     }
 }

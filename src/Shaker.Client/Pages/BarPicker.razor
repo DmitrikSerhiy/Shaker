@@ -3,6 +3,7 @@
 @inject IJSRuntime JSRuntime
 @inject DataService DataService
 @inject ProfileService ProfileService
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 @if (!Loading) {
     <div class="input-group mb-3">
@@ -13,25 +14,37 @@
                 <option value="@profile.Id" selected=@(profile.Id == BarId)>@profile.Name</option>
             }
         </select>
-        <button class="btn btn-outline-secondary inline-cocktails-button add-bar-button" type="button" data-bs-toggle="modal" data-bs-target="#add-bar"></button>
+        <button class="btn btn-outline-secondary inline-cocktails-button add-bar-button" type="button" data-bs-toggle="modal" data-bs-target="#add-bar">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="32"><path fill="#6c757d" d="M480-120v-71l216-216 71 71-216 216h-71ZM120-330v-60h300v60H120Zm690-49-71-71 29-29q8-8 21-8t21 8l29 29q8 8 8 21t-8 21l-29 29ZM120-495v-60h470v60H120Zm0-165v-60h470v60H120Z"/></svg>
+        </button>
     </div>
     
     <div class="modal fade cocktail-popup" id="add-bar" tabindex="-1" aria-labelledby="Новий бар" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down">
             <div class="modal-content">
                 <div class="modal-header cocktail-popup-header">
-                    <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">Новий бар</h2>
+                    <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">Керування барами</h2>
                     <button id="close-add-bar-popup" type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body add-bar-form mb-3">  
-                    <label for="bar-name" class="form-label">Назва бару</label>
-                    <input type="text" class="form-control" id="bar-name" @bind="_barName">
+                <div class="modal-body add-bar-form">  
+                    
+                    <ul class="list-group list-group-flush list-group-item-action">
+                        @foreach (var profile in _profiles) {
+                            <li class="list-group-item list-group-item-action" style="display: flex; justify-content: space-between; align-items: center">
+                                @profile.Name
+                                @if (profile.Id != 1) { 
+                                    <button type="button" class="btn btn-link" @onclick="async () => await DeleteBarAsync(profile)">Видалити</button>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="modal-footer popup-bar-footer">
+                    <input type="text" class="form-control" id="bar-name" placeholder="новий бар" @bind="_barName">
                     @if (_invalid) {
                         <p class="text-danger mt-3">@_validationMessage</p>
                     }
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary inline-cocktails-button" @onclick="async () => await AddProfileAsync()">Гайда!</button>
+                    <button type="button" class="btn btn-link" @onclick="async () => await AddProfileAsync()">Додати</button>
                 </div>
             </div>
         </div>
@@ -83,10 +96,24 @@
 
         _invalid = false;
         _validationMessage = "";
-        
+
         await ProfileService.AddProfileAsync(_barName);
         _profiles = await DataService.LoadProfilesAsync();
-        await ClosePopup();
+        _barName = "";
+        // await ClosePopup();
+    }
+    
+    private async Task DeleteBarAsync(Profile profile) {
+        await DataService.DeleteBarAsync(new Bar {Id = profile.Id, Name = profile.Name});
+        await ProfileService.DeleteProfileAsync(profile);
+        if (BarId == profile.Id) {
+            DataService.ClearCachedBar();
+            BarId = -1;
+            await LocalStorage.RemoveItemAsync("currentBar");
+            await OnBarPicked.InvokeAsync(-1);
+        }
+
+        _profiles = await DataService.LoadProfilesAsync();
     }
     
     private async Task ClosePopup() {

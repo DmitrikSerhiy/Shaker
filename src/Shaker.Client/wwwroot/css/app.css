@@ -161,14 +161,13 @@ a, .btn-link {
     min-width: 58px;
 }
 
-.add-bar-button::after {
-   content: "Створити бар";
+.popup-bar-footer {
+    justify-content: space-between;
+    text-align: unset;
 }
 
-@media (max-width: 400px) {
-    .add-bar-button::after {
-        content: "+";
-    }
+#bar-name {
+    flex: 1 1 60%;
 }
 
 @media (max-width: 800px) {

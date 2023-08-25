@@ -80,7 +80,11 @@ public sealed class DataService {
     }
 
     public async Task CreateBarAsync(Bar bar) {
-        await _repository.AddDataAsync($"bar_{bar.Id}", bar);
+        await _repository.AddDataAsync(GetBarUrl(bar.Id), bar);
+    }
+
+    public async Task DeleteBarAsync(Bar bar) {
+        await _repository.DeleteDataAsync(GetBarUrl(bar.Id));
     }
 
     private string GetBarUrl(int barId) {
