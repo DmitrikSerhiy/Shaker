@@ -22,15 +22,21 @@ h1, h2, h3, h4 {
     margin-bottom: 1rem !important;
 }
 
-.favorite-icon {
+.favorite-icon-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1000;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    justify-content: center;
     cursor: pointer;
 }
 
-.favorite-icon-container {
-    position: absolute;
-    right: 1rem;
-    top: 1rem;
-    z-index: 1000;
+.favorite-icon {
+    cursor: pointer;
+    margin: auto;
 }
 
 h1:focus {
@@ -170,6 +176,10 @@ a, .btn-link {
     flex: 1 1 60%;
 }
 
+.bar-option {
+    border-bottom: 0;
+}
+
 @media (max-width: 800px) {
     .filter-separator {
         display: none;
@@ -248,5 +258,5 @@ a, .btn-link {
 }
 
     .loading-progress-text:after {
-        content: var(--blazor-load-percentage-text, "Loading");
+        content: var(--blazor-load-percentage-text, "Завантаження");
     }

@@ -26,25 +26,24 @@
                     <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">Керування барами</h2>
                     <button id="close-add-bar-popup" type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body add-bar-form">  
-                    
+                <div class="modal-body add-bar-form pb-0">
                     <ul class="list-group list-group-flush list-group-item-action">
                         @foreach (var profile in _profiles) {
-                            <li class="list-group-item list-group-item-action" style="display: flex; justify-content: space-between; align-items: center">
+                            <li class="list-group-item list-group-item-action bar-option py-3 px-0" style="display: flex; justify-content: space-between; align-items: center">
                                 @profile.Name
                                 @if (profile.Id != 1) { 
-                                    <button type="button" class="btn btn-link" @onclick="async () => await DeleteBarAsync(profile)">Видалити</button>
+                                    <button type="button" class="btn btn-link p-0" @onclick="async () => await DeleteBarAsync(profile)">Видалити</button>
                                 }
                             </li>
                         }
                     </ul>
                 </div>
-                <div class="modal-footer popup-bar-footer">
-                    <input type="text" class="form-control" id="bar-name" placeholder="новий бар" @bind="_barName">
-                    @if (_invalid) {
-                        <p class="text-danger mt-3">@_validationMessage</p>
-                    }
-                    <button type="button" class="btn btn-link" @onclick="async () => await AddProfileAsync()">Додати</button>
+                <div class="modal-footer popup-bar-footer p-3">
+                    <input type="text" class="form-control m-0" id="bar-name" placeholder="новий бар" @bind="_barName">
+                    <button type="button" class="btn btn-link m-0 p-0" style="margin-left: 1rem !important;" @onclick="async () => await AddProfileAsync()">Додати</button>
+                     @if (_invalid) {
+                            <p class="text-danger mt-3">@_validationMessage</p>
+                        }
                 </div>
             </div>
         </div>
@@ -100,7 +99,6 @@
         await ProfileService.AddProfileAsync(_barName);
         _profiles = await DataService.LoadProfilesAsync();
         _barName = "";
-        // await ClosePopup();
     }
     
     private async Task DeleteBarAsync(Profile profile) {
@@ -114,6 +112,9 @@
         }
 
         _profiles = await DataService.LoadProfilesAsync();
+        _invalid = false;
+        _validationMessage = "";
+        _barName = "";
     }
     
     private async Task ClosePopup() {
