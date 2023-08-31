@@ -17,7 +17,7 @@ function setThemeManager() {
             return
         }
 
-        const themeSwitcherText = theme === 'dark' ? 'на очі не бачу' : 'тверезий';
+        const themeSwitcherText = theme === 'dark' ? 'на очі не бачу' : 'ще тверезий';
         themeSwitcherLabel.textContent = themeSwitcherText;
         themeSwitcher.setAttribute('aria-label', themeSwitcherText)
         themeSwitcher.checked = theme === 'dark';
