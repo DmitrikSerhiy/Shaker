@@ -4,31 +4,44 @@
 @inject BarService BarService
 
 <div class="modal fade cocktail-popup" id=@($"{Cocktail.Id}-cocktail-modal") tabindex="-1" aria-labelledby="@Cocktail.Name" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-lg">
-    <div class="modal-content">
-      <div class="modal-header cocktail-popup-header">
-        <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">@Cocktail.Name</h2>
-        <button type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-          <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image" alt="cocktail">
-          <p class="card-text my-3">@Cocktail.Recipe</p>
-      </div>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-lg">
+        <div class="modal-content">
+            <div class="modal-header cocktail-popup-header">
+                <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">@Cocktail.Name</h2>
+                <button type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image" alt="cocktail">
+                <p class="card-text my-3">@Cocktail.Recipe</p>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <div class="col mb-3">
     <div class="card mx-auto cocktail-card">
         @if (!IgnoreFavorites) {
-            <div class="favorite-icon-container" @onclick="async () => await ToggleFavoriteAsync()">
+            <div class="icons-container-left" @onclick="async () => await HideUnHideCocktailAsync()" title="@(Cocktail.IsHidden ? "За цим я вже заскучав, показувати знову" : "Приховати")">
+                @if (Cocktail.IsHidden) {
+                    <svg class="cocktail-icon" width="32" height="29" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                        <path fill="#6c757d" d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/>
+                    </svg>
+                }
+                else {
+                    <svg class="cocktail-icon" width="32" height="29" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
+                        <path fill="#6c757d" d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/>
+                    </svg> 
+                }
+            </div>
+            
+            <div class="icons-container-right" @onclick="async () => await ToggleFavoriteAsync()" title="@(Cocktail.IsFavorite ? "Обожнюю!" : "Пройшла любов, зав'яли помідори")">
                 @if (Cocktail.IsFavorite) {
-                    <svg class="favorite-icon" width="32" height="29" viewBox="0 0 32 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="cocktail-icon" width="32" height="29" viewBox="0 0 32 29" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M16 1.61804L19.1167 11.2102L19.229 11.5557H19.5922H29.6781L21.5184 17.484L21.2246 17.6976L21.3368 18.0431L24.4535 27.6353L16.2939 21.7069L16 21.4934L15.7061 21.7069L7.54649 27.6353L10.6632 18.0431L10.7754 17.6976L10.4816 17.484L2.32194 11.5557H12.4078H12.771L12.8833 11.2102L16 1.61804Z" fill="#CB500B" stroke="black"/>
                     </svg>
                 }
                 else {
-                    <svg class="favorite-icon" width="32" height="29" viewBox="0 0 32 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="cocktail-icon" width="32" height="29" viewBox="0 0 32 29" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M16 1.61804L19.1167 11.2102L19.229 11.5557H19.5922H29.6781L21.5184 17.484L21.2246 17.6976L21.3368 18.0431L24.4535 27.6353L16.2939 21.7069L16 21.4934L15.7061 21.7069L7.54649 27.6353L10.6632 18.0431L10.7754 17.6976L10.4816 17.484L2.32194 11.5557H12.4078H12.771L12.8833 11.2102L16 1.61804Z" stroke="black"/>
                     </svg>
                 }
@@ -61,6 +74,9 @@
     
     [Parameter] 
     public EventCallback OnFavoriteToggled { get; set; }
+    
+    [Parameter] 
+    public EventCallback OnHiddenToggled { get; set; }
 
     private async Task ToggleFavoriteAsync() {
         if (Cocktail.IsFavorite) {
@@ -72,6 +88,18 @@
         
         Cocktail.IsFavorite = !Cocktail.IsFavorite;
         await OnFavoriteToggled.InvokeAsync();
+    }
+
+    private async Task HideUnHideCocktailAsync() {
+        if (Cocktail.IsHidden) {
+            await BarService.UnHideCocktailAsync(Cocktail.Id, BarId);
+        }
+        else {
+            await BarService.HideCocktailAsync(Cocktail.Id, BarId);
+        }
+        
+        Cocktail.IsHidden = !Cocktail.IsHidden;
+        await OnHiddenToggled.InvokeAsync();
     }
     
     protected override async Task OnAfterRenderAsync(bool firstRender) {

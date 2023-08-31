@@ -11,7 +11,7 @@
     <h2>Приготувати зараз</h2>
 
     @if (!_loading && !_failed) {
-        <BarPicker BarId="_currentBarId" OnBarPicked="async barId => { await BarPickedAsync(barId); }"></BarPicker>
+        <BarPicker BarId="_currentBarId" OnBarPicked="async barId => { await BarPickedAsync(barId); }" ></BarPicker>
     }
 
     @if (_loading) {
@@ -44,42 +44,58 @@
                 </button>
             </div>
             
-            <div class="input-group mb-3 cocktails-filters" style="@(_showFilters ? "display:flex;" : "display:none;")">
-                <div class="cocktails-filter-input-group">
-                    <div class="form-check form-check-inline">
-                        <input id="all-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==0) value="0" @onchange="@(_ => FilterCocktailsByType(0))">
-                        <label class="form-check-label" for="all-source">Всі</label>
+            @if (_showFilters) {
+                <div class="input-group mb-3 cocktails-filters">
+                    <div class="cocktails-filter-input-group">
+                        <div class="form-check form-check-inline">
+                            <input id="all-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 0) value="0" @onchange="@(_ => FilterCocktailsByType(0))">
+                            <label class="form-check-label" for="all-source">Всі</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="classic-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 1) value="1" @onchange="@(_ => FilterCocktailsByType(1))">
+                            <label class="form-check-label" for="classic-source">Лонг</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="my-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 2) value="2" @onchange="@(_ => FilterCocktailsByType(2))">
+                            <label class="form-check-label" for="my-source">Шот</label>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input id="classic-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==1) value="1" @onchange="@(_ => FilterCocktailsByType(1))">
-                        <label class="form-check-label" for="classic-source">Лонг</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input id="my-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType==2) value="2" @onchange="@(_ => FilterCocktailsByType(2))">
-                        <label class="form-check-label" for="my-source">Шот</label>
-                    </div>
-                </div>
 
-                <span class="filter-separator">|</span>
-                
-                <div class="cocktails-filter-input-group">
-                    <div class="form-check form-check-inline">
-                        <input id="all-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==0) value="0" @onchange="@(_ => FilterCocktailsBySource(0))">
-                        <label class="form-check-label" for="all-type">Всі</label>
+                    <span class="filter-separator">|</span>
+
+                    <div class="cocktails-filter-input-group">
+                        <div class="form-check form-check-inline">
+                            <input id="all-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 0) value="0" @onchange="@(_ => FilterCocktailsBySource(0))">
+                            <label class="form-check-label" for="all-type">Всі</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="long-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 1) value="1" @onchange="@(_ => FilterCocktailsBySource(1))">
+                            <label class="form-check-label" for="long-type">Класичні</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="shot-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 2) value="2" @onchange="@(_ => FilterCocktailsBySource(2))">
+                            <label class="form-check-label" for="shot-type">Кастомні</label>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input id="long-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==1) value="1" @onchange="@(_ => FilterCocktailsBySource(1))">
-                        <label class="form-check-label" for="long-type">Класичні</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input id="shot-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource==2) value="2" @onchange="@(_ => FilterCocktailsBySource(2))">
-                        <label class="form-check-label" for="shot-type">Кастомні</label>
+
+                    <span class="filter-separator">|</span>
+
+                    <div class="cocktails-filter-input-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="show-hidden" @onchange="@(_ => ToggleHiddenCocktails())">
+                            <label class="form-check-label" for="show-hidden">Показати приховані</label>
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
             <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
                 @foreach (var cocktail in _searchedCocktails) {
-                    <CocktailCard Cocktail="cocktail" BarId="_currentBarId" OnFavoriteToggled="async () => await RefreshAsync(_currentBarId)"></CocktailCard>
+                    <CocktailCard
+                        Cocktail="cocktail"
+                        BarId="_currentBarId"
+                        OnFavoriteToggled="async () => await RefreshAsync(_currentBarId)"
+                        OnHiddenToggled="async () => await RefreshAsync(_currentBarId)">
+                    </CocktailCard>
                 }
             </div>
         }
@@ -99,8 +115,9 @@
     private string _errorMessage = "";
     
     private bool _showFilters;
-    private int _filteredBySource = 0;
-    private int _filteredByType = 0;
+    private int _filteredBySource;
+    private int _filteredByType;
+    private bool _showHiddenCocktails;
 
     private int _currentBarId = -1;
     
@@ -141,8 +158,11 @@
         _failed = false;
         _errorMessage = "";
 
+        _showFilters = false;
         _filteredBySource = 0;
         _filteredByType = 0;
+
+        _showHiddenCocktails = false;
         
         _searchQuery = "";
         _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
@@ -229,7 +249,9 @@
 
         _availableCocktails = CocktailService.GetAvailableCocktails(_bar, _allCocktails);
         _availableCocktails = CocktailService.MapAndSortFavoriteCocktails(_bar, _availableCocktails);
-        _searchedCocktails = _availableCocktails;
+        _searchedCocktails = _showHiddenCocktails 
+            ? _availableCocktails 
+            : _availableCocktails.Where(c => c.IsHidden == false).ToList();
     }
 
 
@@ -275,6 +297,13 @@
             _filteredByType = 0;
             FilterCocktails();
         }
+    }
+
+    private void ToggleHiddenCocktails() {
+        _showHiddenCocktails = !_showHiddenCocktails;
+        _searchedCocktails = _showHiddenCocktails 
+            ? _availableCocktails 
+            : _availableCocktails.Where(c => c.IsHidden == false).ToList();
     }
     
     private async Task ResetCurrentBarAsync() {

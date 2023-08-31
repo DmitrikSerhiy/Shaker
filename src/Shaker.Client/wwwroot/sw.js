@@ -43,6 +43,7 @@ const imagesToCacheUrls = [
     baseUrl + 'spritz.webp',
     baseUrl + 'tequila_sunrise.webp',
     baseUrl + 'zomby.webp',
+    baseUrl + 'disappointment.webp',
 ];
 
 const addResourcesToCache = async (resources) => {

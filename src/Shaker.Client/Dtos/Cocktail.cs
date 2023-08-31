@@ -14,6 +14,7 @@ public sealed record Cocktail : IComparable<Cocktail> {
     public List<Ingredient> Ingredients { get; set; } = new();
     public List<Ingredient>? OptionalIngredients { get; set; }
     public bool IsFavorite { get; set; }
+    public bool IsHidden { get; set; }
 
     public int CompareTo(Cocktail? other) {
         return other == null ? 1 : string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);

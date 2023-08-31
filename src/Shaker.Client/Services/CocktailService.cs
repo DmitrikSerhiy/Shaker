@@ -9,11 +9,12 @@ public sealed class CocktailService {
         cocktails.Sort();
         return cocktails.ToList();
     }
-    
+
     public List<Cocktail> MapAndSortFavoriteCocktails(Bar bar, List<Cocktail> cocktails)
     {
         foreach (var cocktail in cocktails) {
             cocktail.IsFavorite = bar.FavoriteCocktails?.Contains(cocktail.Id) ?? false;
+            cocktail.IsHidden = bar.HiddenCocktails?.Contains(cocktail.Id) ?? false;
         }
         return cocktails.OrderByDescending(c => c.IsFavorite).ThenBy(c => c.Name).ToList();
     }

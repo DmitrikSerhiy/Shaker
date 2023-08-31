@@ -46,7 +46,6 @@ public sealed class BarService {
         await _dataService.UpdateBarAsync(bar, barId);
     }
     
-    
     public async Task RemoveFromFavoritesAsync(int cocktailId, int barId) {
         var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
 
@@ -58,9 +57,37 @@ public sealed class BarService {
         SelectIds(bar);
         await _dataService.UpdateBarAsync(bar, barId);
     }
+    
+    public async Task HideCocktailAsync(int cocktailId, int barId) {
+        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
+
+        if (bar.HiddenCocktails?.Contains(cocktailId) ?? false) {
+            return;
+        }
+        
+        bar.HiddenCocktails ??= new List<int>();
+        bar.HiddenCocktails.Add(cocktailId);
+        SelectIds(bar);
+        await _dataService.UpdateBarAsync(bar, barId);
+    }
+    
+    public async Task UnHideCocktailAsync(int cocktailId, int barId) {
+        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
+
+        if (!bar.HiddenCocktails?.Contains(cocktailId) ?? true) {
+            return;
+        }
+        
+        bar.HiddenCocktails.RemoveAll(c => c == cocktailId);
+        SelectIds(bar);
+        await _dataService.UpdateBarAsync(bar, barId);
+    }
+    
+    
 
     private void SelectIds(Bar bar) {
         bar.Ingredients = bar.Ingredients.Select(i => new Ingredient { Id = i.Id }).ToList();
         bar.FavoriteCocktails = bar.FavoriteCocktails?.ToList();
+        bar.HiddenCocktails = bar.HiddenCocktails?.ToList();
     }
 }

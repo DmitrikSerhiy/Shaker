@@ -22,7 +22,7 @@ h1, h2, h3, h4 {
     margin-bottom: 1rem !important;
 }
 
-.favorite-icon-container {
+.icons-container-right {
     position: absolute;
     right: 0;
     top: 0;
@@ -34,7 +34,19 @@ h1, h2, h3, h4 {
     cursor: pointer;
 }
 
-.favorite-icon {
+.icons-container-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.cocktail-icon {
     cursor: pointer;
     margin: auto;
 }
