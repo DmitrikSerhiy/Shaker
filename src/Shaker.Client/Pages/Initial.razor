@@ -5,13 +5,14 @@
 @inject CocktailService CocktailService
 @inject DataService DataService
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject RandomCocktailService RandomCocktailService
 @implements IDisposable
 
 <div class="container text-center">
     <h2>Приготувати зараз (@_availableCocktails.Count)</h2>
 
     @if (!_loading && !_failed) {
-        <BarPicker BarId="_currentBarId" OnBarPicked="async barId => { await BarPickedAsync(barId); }" ></BarPicker>
+        <BarPicker BarId="_currentBarId" OnBarPicked="async barId => { await BarPickedAsync(barId); }"></BarPicker>
     }
 
     @if (_loading) {
@@ -126,8 +127,8 @@
     
     private List<Cocktail> _allCocktails = null!;
     private List<Ingredient> _allIngredients = null!;
-    private Bar? _bar; 
-
+    private Bar? _bar;
+    
     protected override async Task OnInitializedAsync() {
         _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
         _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
@@ -138,6 +139,8 @@
         }
         
         await LoadAndSetBarAsync(_currentBarId);
+        RandomCocktailService.OnRandomCocktailButtonClicked += OpenRandomCocktail;
+        
         _loading = false;
     }
 
@@ -310,8 +313,20 @@
         _currentBarId = -1;
         await LocalStorage.RemoveItemAsync("currentBar");
     }
+
+    private void OpenRandomCocktail() {
+        var randomCocktail = new Random().Next(_availableCocktails.Count);
+        var cocktailId = _availableCocktails[randomCocktail].Id;
+
+        OpenCocktailPopup(cocktailId);
+    }
     
+    private void OpenCocktailPopup(int cocktailId) {
+        RandomCocktailService.OpenRandomCocktailPopup(cocktailId);
+    }
+
     public void Dispose() {
+        RandomCocktailService.OnRandomCocktailButtonClicked -= OpenRandomCocktail;
         _debounceSearchTimer?.Dispose();
     }
 }

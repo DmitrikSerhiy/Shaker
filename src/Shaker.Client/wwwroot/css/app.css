@@ -187,6 +187,17 @@ a, .btn-link {
     border-bottom: 0;
 }
 
+.random-cocktail-button {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.random-cocktail-icon {
+    margin-right: 0.5rem;
+    cursor: pointer;
+}
+
 @media (max-width: 800px) {
     .filter-separator {
         display: none;

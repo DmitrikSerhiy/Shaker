@@ -2,6 +2,8 @@
 @using Shaker.Client.Services
 @inject IJSRuntime JSRuntime
 @inject BarService BarService
+@inject RandomCocktailService RandomCocktailService
+@implements IDisposable
 
 <div class="modal fade cocktail-popup" id=@($"{Cocktail.Id}-cocktail-modal") tabindex="-1" aria-labelledby="@Cocktail.Name" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-lg">
@@ -105,4 +107,30 @@
     protected override async Task OnAfterRenderAsync(bool firstRender) {
         await JSRuntime.InvokeVoidAsync("muteUnmuteImages");
     }
+
+    protected override void OnInitialized() {
+        RandomCocktailService.OnRandomCocktailPopupOpened += OpenCocktailPopupAsync;
+    }
+
+    private async Task OpenCocktailPopupAsync(int cocktailId) {
+        if (cocktailId == Cocktail.Id) {
+            await JSRuntime.InvokeVoidAsync("openCocktailPopup", Cocktail.Id.ToString());
+        }
+    }
+
+    public void Dispose() {
+        RandomCocktailService.OnRandomCocktailPopupOpened -= OpenCocktailPopupAsync;
+    }
+
 }
+
+<script>
+    function closeCocktailPopup() {
+        document.getElementById("cocktail-popup-close-btn").click();
+    }
+    
+    function openCocktailPopup(cocktailId) {
+        const cocktailModal = new bootstrap.Modal('#' + cocktailId + '-cocktail-modal');
+        cocktailModal.show();
+    }
+</script>
