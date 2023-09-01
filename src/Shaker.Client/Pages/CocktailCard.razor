@@ -5,7 +5,7 @@
 @inject RandomCocktailService RandomCocktailService
 @implements IDisposable
 
-<div class="modal fade cocktail-popup" id=@($"{Cocktail.Id}-cocktail-modal") tabindex="-1" aria-labelledby="@Cocktail.Name" aria-hidden="true">
+<div class="modal fade cocktail-popup" id=@($"{Cocktail.Id}-cocktail-modal") data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="@Cocktail.Name" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down modal-lg">
         <div class="modal-content">
             <div class="modal-header cocktail-popup-header">

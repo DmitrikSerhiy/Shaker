@@ -198,6 +198,14 @@ a, .btn-link {
     cursor: pointer;
 }
 
+.edit-bar-name-button {
+    margin-left: auto;
+}
+
+.delete-bar-button {
+    margin-left: 1rem;
+}
+
 @media (max-width: 800px) {
     .filter-separator {
         display: none;

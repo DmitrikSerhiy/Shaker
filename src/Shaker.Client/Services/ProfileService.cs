@@ -22,6 +22,16 @@ public sealed class ProfileService {
         await _dataService.UpdateProfilesAsync(profiles);
     }
 
+    public async Task EditProfileAsync(string barNameToEdit, int barIdToEdit) {
+        var profiles = await _dataService.LoadProfilesAsync();
+        profiles.RemoveAll(p => p.Id == barIdToEdit);
+        var bar = new Bar {Name = barNameToEdit, Id = barIdToEdit};
+        profiles.Add(new Profile {Id = bar.Id, Name = bar.Name});
+        
+        await _dataService.UpdateBarAsync(bar, barIdToEdit);
+        await _dataService.UpdateProfilesAsync(profiles);
+    }
+
     public async Task DeleteProfileAsync(Profile profile) {
         var profiles = await _dataService.LoadProfilesAsync();
         profiles.Remove(profile);
