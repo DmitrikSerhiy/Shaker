@@ -22,6 +22,10 @@ h1, h2, h3, h4 {
     margin-bottom: 1rem !important;
 }
 
+.image-wrapper {
+    position: relative;
+}
+
 .icons-container-right {
     position: absolute;
     right: 0;
@@ -32,6 +36,11 @@ h1, h2, h3, h4 {
     display: flex;
     justify-content: center;
     cursor: pointer;
+    filter: opacity(0.5);
+}
+
+.icons-container-right:hover {
+    filter: opacity(1);
 }
 
 .icons-container-left {
@@ -44,6 +53,31 @@ h1, h2, h3, h4 {
     display: flex;
     justify-content: center;
     cursor: pointer;
+    filter: opacity(0.5);
+}
+
+.icons-container-left:hover {
+    filter: opacity(1);
+}
+
+.icons-container-left-down {
+    position: absolute;
+    left: 0;
+    bottom: 1rem;
+    z-index: 1000;
+    width: 4rem;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    filter: opacity(0.5);
+}
+
+.icons-container-left-down svg {
+    margin-top: auto;
+}
+
+.icons-container-left-down:hover {
+    filter: opacity(1);
 }
 
 .cocktail-icon {

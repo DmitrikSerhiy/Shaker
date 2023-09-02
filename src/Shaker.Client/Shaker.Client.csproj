@@ -19,6 +19,17 @@
       <_ContentIncludedByDefault Remove="wwwroot\fonts\ReImagineUAMalevichVF.ttf" />
       <_ContentIncludedByDefault Remove="wwwroot\fonts\ReImagineUAMalevichVF.woff" />
       <_ContentIncludedByDefault Remove="wwwroot\fonts\ReImagineUAMalevichVF.woff2" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\10_coffee.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\11_champain.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\1_martini.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\2_margaritha.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\3_wine.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\4_collins.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\5_mug.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\6_sour.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\7_old_fashioned.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\8_shot.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\glasses\9_round_old_fashioned.svg" />
     </ItemGroup>
 
 </Project>
