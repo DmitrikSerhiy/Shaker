@@ -51,6 +51,16 @@ h1, h2, h3, h4 {
     margin-left: .5rem;
 }
 
+.to-top {
+    --offset: 100px;
+
+    position: sticky;
+    bottom: 20px;
+    margin-right:10px;
+    place-self: end;
+    margin-top: calc(100vh + var(--offset));
+}
+
 .image-wrapper {
     position: relative;
 }
