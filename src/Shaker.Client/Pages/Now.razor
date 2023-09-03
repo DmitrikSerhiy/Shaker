@@ -9,7 +9,7 @@
 @implements IDisposable
 
 <div class="container text-center">
-    <h2>Приготувати зараз (@_availableCocktails.Count)</h2>
+    <h2>Приготувати зараз @_availableCocktails.Count</h2>
 
     @if (!_loading && !_failed) {
         <BarPicker BarId="_currentBarId" OnBarPicked="async barId => { await BarPickedAsync(barId); }"></BarPicker>
@@ -39,56 +39,71 @@
         }
         else {
             <div class="input-group mb-3">
-                <input id="search-available-cocktails" type="text" class="form-control" placeholder="Знайти за назвою або рецептом" aria-label="Знайти за назвою або рецептом" aria-describedby="filter-button" @bind="_searchQuery" @oninput="OnInput">
-                <button class="btn btn-outline-secondary inline-cocktails-button" type="button" @onclick="ToggleFilters" title="Керувати фільтрами">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960"> <path fill="#6c757d" d="M440-160q-17 0-28.5-11.5T400-200v-240L161-745q-14-17-4-36t31-19h584q21 0 31 19t-4 36L560-440v240q0 17-11.5 28.5T520-160h-80Zm40-276 240-304H240l240 304Zm0 0Z"/></svg>
+                <input id="search-available-cocktails" type="text" class="form-control" placeholder="Знайти за назвою або інгрідієнтами" aria-label="Знайти за назвою або рецептом" aria-describedby="filter-button" @bind="_searchQuery" @oninput="OnInput">
+                <button class="btn btn-outline-secondary inline-cocktails-button" type="button" @onclick="OpenRandomCocktail" title="Випадковий коктейль">
+                    <svg height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="none" stroke="#6c757d" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M448,341.37V170.61A32,32,0,0,0,432.11,143l-152-88.46a47.94,47.94,0,0,0-48.24,0L79.89,143A32,32,0,0,0,64,170.61V341.37A32,32,0,0,0,79.89,369l152,88.46a48,48,0,0,0,48.24,0l152-88.46A32,32,0,0,0,448,341.37Z"/>
+                        <polyline fill="none" stroke="#6c757d" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" points="69 153.99 256 263.99 443 153.99"/>
+                        <line fill="none" stroke="#6c757d" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" x1="256" y1="463.99" x2="256" y2="263.99"/>
+                        <ellipse cx="256" cy="152" rx="24" ry="16" fill="#6c757d"/>
+                        <ellipse cx="208" cy="296" rx="16" ry="24" fill="#6c757d"/>
+                        <ellipse cx="112" cy="328" rx="16" ry="24" fill="#6c757d"/>
+                        <ellipse cx="304" cy="296" rx="16" ry="24" fill="#6c757d"/>
+                        <ellipse cx="400" cy="240" rx="16" ry="24" fill="#6c757d"/>
+                        <ellipse cx="304" cy="384" rx="16" ry="24" fill="#6c757d"/>
+                        <ellipse cx="400" cy="328" rx="16" ry="24" fill="#6c757d"/>
+                    </svg>
+                </button>
+                <button class="btn btn-outline-secondary inline-cocktails-button" type="button" @onclick="ToggleFilters" title="Керувати фільтрами" data-bs-toggle="collapse" data-bs-target="#cocktail-filters" aria-expanded="false" aria-controls="cocktail-filters">
+                    <svg height="32" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"> <path fill="#6c757d" d="M440-160q-17 0-28.5-11.5T400-200v-240L161-745q-14-17-4-36t31-19h584q21 0 31 19t-4 36L560-440v240q0 17-11.5 28.5T520-160h-80Zm40-276 240-304H240l240 304Zm0 0Z"/></svg>
                 </button>
             </div>
             
-            @if (_showFilters) {
-                <div class="input-group mb-3 cocktails-filters">
-                    <div class="cocktails-filter-input-group">
-                        <div class="form-check form-check-inline">
-                            <input id="all-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 0) value="0" @onchange="@(_ => FilterCocktailsByType(0))">
-                            <label class="form-check-label" for="all-source">Всі</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input id="classic-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 1) value="1" @onchange="@(_ => FilterCocktailsByType(1))">
-                            <label class="form-check-label" for="classic-source">Лонг</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input id="my-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 2) value="2" @onchange="@(_ => FilterCocktailsByType(2))">
-                            <label class="form-check-label" for="my-source">Шот</label>
-                        </div>
+            <div id="cocktail-filters" class="input-group cocktails-filters collapse">
+                <div class="cocktails-filter-input-group">
+                    <div class="form-check form-check-inline">
+                        <input id="all-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 0) value="0" @onchange="@(_ => FilterCocktailsByType(0))">
+                        <label class="form-check-label" for="all-source">Всі</label>
                     </div>
-
-                    <span class="filter-separator">|</span>
-
-                    <div class="cocktails-filter-input-group">
-                        <div class="form-check form-check-inline">
-                            <input id="all-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 0) value="0" @onchange="@(_ => FilterCocktailsBySource(0))">
-                            <label class="form-check-label" for="all-type">Всі</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input id="long-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 1) value="1" @onchange="@(_ => FilterCocktailsBySource(1))">
-                            <label class="form-check-label" for="long-type">Класичні</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input id="shot-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 2) value="2" @onchange="@(_ => FilterCocktailsBySource(2))">
-                            <label class="form-check-label" for="shot-type">Кастомні</label>
-                        </div>
+                    <div class="form-check form-check-inline">
+                        <input id="classic-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 1) value="1" @onchange="@(_ => FilterCocktailsByType(1))">
+                        <label class="form-check-label" for="classic-source">Лонг</label>
                     </div>
-
-                    <span class="filter-separator">|</span>
-
-                    <div class="cocktails-filter-input-group">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="show-hidden" @onchange="@(_ => ToggleHiddenCocktails())">
-                            <label class="form-check-label" for="show-hidden">Показати приховані</label>
-                        </div>
+                    <div class="form-check form-check-inline">
+                        <input id="my-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 2) value="2" @onchange="@(_ => FilterCocktailsByType(2))">
+                        <label class="form-check-label" for="my-source">Шот</label>
                     </div>
                 </div>
-            }
+
+                <span class="filter-separator">|</span>
+
+                <div class="cocktails-filter-input-group">
+                    <div class="form-check form-check-inline">
+                        <input id="all-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 0) value="0" @onchange="@(_ => FilterCocktailsBySource(0))">
+                        <label class="form-check-label" for="all-type">Всі</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input id="long-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 1) value="1" @onchange="@(_ => FilterCocktailsBySource(1))">
+                        <label class="form-check-label" for="long-type">Класичні</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input id="shot-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 2) value="2" @onchange="@(_ => FilterCocktailsBySource(2))">
+                        <label class="form-check-label" for="shot-type">Кастомні</label>
+                    </div>
+                </div>
+
+                <span class="filter-separator">|</span>
+
+                <div class="cocktails-filter-input-group">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="show-hidden" @onchange="@(_ => ToggleHiddenCocktails())">
+                        <label class="form-check-label" for="show-hidden">Показати приховані</label>
+                    </div>
+                </div>
+                
+                <div class="filters-margin"></div>
+            </div>
+            
             <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
                 @foreach (var cocktail in _searchedCocktails) {
                     <CocktailCard
@@ -139,8 +154,6 @@
         }
         
         await LoadAndSetBarAsync(_currentBarId);
-        RandomCocktailService.OnRandomCocktailButtonClicked += OpenRandomCocktail;
-        
         _loading = false;
     }
 
@@ -298,6 +311,7 @@
         if (!_showFilters) {
             _filteredBySource = 0;
             _filteredByType = 0;
+            _showHiddenCocktails = false;
             FilterCocktails();
         }
     }
@@ -326,7 +340,6 @@
     }
 
     public void Dispose() {
-        RandomCocktailService.OnRandomCocktailButtonClicked -= OpenRandomCocktail;
         _debounceSearchTimer?.Dispose();
     }
 }

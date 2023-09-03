@@ -22,6 +22,10 @@ h1, h2, h3, h4 {
     margin-bottom: 1rem !important;
 }
 
+.logo-container {
+    cursor: pointer;
+}
+
 .image-wrapper {
     position: relative;
 }
@@ -179,6 +183,12 @@ a, .btn-link {
 .cocktails-filters {
     display: flex;
     justify-content: center;
+    align-items: flex-start;
+}
+
+.filters-margin {
+    width: 100%;
+    height: 15px;
 }
 
 .filter-separator {
@@ -227,17 +237,47 @@ a, .btn-link {
     cursor: pointer;
 }
 
-.random-cocktail-icon {
-    margin-right: 0.5rem;
-    cursor: pointer;
-}
-
 .edit-bar-name-button {
     margin-left: auto;
 }
 
 .delete-bar-button {
     margin-left: 1rem;
+}
+
+
+.top-nav-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.theme-switcher {
+    margin-left: 0 !important;
+}
+
+.list-group-item.active {
+    color: unset !important;
+    background-color: unset !important;
+    border-color: unset !important;
+    text-decoration: underline !important;
+}
+
+.nav-list-group-item {
+    border: 0 !important;
+    cursor: pointer;
+}
+
+.theme-switcher {
+    margin-right: .5rem;
+}
+
+.form-check {
+    margin-bottom: 0 !important;
+}
+
+#search-all-cocktail {
+    height: 45px;
 }
 
 @media (max-width: 800px) {
@@ -257,6 +297,21 @@ a, .btn-link {
         padding-left: 1.2rem;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #blazor-error-ui {
