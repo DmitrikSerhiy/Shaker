@@ -48,17 +48,17 @@ public sealed class DataService {
         await Task.WhenAll(tasks);
     }
     
-    public async Task<Bar?> LoadBarAsync(int barId) {
+    public async Task<Bar> LoadBarAsync(int barId) {
         if (_cachedBar != null) {
             return _cachedBar;
         }
 
         if (barId == -1) {
-            return null;
+            return new Bar();
         }
         
         _cachedBar = await _repository.GetData<Bar?>(GetBarUrl(barId));
-        return _cachedBar;
+        return _cachedBar ?? new Bar();
     }
     
     public async Task UpdateBarAsync(Bar bar, int barId) {

@@ -26,6 +26,18 @@ h1, h2, h3, h4 {
     cursor: pointer;
 }
 
+.cocktail-nav-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.cocktails-badge {
+    top: unset !important;
+    position: unset !important;
+    margin-left: .5rem;
+}
+
 .image-wrapper {
     position: relative;
 }
@@ -260,7 +272,6 @@ a, .btn-link {
     color: unset !important;
     background-color: unset !important;
     border-color: unset !important;
-    text-decoration: underline !important;
 }
 
 .nav-list-group-item {
@@ -276,7 +287,7 @@ a, .btn-link {
     margin-bottom: 0 !important;
 }
 
-#search-all-cocktail {
+#search-all-cocktail, #search-ingredient {
     height: 45px;
 }
 
@@ -297,22 +308,6 @@ a, .btn-link {
         padding-left: 1.2rem;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #blazor-error-ui {
     background: lightyellow;

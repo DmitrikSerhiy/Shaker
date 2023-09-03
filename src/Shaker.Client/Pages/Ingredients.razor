@@ -4,7 +4,9 @@
 @using Shaker.Client.Helpers
 @inject DataService DataService
 @inject BarService BarService
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject ILocalStorageService LocalStorage
+@inject CocktailService CocktailService
+@inject CocktailsStateService CocktailsStateService
 
 <div class="container text-center">
     <h2>Інгрідієнти</h2>
@@ -29,7 +31,7 @@
         else {
             <select id="select-ingredient" @bind="_selectedIngredientId" class="form-select form-select mb-3 cocktails-select" style="padding: 1rem" aria-label="Обрати інгрідієнт">
                 <option value="-1">Обрати інгрідієнт</option>
-                @foreach (var ingredient in _allIngredients.Except(_bar!.Ingredients)) {
+                @foreach (var ingredient in _allIngredients.Except(_bar.Ingredients)) {
                     <option value="@ingredient.Id">@ingredient.Name</option>
                 }
             </select>
@@ -68,7 +70,7 @@
     private int _selectedIngredientId = -1;
     private List<Ingredient> _allIngredients = new();
     private List<Ingredient> _searchedIngredients = new();
-    private Bar? _bar;
+    private Bar _bar = new();
 
     private string _searchQuery = "";
     private Timer? _debounceSearchTimer;
@@ -130,34 +132,47 @@
     
     private async Task LoadBarAsync(int barId) {
         if (barId == -1) {
-            _bar = new Bar();
+            return;
         }
-        else {
-            try {
-                _bar = await DataService.LoadBarAsync(barId);
-                if (_bar == null || _bar.Ingredients.Count == 0) {
-                    _loading = false;
-                    _myIngredientsEmpty = true;
-                    return;
-                }
-                _bar.Ingredients = _allIngredients
-                    .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
-                    .ToList();
-
-                _searchedIngredients = _bar.Ingredients.ToList();
-            }
-            catch {
-                _failed = true;
-                _errorMessage = "Не вдалося завантажити бар";
-                await ResetCurrentBarAsync();
+        try {
+            _bar = await DataService.LoadBarAsync(barId);
+            if (_bar.Ingredients.Count == 0) {
                 _loading = false;
+                _myIngredientsEmpty = true;
+                await ReCalculateAvailableCocktailsAsync(_bar);
+                return;
             }
+            _bar.Ingredients = _allIngredients
+                .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
+                .ToList();
+            
+            await ReCalculateAvailableCocktailsAsync(_bar);
+            _searchedIngredients = _bar.Ingredients.ToList();
         }
+        catch {
+            _failed = true;
+            _errorMessage = "Не вдалося завантажити бар";
+            await ResetCurrentBarAsync();
+            await ReCalculateAvailableCocktailsAsync(_bar);
+            _loading = false;
+        }
+    }
+
+    private async Task ReCalculateAvailableCocktailsAsync(Bar bar) {
+        var allCocktails = await DataService.LoadCocktailsAsync();
+        foreach(var cocktail in allCocktails) {
+            cocktail.Ingredients = _allIngredients
+                .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
+                .ToList();
+        }
+        
+        var availableCocktails = CocktailService.GetAvailableCocktails(bar, allCocktails);
+        await CocktailsStateService.SetAvailableCocktailsCountAsync(availableCocktails.Count);
     }
 
     private void ResetSearch() {
         _searchQuery = "";
-        _searchedIngredients = _bar!.Ingredients;
+        _searchedIngredients = _bar.Ingredients;
     }
 
     private async Task ResetCurrentBarAsync() {
@@ -188,7 +203,7 @@
     private async void Search(object? state)
     {
         await InvokeAsync(() => {
-            _searchedIngredients = SearchHelper.SearchIngredients(_bar!.Ingredients, _searchQuery);
+            _searchedIngredients = SearchHelper.SearchIngredients(_bar.Ingredients, _searchQuery);
             StateHasChanged();
         });
     }

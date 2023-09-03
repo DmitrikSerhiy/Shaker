@@ -1,12 +1,13 @@
-﻿@page "/cocktails"
+﻿@page "/allcocktails"
 @using Shaker.Client.Services
 @using Shaker.Client.Dtos
 @using Shaker.Client.Helpers
 @inject DataService DataService
+@inject CocktailsStateService CocktailsStateService
 @implements IDisposable
 
 <div class="container text-center">
-    <h2>Коктельна карта</h2>
+    <h2>Всі коктейлі</h2>
     
     @if(_loading) {
         <p>Завантаження...</p>
@@ -56,6 +57,7 @@
 
         try {
             _allCocktails = await DataService.LoadCocktailsAsync();
+            await CocktailsStateService.SetAllCocktailsCountAsync(_allCocktails.Count);
             _searchedCocktails = _allCocktails.ToList();
             if (_allCocktails.Count == 0) {
                 _cocktailsEmpty = true;

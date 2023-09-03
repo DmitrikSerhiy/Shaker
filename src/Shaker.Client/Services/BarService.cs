@@ -10,7 +10,7 @@ public sealed class BarService {
     }
     
     public async Task AddToBarAsync(Ingredient ingredient, int barId) {
-        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
+        var bar = await _dataService.LoadBarAsync(barId);
 
         if (bar.Ingredients.Select(i => i.Id).Contains(ingredient.Id)) {
             return;
@@ -22,7 +22,7 @@ public sealed class BarService {
     }
 
     public async Task RemoveFromBarAsync(Ingredient ingredient, int barId) {
-        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
+        var bar = await _dataService.LoadBarAsync(barId);
 
         if (!bar.Ingredients.Select(i => i.Id).Contains(ingredient.Id)) {
             return;
@@ -34,7 +34,7 @@ public sealed class BarService {
     }
     
     public async Task AddToFavoritesAsync(int cocktailId, int barId) {
-        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
+        var bar = await _dataService.LoadBarAsync(barId);
 
         if (bar.FavoriteCocktails?.Contains(cocktailId) ?? false) {
             return;
@@ -47,7 +47,7 @@ public sealed class BarService {
     }
     
     public async Task RemoveFromFavoritesAsync(int cocktailId, int barId) {
-        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
+        var bar = await _dataService.LoadBarAsync(barId);
 
         if (!bar.FavoriteCocktails?.Contains(cocktailId) ?? true) {
             return;
@@ -59,7 +59,7 @@ public sealed class BarService {
     }
     
     public async Task HideCocktailAsync(int cocktailId, int barId) {
-        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
+        var bar = await _dataService.LoadBarAsync(barId);
 
         if (bar.HiddenCocktails?.Contains(cocktailId) ?? false) {
             return;
@@ -72,7 +72,7 @@ public sealed class BarService {
     }
     
     public async Task UnHideCocktailAsync(int cocktailId, int barId) {
-        var bar = await _dataService.LoadBarAsync(barId) ?? new Bar();
+        var bar = await _dataService.LoadBarAsync(barId);
 
         if (!bar.HiddenCocktails?.Contains(cocktailId) ?? true) {
             return;

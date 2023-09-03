@@ -3,7 +3,7 @@
 @inject IJSRuntime JSRuntime
 @inject DataService DataService
 @inject ProfileService ProfileService
-@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject ILocalStorageService LocalStorage
 
 @if (!Loading) {
     <div class="input-group mb-3">
@@ -23,7 +23,7 @@
         <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down">
             <div class="modal-content">
                 <div class="modal-header cocktail-popup-header">
-                    <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">Керувати барами</h2>
+                    <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">Мої бари</h2>
                     <button id="close-manage-bar-popup" type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close" @onclick="ResetPopup"></button>
                 </div>
                 <div class="modal-body add-bar-form pb-0">
