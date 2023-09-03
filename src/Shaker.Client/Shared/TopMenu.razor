@@ -5,31 +5,44 @@
 <div class="container mt-3 top-nav-bar">
     <h1>Шейкер</h1>
     <h2>Мій бар - мої правила.</h2>
-    <div class="logo-container mb-3" data-bs-toggle="collapse" data-bs-target="#shaker-menu" aria-expanded="false" aria-controls="shaker-menu">
+    <div class="logo-container mb-3" data-bs-toggle="offcanvas" data-bs-target="#shaker-menu" aria-expanded="false" aria-controls="shaker-menu">
         <svg height="300px" viewBox="0 0 100 171" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M53.3979 152.557V101.809C75.3188 93.7221 99.5966 16.2491 99.5966 16.2491C99.5966 16.2491 73.4618 84.6759 49.8003 84.6759C26.1408 84.6759 0 16.2491 0 16.2491C0 16.2491 24.2798 93.7221 46.2007 101.809V152.557C32.9305 153.129 22.6858 156.839 22.6858 161.33C22.6858 166.218 34.8217 170.183 49.8003 170.183C64.7749 170.183 76.9148 166.216 76.9148 161.33C76.9148 156.839 66.6681 153.129 53.3979 152.557Z" fill="#4C5D6D"/>
             <path d="M55.0403 60L98.5403 1" stroke="#4C5D6D"/>
             <path d="M57.0075 61.2304L54.9778 59.7303C50.5812 57.3212 44.97 58.5242 41.9566 62.69C38.6882 67.205 39.7041 73.5049 44.2151 76.7712C48.7322 80.0335 55.036 79.0257 58.3004 74.5127C61.3158 70.3409 60.6714 64.6474 57.0075 61.2304Z" fill="#CB500B"/>
         </svg>
     </div>
-    
-    <div id="shaker-menu" class="list-group collapse">
-        <NavLink class="list-group-item list-group-item-action btn btn-link nav-list-group-item cocktail-nav-item" ActiveClass="active" Match="NavLinkMatch.All" href="/">
-            Мої коктейлі
-            @if (availableCocktailsCount != 0) {
-                <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill cocktails-badge">@availableCocktailsCount</span>
-            }
-        </NavLink>
-        <NavLink class="list-group-item list-group-item-action btn btn-link nav-list-group-item cocktail-nav-item" ActiveClass="active" href="allcocktails">
-            Всі коктейлі
-            @if (allCocktailsCount != 0) {
-                <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill cocktails-badge">@allCocktailsCount</span>
-            }
-        </NavLink>
-        <NavLink class="list-group-item list-group-item-action btn btn-link nav-list-group-item" ActiveClass="active" href="ingredients">Інгрідієнти</NavLink>
-        <div class="form-check form-switch list-group-item list-group-item-action nav-list-group-item ">
-            <input id="dark-switch" type="checkbox" class="form-check-input theme-switcher">
-            <label id="dark-switch-label" for="dark-switch"></label>
+
+    <div id="shaker-menu" class="list-group offcanvas offcanvas-top shaker-menu">
+        <div class="offcanvas-body">
+            <div class="shaker-menu-container">
+                <div data-bs-dismiss="offcanvas" >
+                    <NavLink class="list-group-item list-group-item-action btn btn-link nav-list-group-item cocktail-nav-item" ActiveClass="active" Match="NavLinkMatch.All" href="/">
+                        Мої коктейлі
+                        @if (availableCocktailsCount != 0) {
+                            <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill cocktails-badge">@availableCocktailsCount</span>
+                        }
+                    </NavLink>
+                </div>
+                <div data-bs-dismiss="offcanvas">
+                    <NavLink class="list-group-item list-group-item-action btn btn-link nav-list-group-item cocktail-nav-item" ActiveClass="active" href="allcocktails">
+                        Всі коктейлі
+                        @if (allCocktailsCount != 0) {
+                            <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill cocktails-badge">@allCocktailsCount</span>
+                        }
+                    </NavLink>
+                </div>
+
+                <div data-bs-dismiss="offcanvas">
+                    <NavLink class="list-group-item list-group-item-action btn btn-link nav-list-group-item" ActiveClass="active" href="ingredients">Інгрідієнти
+                    </NavLink>
+                </div>
+               
+                <div class="form-check form-switch list-group-item list-group-item-action nav-list-group-item ">
+                    <input id="dark-switch" type="checkbox" class="form-check-input theme-switcher">
+                    <label id="dark-switch-label" for="dark-switch"></label>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -43,7 +56,7 @@
 
         await CocktailStateChangedAsync();
     }
-    
+
     public void Dispose() {
         CocktailsStateService.OnChange -= CocktailStateChangedAsync;
     }

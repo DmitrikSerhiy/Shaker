@@ -26,6 +26,19 @@ h1, h2, h3, h4 {
     cursor: pointer;
 }
 
+.shaker-menu-container {
+    max-width: 400px;
+    margin: auto;
+}
+
+.shaker-menu {
+    max-width: 400px;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+    height: fit-content !important;
+}
+
 .cocktail-nav-item {
     display: flex;
     justify-content: space-between;
