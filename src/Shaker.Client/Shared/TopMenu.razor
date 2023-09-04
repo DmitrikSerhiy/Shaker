@@ -1,5 +1,6 @@
 @using Shaker.Client.Services
 @inject CocktailsStateService CocktailsStateService
+@inject ILocalStorageService LocalStorage
 @implements IDisposable
 
 <div class="container mt-3 top-nav-bar">
@@ -12,6 +13,7 @@
             <path d="M57.0075 61.2304L54.9778 59.7303C50.5812 57.3212 44.97 58.5242 41.9566 62.69C38.6882 67.205 39.7041 73.5049 44.2151 76.7712C48.7322 80.0335 55.036 79.0257 58.3004 74.5127C61.3158 70.3409 60.6714 64.6474 57.0075 61.2304Z" fill="#CB500B"/>
         </svg>
     </div>
+    <BarPopup></BarPopup>
 
     <div id="shaker-menu" class="list-group offcanvas offcanvas-top shaker-menu">
         <div class="offcanvas-body">
@@ -37,11 +39,14 @@
                     <NavLink class="list-group-item list-group-item-action btn btn-link nav-list-group-item" ActiveClass="active" href="ingredients">Інгрідієнти
                     </NavLink>
                 </div>
-               
+                
                 <div class="form-check form-switch list-group-item list-group-item-action nav-list-group-item ">
                     <input id="dark-switch" type="checkbox" class="form-check-input theme-switcher">
                     <label id="dark-switch-label" for="dark-switch"></label>
                 </div>
+                
+                <BarPicker></BarPicker>
+                
             </div>
         </div>
     </div>
@@ -50,11 +55,17 @@
 @code {
     public int allCocktailsCount { get; set; }
     public int availableCocktailsCount { get; set; }
+    private int _currentBarId = -1;
 
     protected override async Task OnInitializedAsync() {
         CocktailsStateService.OnChange += CocktailStateChangedAsync;
 
         await CocktailStateChangedAsync();
+        
+        _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
+        if (_currentBarId == 0) {
+            _currentBarId = -1;
+        }
     }
 
     public void Dispose() {

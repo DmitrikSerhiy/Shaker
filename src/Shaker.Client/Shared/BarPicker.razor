@@ -1,0 +1,58 @@
+@using Shaker.Client.Dtos
+@using Shaker.Client.Services
+@inject IJSRuntime JSRuntime
+@inject DataService DataService
+@inject BarStateService BarStateService
+@implements IDisposable
+
+@if (!Loading) {
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="select-profile">Бар:</label>
+        <select id="select-profile" @onchange="OnBarPick" class="form-select form-select cocktails-select" style="padding: 1rem" aria-label="Обери бар">
+            <option value="-1">Обери бар</option>
+            @foreach (var profile in _profiles) {
+                <option value="@profile.Id" selected=@(profile.Id == BarId)>@profile.Name</option>
+            }
+        </select>
+        <button class="btn btn-outline-secondary inline-cocktails-button manage-bar-button" type="button" data-bs-dismiss="offcanvas" data-bs-target="#shaker-menu" @onclick="async () => await OnBarPopupOpenAsync()" title="Мої бари">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="32"><path fill="#6c757d" d="M480-120v-71l216-216 71 71-216 216h-71ZM120-330v-60h300v60H120Zm690-49-71-71 29-29q8-8 21-8t21 8l29 29q8 8 8 21t-8 21l-29 29ZM120-495v-60h470v60H120Zm0-165v-60h470v60H120Z"/></svg>
+        </button>
+    </div>
+}
+
+@code {
+    private int BarId { get; set; }
+    private List<Profile> _profiles = null!;
+    private bool Loading { get; set; } = true;
+
+    protected override async Task OnInitializedAsync() {
+        _profiles = await DataService.LoadProfilesAsync();
+        BarId = await BarStateService.GetBarAsync();
+        Loading = false;
+        
+        BarStateService.OnBarListChange += ReloadProfilesAsync;
+    }
+    
+    private async Task ReloadProfilesAsync() {
+        Loading = true;
+        Console.WriteLine("Changed");
+        _profiles = await DataService.LoadProfilesAsync();
+        Loading = false;
+        StateHasChanged();
+    }
+    
+    private async Task OnBarPick(ChangeEventArgs e) {
+        var barId = Int32.Parse(e.Value!.ToString()!);
+        await BarStateService.SetBarAsync(barId);
+        BarId = await BarStateService.GetBarAsync();
+    }
+    
+    private async Task OnBarPopupOpenAsync() {
+        await Task.Delay(500); // wait until offcanvas is closed
+        await JSRuntime.InvokeVoidAsync("openBarPopup");
+    }
+    
+    public void Dispose() {
+        BarStateService.OnBarListChange -= ReloadProfilesAsync;
+    }
+}

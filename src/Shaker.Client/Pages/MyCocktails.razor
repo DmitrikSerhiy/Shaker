@@ -4,17 +4,13 @@
 @using Shaker.Client.Helpers
 @inject CocktailService CocktailService
 @inject DataService DataService
-@inject ILocalStorageService LocalStorage
 @inject RandomCocktailService RandomCocktailService
 @inject CocktailsStateService CocktailsStateService
+@inject BarStateService BarStateService
 @implements IDisposable
 
 <div class="container text-center">
     <h2>Мої коктейлі</h2>
-
-    @if (!_loading && !_failed) {
-        <BarPicker BarId="_currentBarId" OnBarPicked="async barId => { await BarPickedAsync(barId); }"></BarPicker>
-    }
 
     @if (_loading) {
         <p>Завантаження...</p>
@@ -110,8 +106,8 @@
                     <CocktailCard
                         Cocktail="cocktail"
                         BarId="_currentBarId"
-                        OnFavoriteToggled="async () => await RefreshAsync(_currentBarId)"
-                        OnHiddenToggled="async () => await RefreshAsync(_currentBarId)">
+                        OnFavoriteToggled="async () => await RefreshAsync()"
+                        OnHiddenToggled="async () => await RefreshAsync()">
                     </CocktailCard>
                 }
             </div>
@@ -144,19 +140,19 @@
     
     private List<Cocktail> _allCocktails = null!;
     private List<Ingredient> _allIngredients = null!;
-    private Bar? _bar;
+    private Bar _bar = new();
     
     protected override async Task OnInitializedAsync() {
         _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
-        _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
-        if (_currentBarId == 0) {
-            _currentBarId = -1;
-            _loading = false;
-            return;
-        }
-        
-        await LoadAndSetBarAsync(_currentBarId);
+        BarStateService.OnCurrentBarChange += OnCurrentBarBarChanged;
+        await LoadAndSetBarAsync();
         _loading = false;
+    }
+
+    private async Task OnCurrentBarBarChanged() {
+        DataService.ClearCachedBar();
+        await RefreshAsync();
+        StateHasChanged();
     }
 
     private void OnInput(ChangeEventArgs e) {
@@ -164,8 +160,7 @@
         _debounceSearchTimer!.Change(250, Timeout.Infinite);
     }
     
-
-    private async Task RefreshAsync(int barId) {
+    private async Task RefreshAsync() {
         _availableCocktails = new();
         _searchedCocktails = new();
         _ingredientsEmpty = false;
@@ -183,23 +178,20 @@
         _showHiddenCocktails = false;
         
         _searchQuery = "";
-        _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
+        _currentBarId = await BarStateService.GetBarAsync();
         if (_currentBarId == 0) {
             _currentBarId = -1;
         }
         _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
-        await LoadAndSetBarAsync(barId);
+        await LoadAndSetBarAsync();
         _loading = false;
     }
-    
-    private async Task BarPickedAsync(int barId) {
-        await LocalStorage.SetItemAsync("currentBar", barId);
-        _currentBarId = barId;
-        DataService.ClearCachedBar();
-        await RefreshAsync(_currentBarId);
-    }
 
-    private async Task LoadAndSetBarAsync(int barId) {
+    private async Task LoadAndSetBarAsync() {
+        _currentBarId = await BarStateService.GetBarAsync();
+        if (_currentBarId == -1) {
+            return;
+        }
         try {
             _allCocktails = await DataService.LoadCocktailsAsync();
             await CocktailsStateService.SetAllCocktailsCountAsync(_allCocktails.Count);
@@ -247,32 +239,26 @@
             return;
         }
 
-        if (barId == -1) {
-            _bar = new Bar();
-        }
-        else {
-            try {
-                _bar = await DataService.LoadBarAsync(barId);
-                if (_bar == null || _bar.Ingredients.Count == 0) {
-                    _loading = false;
-                    _myIngredientsEmpty = true;
-                    await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
-                    return;
-                }
-                _bar.Ingredients = _allIngredients
-                    .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
-                    .ToList();
-            }
-            catch {
-                _failed = true;
-                await ResetCurrentBarAsync();
-                _errorMessage = "Не вдалося завантажити бар.";
+        try {
+            _bar = await DataService.LoadBarAsync(_currentBarId);
+            if (_bar.Ingredients.Count == 0) {
                 _loading = false;
+                _myIngredientsEmpty = true;
                 await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
                 return;
             }
+            _bar.Ingredients = _allIngredients
+                .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
+                .ToList();
         }
-
+        catch {
+            _failed = true;
+            _errorMessage = "Не вдалося завантажити бар.";
+            _loading = false;
+            await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
+            return;
+        }
+        
         _availableCocktails = CocktailService.GetAvailableCocktails(_bar, _allCocktails);
         _availableCocktails = CocktailService.MapAndSortFavoriteCocktails(_bar, _availableCocktails);
         _searchedCocktails = _showHiddenCocktails 
@@ -281,7 +267,6 @@
         
         await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
     }
-
 
     private void FilterCocktails() {
         var searched = _availableCocktails.AsQueryable();
@@ -299,7 +284,6 @@
         
         _searchedCocktails = searched.ToList();
     }
-    
 
     private void FilterCocktailsByType(int type) {
         _filteredByType = type;
@@ -334,11 +318,6 @@
             ? _availableCocktails 
             : _availableCocktails.Where(c => c.IsHidden == false).ToList();
     }
-    
-    private async Task ResetCurrentBarAsync() {
-        _currentBarId = -1;
-        await LocalStorage.RemoveItemAsync("currentBar");
-    }
 
     private void OpenRandomCocktail() {
         var randomCocktail = new Random().Next(_availableCocktails.Count);
@@ -352,6 +331,7 @@
     }
 
     public void Dispose() {
+        BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
         _debounceSearchTimer?.Dispose();
     }
 }

@@ -4,16 +4,13 @@
 @using Shaker.Client.Helpers
 @inject DataService DataService
 @inject BarService BarService
-@inject ILocalStorageService LocalStorage
 @inject CocktailService CocktailService
 @inject CocktailsStateService CocktailsStateService
+@inject BarStateService BarStateService
+@implements IDisposable
 
 <div class="container text-center">
     <h2>Інгрідієнти</h2>
-    
-    @if (!_loading && !_failed) {
-        <BarPicker BarId="_currentBarId" OnBarPicked="async barId => { await BarPickedAsync(barId); }"></BarPicker>
-    }
 
     @if(_loading) {
         <p>Завантаження...</p>
@@ -78,14 +75,38 @@
 
     protected override async Task OnInitializedAsync() {
         _debounceSearchTimer = new Timer(Search, null, Timeout.Infinite, Timeout.Infinite);
+        BarStateService.OnCurrentBarChange += OnCurrentBarBarChanged;
+        await LoadBarAsync();
+        _loading = false;
+    }
+    
+    private async Task OnCurrentBarBarChanged() {
+        DataService.ClearCachedBar();
+        await RefreshAsync();
+        StateHasChanged();
+    }
+
+    private async Task RefreshAsync() {
+        _loading = true;
+        _selectedIngredientId = -1;
+        _ingredientsEmpty = false;
+        _myIngredientsEmpty = false;
         
-        _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
-        if (_currentBarId == 0) {
-            _currentBarId = -1;
-            _loading = false;
+        _failed = false;
+        _errorMessage = "";
+        
+        _currentBarId = await BarStateService.GetBarAsync();
+        await LoadBarAsync();
+        ResetSearch();
+        _loading = false;
+    }
+    
+    private async Task LoadBarAsync() {
+        _currentBarId = await BarStateService.GetBarAsync();
+        if (_currentBarId == -1) {
             return;
         }
-
+        
         try {
             _allIngredients = await DataService.LoadIngredientsAsync();
             if (_allIngredients.Count == 0) {
@@ -100,43 +121,9 @@
             _loading = false;
             return;
         }
-
-
-        await LoadBarAsync(_currentBarId);
-        _loading = false;
-    }
-
-    private async Task RefreshAsync(int barId) {
-        _loading = true;
-        _selectedIngredientId = -1;
-        _ingredientsEmpty = false;
-        _myIngredientsEmpty = false;
         
-        _failed = false;
-        _errorMessage = "";
-        
-        _currentBarId = await LocalStorage.GetItemAsync<int>("currentBar");
-        if (_currentBarId == 0) {
-            _currentBarId = -1;
-        }
-        await LoadBarAsync(barId);
-        ResetSearch();
-        _loading = false;
-    }
-    
-    private async Task BarPickedAsync(int barId) {
-        await LocalStorage.SetItemAsync("currentBar", barId);
-        _currentBarId = barId;
-        DataService.ClearCachedBar();
-        await RefreshAsync(_currentBarId);
-    }
-    
-    private async Task LoadBarAsync(int barId) {
-        if (barId == -1) {
-            return;
-        }
         try {
-            _bar = await DataService.LoadBarAsync(barId);
+            _bar = await DataService.LoadBarAsync(_currentBarId);
             if (_bar.Ingredients.Count == 0) {
                 _loading = false;
                 _myIngredientsEmpty = true;
@@ -153,7 +140,6 @@
         catch {
             _failed = true;
             _errorMessage = "Не вдалося завантажити бар";
-            await ResetCurrentBarAsync();
             await ReCalculateAvailableCocktailsAsync(_bar);
             _loading = false;
         }
@@ -176,22 +162,17 @@
         _searchedIngredients = _bar.Ingredients;
     }
 
-    private async Task ResetCurrentBarAsync() {
-        _currentBarId = -1;
-        await LocalStorage.RemoveItemAsync("currentBar");
-    }
-
     private async Task AddToBarAsync(int ingredientToAddId, int barId) {
         if (ingredientToAddId == -1) {
             return;
         } 
         await BarService.AddToBarAsync(new Ingredient { Id = ingredientToAddId }, barId); 
-        await RefreshAsync(barId);
+        await RefreshAsync();
     }
 
     private async Task RemoveFromBarAsync(Ingredient ingredientToRemove, int barId) {
         await BarService.RemoveFromBarAsync(ingredientToRemove, barId);
-        await RefreshAsync(barId); 
+        await RefreshAsync(); 
     }
     
     
@@ -207,5 +188,9 @@
             _searchedIngredients = SearchHelper.SearchIngredients(_bar.Ingredients, _searchQuery);
             StateHasChanged();
         });
+    }
+
+    public void Dispose() {
+        BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
     }
 }

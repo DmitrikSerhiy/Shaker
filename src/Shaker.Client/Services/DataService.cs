@@ -71,6 +71,7 @@ public sealed class DataService {
     }
 
     public async Task<List<Profile>> LoadProfilesAsync() {
+        // todo: cache profiles
         var profiles = await _repository.GetData<List<Profile>>(ShakerConstants.ProfilesUrl);
         return profiles ?? new List<Profile>();
     }

@@ -16,16 +16,16 @@ public sealed class CocktailsStateService {
     private int? AllCocktailsCount { get; set; }
     private int? AvailableCocktailsCount { get; set; }
 
-    public async Task SetAllCocktailsCountAsync(int count) {
-        AllCocktailsCount = count;
-        await SaveToLocalStorage(AllCocktailsCountName, count);
-        await NotifyStateChanged()!;
-    }
+        public async Task SetAllCocktailsCountAsync(int count) {
+            AllCocktailsCount = count;
+            await SaveToLocalStorage(AllCocktailsCountName, count);
+            await NotifyStateChanged();
+        }
 
     public async Task SetAvailableCocktailsCountAsync(int count) {
         AvailableCocktailsCount = count;
         await SaveToLocalStorage(AvailableCocktailsCountName, count);
-        await NotifyStateChanged()!;
+        await NotifyStateChanged();
     }
     
     public async Task<int> GetAllCocktailsCountAsync() {
@@ -38,7 +38,7 @@ public sealed class CocktailsStateService {
         return AvailableCocktailsCount.GetValueOrDefault();
     }
 
-    private Task? NotifyStateChanged() => OnChange?.Invoke();
+    private Task NotifyStateChanged() => OnChange?.Invoke() ?? Task.CompletedTask;
 
     private async Task SaveToLocalStorage(string key, int value) {
         await _localStorageService.SetItemAsync(key, value);

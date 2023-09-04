@@ -16,6 +16,7 @@ builder.Services.AddScoped<DataService>();
 builder.Services.AddSingleton<IRepository, BlobRepository>();
 builder.Services.AddSingleton<RandomCocktailService>();
 builder.Services.AddScoped<CocktailsStateService>();
+builder.Services.AddScoped<BarStateService>();
 
 var host = builder.Build();
 
