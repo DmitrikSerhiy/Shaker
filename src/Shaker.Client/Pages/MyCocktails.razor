@@ -163,6 +163,7 @@
     private async Task RefreshAsync() {
         _availableCocktails = new();
         _searchedCocktails = new();
+        _bar = new Bar();
         _ingredientsEmpty = false;
         _cocktailsEmpty = false;
         _myIngredientsEmpty = false;
@@ -177,11 +178,9 @@
 
         _showHiddenCocktails = false;
         
-        _searchQuery = "";
         _currentBarId = await BarStateService.GetBarAsync();
-        if (_currentBarId == 0) {
-            _currentBarId = -1;
-        }
+        
+        _searchQuery = "";
         _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
         await LoadAndSetBarAsync();
         _loading = false;
@@ -190,61 +189,59 @@
     private async Task LoadAndSetBarAsync() {
         _currentBarId = await BarStateService.GetBarAsync();
         if (_currentBarId == -1) {
+            await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
+        
+        // load all cocktails
         try {
             _allCocktails = await DataService.LoadCocktailsAsync();
             await CocktailsStateService.SetAllCocktailsCountAsync(_allCocktails.Count);
             if (_allCocktails.Count == 0) {
                 _cocktailsEmpty = true;
+                await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
                 _loading = false;
-                await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
                 return;
             }
         } catch {
             _failed = true;
             _errorMessage = "Не вдалося завантажити рецепти коктейлів.";
             _loading = false;
-            await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
+            await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
         
+        // load all ingredients
         try {
             _allIngredients = await DataService.LoadIngredientsAsync();
             if (_allIngredients.Count == 0) {
                 _ingredientsEmpty = true;
                 _loading = false;
-                await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
+                await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
                 return;
             }
         } catch {
             _failed = true;
             _errorMessage = "Не вдалося завантажити інгрідієнти.";
             _loading = false;
-            await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
+            await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
-
-        try {
-            foreach(var cocktail in _allCocktails) {
-                cocktail.Ingredients = _allIngredients
-                    .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
-                    .ToList();
-            }
-        } catch {
-            _failed = true;
-            _errorMessage = "Не вдалося завантажити коктейлі.";
-            _loading = false;
-            await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
-            return;
+        
+        // map all cocktails
+        foreach(var cocktail in _allCocktails) {
+            cocktail.Ingredients = _allIngredients
+                .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
+                .ToList();
         }
-
+        
+        // load bar
         try {
             _bar = await DataService.LoadBarAsync(_currentBarId);
             if (_bar.Ingredients.Count == 0) {
                 _loading = false;
                 _myIngredientsEmpty = true;
-                await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
+                await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
                 return;
             }
             _bar.Ingredients = _allIngredients
@@ -255,7 +252,7 @@
             _failed = true;
             _errorMessage = "Не вдалося завантажити бар.";
             _loading = false;
-            await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
+            await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
         
@@ -265,7 +262,7 @@
             ? _availableCocktails 
             : _availableCocktails.Where(c => c.IsHidden == false).ToList();
         
-        await CocktailsStateService.SetAvailableCocktailsCountAsync(_availableCocktails.Count);
+        await CocktailsStateService.SetCalculatedCocktailsCountsAsync(_availableCocktails.Count, _bar.Ingredients.Count);
     }
 
     private void FilterCocktails() {

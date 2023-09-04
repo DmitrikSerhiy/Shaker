@@ -21,7 +21,7 @@ public sealed class BarStateService {
     }
     
     public async Task<int> GetBarAsync() {
-        CurrentBar ??= await _localStorageService.GetItemAsync<int>(CurrentBarName);
+        CurrentBar ??= await _localStorageService.GetItemAsync<int?>(CurrentBarName);
         return CurrentBar ?? -1;
     }
 

@@ -25,6 +25,9 @@
         else if (_ingredientsEmpty) {
             <p>Інгрідієнти недоступні.</p>
         }
+        else if (_cocktailsEmpty) {
+            <p>Коктейлі недоступні.</p>
+        }
         else {
             <select id="select-ingredient" @bind="_selectedIngredientId" class="form-select form-select mb-3 cocktails-select" style="padding: 1rem" aria-label="Обрати інгрідієнт">
                 <option value="-1">Обрати інгрідієнт</option>
@@ -59,6 +62,8 @@
 @code {
     private bool _ingredientsEmpty;
     private bool _myIngredientsEmpty;
+    private bool _cocktailsEmpty;
+
 
     private bool _loading = true;
     private bool _failed;
@@ -76,8 +81,7 @@
     protected override async Task OnInitializedAsync() {
         _debounceSearchTimer = new Timer(Search, null, Timeout.Infinite, Timeout.Infinite);
         BarStateService.OnCurrentBarChange += OnCurrentBarBarChanged;
-        await LoadBarAsync();
-        _loading = false;
+        await LoadAndSetIngredientsAsync();
     }
     
     private async Task OnCurrentBarBarChanged() {
@@ -88,28 +92,36 @@
 
     private async Task RefreshAsync() {
         _loading = true;
+        _searchedIngredients = new();
+        _bar = new Bar();
         _selectedIngredientId = -1;
         _ingredientsEmpty = false;
         _myIngredientsEmpty = false;
+        _cocktailsEmpty = false;
         
         _failed = false;
         _errorMessage = "";
         
-        _currentBarId = await BarStateService.GetBarAsync();
-        await LoadBarAsync();
         ResetSearch();
+        _currentBarId = await BarStateService.GetBarAsync();
+        await LoadAndSetIngredientsAsync();
         _loading = false;
     }
     
-    private async Task LoadBarAsync() {
+    private async Task LoadAndSetIngredientsAsync() {
         _currentBarId = await BarStateService.GetBarAsync();
         if (_currentBarId == -1) {
+            await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
+            _loading = false;
             return;
         }
+        List<Cocktail> allCocktails;
         
+        // load all ingredients
         try {
             _allIngredients = await DataService.LoadIngredientsAsync();
             if (_allIngredients.Count == 0) {
+                await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
                 _ingredientsEmpty = true;
                 _loading = false;
                 return;
@@ -117,45 +129,65 @@
         }
         catch {
             _failed = true;
+            await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             _errorMessage = "Не вдалося завантажити інгрідієнти.";
             _loading = false;
             return;
         }
         
+        // load all cocktails
         try {
-            _bar = await DataService.LoadBarAsync(_currentBarId);
-            if (_bar.Ingredients.Count == 0) {
+            allCocktails = await DataService.LoadCocktailsAsync();
+            await CocktailsStateService.SetAllCocktailsCountAsync(allCocktails.Count);
+            if (allCocktails.Count == 0) {
+                _cocktailsEmpty = true;
+                await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
                 _loading = false;
-                _myIngredientsEmpty = true;
-                await ReCalculateAvailableCocktailsAsync(_bar);
                 return;
             }
-            _bar.Ingredients = _allIngredients
-                .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
-                .ToList();
-            
-            await ReCalculateAvailableCocktailsAsync(_bar);
-            _searchedIngredients = _bar.Ingredients.ToList();
-        }
-        catch {
+        } catch {
             _failed = true;
-            _errorMessage = "Не вдалося завантажити бар";
-            await ReCalculateAvailableCocktailsAsync(_bar);
+            _errorMessage = "Не вдалося завантажити рецепти коктейлів.";
             _loading = false;
+            await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
+            return;
         }
-    }
-
-    private async Task ReCalculateAvailableCocktailsAsync(Bar bar) {
-        var allCocktails = await DataService.LoadCocktailsAsync();
+        
+        // map all cocktails
         foreach(var cocktail in allCocktails) {
             cocktail.Ingredients = _allIngredients
                 .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
         }
         
-        var availableCocktails = CocktailService.GetAvailableCocktails(bar, allCocktails);
-        await CocktailsStateService.SetAvailableCocktailsCountAsync(availableCocktails.Count);
+        // load bar
+        try {
+            _bar = await DataService.LoadBarAsync(_currentBarId);
+            if (_bar.Ingredients.Count == 0) {
+                _loading = false;
+                await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
+                _myIngredientsEmpty = true;
+                return;
+            }
+        }
+        catch {
+            _failed = true;
+            await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
+            _errorMessage = "Не вдалося завантажити бар";
+            _loading = false;
+        }
+        
+        _bar.Ingredients = _allIngredients
+            .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
+            .ToList();
+        
+        _searchedIngredients = _bar.Ingredients.ToList();
+        var availableCocktails = CocktailService.GetAvailableCocktails(_bar, allCocktails);
+        
+        await CocktailsStateService.SetCalculatedCocktailsCountsAsync(availableCocktails.Count, _bar.Ingredients.Count);
+        _loading = false;
     }
+    
 
     private void ResetSearch() {
         _searchQuery = "";
@@ -191,6 +223,7 @@
     }
 
     public void Dispose() {
+        _debounceSearchTimer?.Dispose();
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
     }
 }
