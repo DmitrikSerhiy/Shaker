@@ -40,7 +40,7 @@
             <button type="button" class="btn btn-link mb-3 @(_selectedIngredientId == -1 ? "disabled" : "")" @onclick="async () => await AddToBarAsync(_selectedIngredientId, _currentBarId)">Додати до бару</button>
 
             <div class="mb-3">
-                <input id="search-ingredient" type="text" class="form-control" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
+                <input id="search-ingredient" type="text" class="form-control cocktail-input" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
             </div>
 
             @if (_myIngredientsEmpty) {
@@ -243,18 +243,15 @@
     setTimeout(() => {
         let myIngredientsScrollable = document.getElementById("my-ingredients-page-wrapper");
         let ingredientsToTopButton = document.getElementById("my-ingredients-to-top");
-            
-        myIngredientsScrollable.onscroll = function () {
-            scrollFunction();
-        };
-        
-        function scrollFunction() {
-            if (myIngredientsScrollable.scrollTop > 200) {
+          
+        myIngredientsScrollable.addEventListener('scroll',(event) => {
+            if (event.target.scrollTop > 400) {
                 ingredientsToTopButton.style.display = "flex";
             } else {
                 ingredientsToTopButton.style.display = "none";
             }
-        }
+        });
+                
     }, 1000);
     
     function myIngredientsToTop() {

@@ -27,7 +27,7 @@
         }
         else {
             <div class="mb-3">
-                <input id="search-all-cocktail" type="text" class="form-control" placeholder="Знайти за назвою або рецептом" @bind="_searchQuery" @oninput="OnInput">
+                <input id="search-all-cocktail" type="text" class="form-control cocktail-input" placeholder="Знайти за назвою або рецептом" @bind="_searchQuery" @oninput="OnInput">
             </div>
         }
     }
@@ -180,17 +180,13 @@
         let allCocktailsScrollable = document.getElementById("all-cocktails-page-wrapper");
         let allCocktailsToTopButton = document.getElementById("all-cocktails-to-top");
             
-        allCocktailsScrollable.onscroll = function () {
-            scrollFunction();
-        };
-        
-        function scrollFunction() {
-            if (allCocktailsScrollable.scrollTop > 200) {
+        allCocktailsScrollable.addEventListener('scroll',(event) => {
+            if (event.target.scrollTop > 400) {
                 allCocktailsToTopButton.style.display = "flex";
             } else {
                 allCocktailsToTopButton.style.display = "none";
             }
-        }
+        });
     }, 1000);
     
     function allCocktailsToTop() {

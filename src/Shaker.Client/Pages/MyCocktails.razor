@@ -36,7 +36,7 @@
             <p>Неможливо приготувати смачний коктейль із наявних інгрідієнтів. Тіко не змішуй все, що є у твоєму барі. Краще випий чаю.</p>
         }
         else {
-            <div class="input-group mb-3">
+            <div class="input-group mb-3 cocktail-input">
                 <input id="search-available-cocktails" type="text" class="form-control" placeholder="Знайти за назвою або інгрідієнтами" aria-label="Знайти за назвою або рецептом" aria-describedby="filter-button" @bind="_searchQuery" @oninput="OnInput">
                 <button class="btn btn-outline-secondary inline-cocktails-button" type="button" @onclick="OpenRandomCocktail" title="Випадковий коктейль">
                     <svg height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
@@ -353,17 +353,14 @@
         let myCocktailsScrollable = document.getElementById("my-cocktails-page-wrapper");
         let toTopButton = document.getElementById("my-cocktails-to-top");
             
-        myCocktailsScrollable.onscroll = function () {
-            scrollFunction();
-        };
-        
-        function scrollFunction() {
-            if (myCocktailsScrollable.scrollTop > 200) {
+        myCocktailsScrollable.addEventListener('scroll',(event) => {
+            if (event.target.scrollTop > 400) {
                 toTopButton.style.display = "flex";
             } else {
                 toTopButton.style.display = "none";
             }
-        }
+        });
+
     }, 1000);
     
     function myCocktailsToTop() {
