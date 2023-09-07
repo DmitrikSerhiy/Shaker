@@ -7,12 +7,13 @@
 @inject CocktailService CocktailService
 @inject CocktailsStateService CocktailsStateService
 @inject BarStateService BarStateService
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <div class="container text-center">
     <h2>Інгрідієнти</h2>
 
-    @if(_loading) {
+    @if (_loading) {
         <p>Завантаження...</p>
     }
     else {
@@ -35,29 +36,37 @@
                     <option value="@ingredient.Id">@ingredient.Name</option>
                 }
             </select>
-            
-            <button type="button" class="btn btn-link mb-3 @(_selectedIngredientId == -1 ? "disabled" : "")"  @onclick="async () => await AddToBarAsync(_selectedIngredientId, _currentBarId)">Додати до бару</button>
-            
+
+            <button type="button" class="btn btn-link mb-3 @(_selectedIngredientId == -1 ? "disabled" : "")" @onclick="async () => await AddToBarAsync(_selectedIngredientId, _currentBarId)">Додати до бару</button>
+
             <div class="mb-3">
                 <input id="search-ingredient" type="text" class="form-control" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
             </div>
-            
+
             @if (_myIngredientsEmpty) {
                 <p>Бар порожній. Додай інгрідієнти.</p>
-            }
-            else {
-                <ul class="list-group list-group-flush list-group-item-action">
-                    @foreach (var ingredient in _searchedIngredients) {
-                        <li class="list-group-item list-group-item-action" style="display: flex; justify-content: space-between; align-items: center">
-                            @ingredient.Name 
-                            <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient, _currentBarId)">Прибрати</button>
-                        </li>
-                    }
-                </ul>
             }
         }
     }
 </div>
+
+@if (_loading == false && _failed == false && _currentBarId != -1 && _myIngredientsEmpty == false && _ingredientsEmpty == false && _cocktailsEmpty == false) {
+    <div id="my-ingredients-page-wrapper" class="ingredients-page-wrapper container-fluid">
+        <div class="container">
+            <ul class="list-group list-group-flush list-group-item-action">
+                @foreach (var ingredient in _searchedIngredients) {
+                    <li class="list-group-item list-group-item-action" style="display: flex; justify-content: space-between; align-items: center">
+                        @ingredient.Name
+                        <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient, _currentBarId)">Прибрати</button>
+                    </li>
+                }
+            </ul>
+        </div>
+        <a id="my-ingredients-to-top" href="/ingredients/#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
+    </div>
+}
+
+
 @code {
     private bool _ingredientsEmpty;
     private bool _myIngredientsEmpty;
@@ -67,7 +76,7 @@
     private bool _loading = true;
     private bool _failed;
     private string _errorMessage = "";
-    
+
     private int _currentBarId = -1;
     private int _selectedIngredientId = -1;
     private List<Ingredient> _allIngredients = new();
@@ -82,7 +91,7 @@
         BarStateService.OnCurrentBarChange += OnCurrentBarBarChanged;
         await LoadAndSetIngredientsAsync();
     }
-    
+
     private async Task OnCurrentBarBarChanged() {
         DataService.ClearCachedBar();
         await RefreshAsync();
@@ -97,16 +106,16 @@
         _ingredientsEmpty = false;
         _myIngredientsEmpty = false;
         _cocktailsEmpty = false;
-        
+
         _failed = false;
         _errorMessage = "";
-        
+
         ResetSearch();
         _currentBarId = await BarStateService.GetBarAsync();
         await LoadAndSetIngredientsAsync();
         _loading = false;
     }
-    
+
     private async Task LoadAndSetIngredientsAsync() {
         _currentBarId = await BarStateService.GetBarAsync();
         if (_currentBarId == -1) {
@@ -115,7 +124,7 @@
             return;
         }
         List<Cocktail> allCocktails;
-        
+
         // load all ingredients
         try {
             _allIngredients = await DataService.LoadIngredientsAsync();
@@ -133,7 +142,7 @@
             _loading = false;
             return;
         }
-        
+
         // load all cocktails
         try {
             allCocktails = await DataService.LoadCocktailsAsync();
@@ -144,21 +153,22 @@
                 _loading = false;
                 return;
             }
-        } catch {
+        }
+        catch {
             _failed = true;
             _errorMessage = "Не вдалося завантажити рецепти коктейлів.";
             _loading = false;
             await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
-        
+
         // map all cocktails
-        foreach(var cocktail in allCocktails) {
+        foreach (var cocktail in allCocktails) {
             cocktail.Ingredients = _allIngredients
                 .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
         }
-        
+
         // load bar
         try {
             _bar = await DataService.LoadBarAsync(_currentBarId);
@@ -175,18 +185,18 @@
             _errorMessage = "Не вдалося завантажити бар";
             _loading = false;
         }
-        
+
         _bar.Ingredients = _allIngredients
             .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
             .ToList();
-        
+
         _searchedIngredients = _bar.Ingredients.ToList();
         var availableCocktails = CocktailService.GetAvailableCocktails(_bar, allCocktails);
-        
+
         await CocktailsStateService.SetCalculatedCocktailsCountsAsync(availableCocktails.Count, _bar.Ingredients.Count);
         _loading = false;
     }
-    
+
 
     private void ResetSearch() {
         _searchQuery = "";
@@ -196,25 +206,23 @@
     private async Task AddToBarAsync(int ingredientToAddId, int barId) {
         if (ingredientToAddId == -1) {
             return;
-        } 
-        await BarService.AddToBarAsync(new Ingredient { Id = ingredientToAddId }, barId); 
+        }
+        await BarService.AddToBarAsync(new Ingredient { Id = ingredientToAddId }, barId);
         await RefreshAsync();
     }
 
     private async Task RemoveFromBarAsync(Ingredient ingredientToRemove, int barId) {
         await BarService.RemoveFromBarAsync(ingredientToRemove, barId);
-        await RefreshAsync(); 
+        await RefreshAsync();
     }
-    
-    
-    private void OnInput(ChangeEventArgs e)
-    {
+
+
+    private void OnInput(ChangeEventArgs e) {
         _searchQuery = e.Value?.ToString() ?? "";
         _debounceSearchTimer!.Change(250, Timeout.Infinite);
     }
-    
-    private async void Search(object? state)
-    {
+
+    private async void Search(object? state) {
         await InvokeAsync(() => {
             _searchedIngredients = SearchHelper.SearchIngredients(_bar.Ingredients, _searchQuery);
             StateHasChanged();
@@ -225,4 +233,36 @@
         _debounceSearchTimer?.Dispose();
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
     }
+    
+    private async Task ToTopAsync() {
+        await JSRuntime.InvokeVoidAsync("myIngredientsToTop");
+    }
 }
+
+<script>
+    setTimeout(() => {
+        let myIngredientsScrollable = document.getElementById("my-ingredients-page-wrapper");
+        let ingredientsToTopButton = document.getElementById("my-ingredients-to-top");
+            
+        myIngredientsScrollable.onscroll = function () {
+            scrollFunction();
+        };
+        
+        function scrollFunction() {
+            if (myIngredientsScrollable.scrollTop > 200) {
+                ingredientsToTopButton.style.display = "flex";
+            } else {
+                ingredientsToTopButton.style.display = "none";
+            }
+        }
+    }, 1000);
+    
+    function myIngredientsToTop() {
+        let myIngredientsScrollable = document.getElementById("my-ingredients-page-wrapper");
+
+        myIngredientsScrollable.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+</script>

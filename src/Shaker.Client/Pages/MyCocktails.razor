@@ -7,6 +7,7 @@
 @inject RandomCocktailService RandomCocktailService
 @inject CocktailsStateService CocktailsStateService
 @inject BarStateService BarStateService
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <div class="container text-center">
@@ -52,10 +53,12 @@
                     </svg>
                 </button>
                 <button class="btn btn-outline-secondary inline-cocktails-button" type="button" @onclick="ToggleFilters" title="Фільтри" data-bs-toggle="collapse" data-bs-target="#cocktail-filters" aria-expanded="false" aria-controls="cocktail-filters">
-                    <svg height="32" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg"> <path fill="#6c757d" d="M440-160q-17 0-28.5-11.5T400-200v-240L161-745q-14-17-4-36t31-19h584q21 0 31 19t-4 36L560-440v240q0 17-11.5 28.5T520-160h-80Zm40-276 240-304H240l240 304Zm0 0Z"/></svg>
+                    <svg height="32" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#6c757d" d="M440-160q-17 0-28.5-11.5T400-200v-240L161-745q-14-17-4-36t31-19h584q21 0 31 19t-4 36L560-440v240q0 17-11.5 28.5T520-160h-80Zm40-276 240-304H240l240 304Zm0 0Z"/>
+                    </svg>
                 </button>
             </div>
-            
+
             <div id="cocktail-filters" class="input-group cocktails-filters collapse">
                 <div class="cocktails-filter-input-group">
                     <div class="form-check form-check-inline">
@@ -97,10 +100,16 @@
                         <label class="form-check-label" for="show-hidden">Показати приховані</label>
                     </div>
                 </div>
-                
+
                 <div class="filters-margin"></div>
             </div>
-            
+        }
+    }
+</div>
+
+@if (_loading == false && _failed == false && _currentBarId != -1 && _ingredientsEmpty == false && _myIngredientsEmpty == false && _cocktailsEmpty == false && _availableCocktails.Count != 0) {
+    <div id="my-cocktails-page-wrapper" class="cocktails-page-wrapper container-fluid">
+        <div class="container">
             <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
                 @foreach (var cocktail in _searchedCocktails) {
                     <CocktailCard
@@ -111,36 +120,37 @@
                     </CocktailCard>
                 }
             </div>
-        }
-    }
-</div>
+        </div>
+        <a id="my-cocktails-to-top" href="#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
+    </div>
+}
 
 @code {
     private List<Cocktail> _availableCocktails = new();
     private List<Cocktail> _searchedCocktails = new();
-    
+
     private bool _ingredientsEmpty;
     private bool _cocktailsEmpty;
     private bool _myIngredientsEmpty;
-    
+
     private bool _loading = true;
     private bool _failed;
     private string _errorMessage = "";
-    
+
     private bool _showFilters;
     private int _filteredBySource;
     private int _filteredByType;
     private bool _showHiddenCocktails;
 
     private int _currentBarId = -1;
-    
+
     private string _searchQuery = "";
     private Timer? _debounceSearchTimer;
-    
+
     private List<Cocktail> _allCocktails = null!;
     private List<Ingredient> _allIngredients = null!;
     private Bar _bar = new();
-    
+
     protected override async Task OnInitializedAsync() {
         _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
         BarStateService.OnCurrentBarChange += OnCurrentBarBarChanged;
@@ -158,7 +168,7 @@
         _searchQuery = e.Value?.ToString() ?? "";
         _debounceSearchTimer!.Change(250, Timeout.Infinite);
     }
-    
+
     private async Task RefreshAsync() {
         _availableCocktails = new();
         _searchedCocktails = new();
@@ -166,7 +176,7 @@
         _ingredientsEmpty = false;
         _cocktailsEmpty = false;
         _myIngredientsEmpty = false;
-    
+
         _loading = true;
         _failed = false;
         _errorMessage = "";
@@ -176,9 +186,9 @@
         _filteredByType = 0;
 
         _showHiddenCocktails = false;
-        
+
         _currentBarId = await BarStateService.GetBarAsync();
-        
+
         _searchQuery = "";
         _debounceSearchTimer = new Timer(FilterCocktailsByName, null, Timeout.Infinite, Timeout.Infinite);
         await LoadAndSetBarAsync();
@@ -191,7 +201,7 @@
             await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
-        
+
         // load all cocktails
         try {
             _allCocktails = await DataService.LoadCocktailsAsync();
@@ -202,14 +212,15 @@
                 _loading = false;
                 return;
             }
-        } catch {
+        }
+        catch {
             _failed = true;
             _errorMessage = "Не вдалося завантажити рецепти коктейлів.";
             _loading = false;
             await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
-        
+
         // load all ingredients
         try {
             _allIngredients = await DataService.LoadIngredientsAsync();
@@ -219,21 +230,22 @@
                 await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
                 return;
             }
-        } catch {
+        }
+        catch {
             _failed = true;
             _errorMessage = "Не вдалося завантажити інгрідієнти.";
             _loading = false;
             await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
-        
+
         // map all cocktails
-        foreach(var cocktail in _allCocktails) {
+        foreach (var cocktail in _allCocktails) {
             cocktail.Ingredients = _allIngredients
                 .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
         }
-        
+
         // load bar
         try {
             _bar = await DataService.LoadBarAsync(_currentBarId);
@@ -254,13 +266,13 @@
             await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
-        
+
         _availableCocktails = CocktailService.GetAvailableCocktails(_bar, _allCocktails);
         _availableCocktails = CocktailService.MapAndSortFavoriteCocktails(_bar, _availableCocktails);
-        _searchedCocktails = _showHiddenCocktails 
-            ? _availableCocktails 
+        _searchedCocktails = _showHiddenCocktails
+            ? _availableCocktails
             : _availableCocktails.Where(c => c.IsHidden == false).ToList();
-        
+
         await CocktailsStateService.SetCalculatedCocktailsCountsAsync(_availableCocktails.Count, _bar.Ingredients.Count);
     }
 
@@ -277,7 +289,7 @@
         if (_filteredByType != 0) {
             searched = SearchHelper.FilterCocktailsByType(searched, (CocktailType)_filteredByType);
         }
-        
+
         _searchedCocktails = searched.ToList();
     }
 
@@ -285,12 +297,12 @@
         _filteredByType = type;
         FilterCocktails();
     }
-    
+
     private void FilterCocktailsBySource(int source) {
         _filteredBySource = source;
         FilterCocktails();
     }
-    
+
     private async void FilterCocktailsByName(object? state) {
         await InvokeAsync(() => {
             FilterCocktails();
@@ -310,8 +322,8 @@
 
     private void ToggleHiddenCocktails() {
         _showHiddenCocktails = !_showHiddenCocktails;
-        _searchedCocktails = _showHiddenCocktails 
-            ? _availableCocktails 
+        _searchedCocktails = _showHiddenCocktails
+            ? _availableCocktails
             : _availableCocktails.Where(c => c.IsHidden == false).ToList();
     }
 
@@ -321,7 +333,7 @@
 
         OpenCocktailPopup(cocktailId);
     }
-    
+
     private void OpenCocktailPopup(int cocktailId) {
         RandomCocktailService.OpenRandomCocktailPopup(cocktailId);
     }
@@ -330,4 +342,36 @@
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
         _debounceSearchTimer?.Dispose();
     }
+    
+    private async Task ToTopAsync() {
+        await JSRuntime.InvokeVoidAsync("myCocktailsToTop");
+    }
 }
+
+<script>
+    setTimeout(() => {
+        let myCocktailsScrollable = document.getElementById("my-cocktails-page-wrapper");
+        let toTopButton = document.getElementById("my-cocktails-to-top");
+            
+        myCocktailsScrollable.onscroll = function () {
+            scrollFunction();
+        };
+        
+        function scrollFunction() {
+            if (myCocktailsScrollable.scrollTop > 200) {
+                toTopButton.style.display = "flex";
+            } else {
+                toTopButton.style.display = "none";
+            }
+        }
+    }, 1000);
+    
+    function myCocktailsToTop() {
+        let myCocktailsScrollable = document.getElementById("my-cocktails-page-wrapper");
+
+        myCocktailsScrollable.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+</script>

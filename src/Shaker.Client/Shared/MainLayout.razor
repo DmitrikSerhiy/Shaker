@@ -3,16 +3,7 @@
 @inherits LayoutComponentBase
 
 <TopMenu/>
-<div class="page">
-    <main>
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
-
-<a id="to-top" href="#" type="button" class="btn btn-secondary to-top">На початок &#8593;</a>
-
+@Body
 
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -23,19 +14,3 @@
         }
     }
 }
-
-<script>
-    let toTopButton = document.getElementById("to-top");
-    
-    window.onscroll = function () {
-        scrollFunction();
-    };
-    
-    function scrollFunction() {
-        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-            toTopButton.style.display = "flex";
-        } else {
-            toTopButton.style.display = "none";
-        }
-    }
-</script>

@@ -11,11 +11,44 @@
         <div class="modal-content">
             <div class="modal-header cocktail-popup-header">
                 <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">@Cocktail.Name</h2>
-                <button type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" @onclick="async () => await ResetCocktailPopupAsync(Cocktail.Id)" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image" alt="cocktail">
-                <p class="card-text my-3">@Cocktail.Recipe</p>
+            <div class="modal-body cocktail-popup-body row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2">
+                <div class="cocktail-popup-image-container col">
+                    <img src="@Cocktail.ImageUrl" class="cocktail-popup-image" alt="cocktail">
+                </div>
+                <div class="cocktail-popup-info-container col">
+                    <div class="accordion accordion-flush open" id="@($"cocktails-info-accordion-{Cocktail.Id}")">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="@($"flush-heading-recipe-{Cocktail.Id}")">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="@($"#flush-collapse-recipe-{Cocktail.Id}")" aria-expanded="true" aria-controls="@($"flush-collapse-recipe-{Cocktail.Id}")">
+                                    Рецепт
+                                </button>
+                            </h2>
+                            <div id="@($"flush-collapse-recipe-{Cocktail.Id}")" class="accordion-collapse collapse show" aria-labelledby="@($"flush-heading-recipe-{Cocktail.Id}")" data-bs-parent="@($"#cocktails-info-accordion-{Cocktail.Id}")">
+                                <div class="accordion-body">
+                                    <p class="card-text my-3">@Cocktail.Recipe</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="@($"flush-heading-ingredients-{Cocktail.Id}")">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="@($"#flush-collapse-ingredients-{Cocktail.Id}")" aria-expanded="false" aria-controls="@($"flush-collapse-ingredients-{Cocktail.Id}")">
+                                    Інгрідієнти
+                                </button>
+                            </h2>
+                            <div id="@($"flush-collapse-ingredients-{Cocktail.Id}")" class="accordion-collapse collapse" aria-labelledby="@($"flush-heading-ingredients-{Cocktail.Id}")" data-bs-parent="@($"#cocktails-info-accordion-{Cocktail.Id}")" >
+                                <div class="accordion-body">
+                                    <ul class="list-group list-group-flush text-left">
+                                        @foreach (var ingredient in Cocktail.Ingredients) {
+                                            <li class="list-group-item">@ingredient.Name</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -23,6 +56,7 @@
 
 <div class="col mb-3">
     <div class="card mx-auto cocktail-card">
+        <h2 class="card-title cocktail-name">@Cocktail.Name</h2>
         <div class="image-wrapper">
             @if (!IgnoreFavoriteAndHideIcons) {
                 <div class="icons-container-left" @onclick="async () => await HideUnHideCocktailAsync()" title="@(Cocktail.IsHidden ? "За цим я вже заскучав, показувати знову" : "Приховати")">
@@ -56,16 +90,6 @@
             </div>
             <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image cocktail-image-in-card" alt="cocktail" data-bs-toggle="modal" data-bs-target=@($"#{Cocktail.Id}-cocktail-modal")>
         </div>
-        <div class="card-body">
-            <div class="d-flex">
-                <h2 class="card-title cocktail-name">@Cocktail.Name</h2>
-            </div>
-        </div>
-        <ul class="list-group list-group-flush text-left">
-            @foreach (var ingredient in Cocktail.Ingredients) {
-                <li class="list-group-item">@ingredient.Name</li>
-            }
-        </ul>
     </div>
 </div>
 
@@ -123,16 +147,21 @@
             await JSRuntime.InvokeVoidAsync("openCocktailPopup", Cocktail.Id.ToString());
         }
     }
+    
+    private async Task ResetCocktailPopupAsync(int cocktailId) {
+        if (cocktailId == Cocktail.Id) {
+            await JSRuntime.InvokeVoidAsync("resetCocktailPopup", Cocktail.Id.ToString());
+        }
+    }
 
     public void Dispose() {
         RandomCocktailService.OnRandomCocktailPopupOpened -= OpenCocktailPopupAsync;
     }
-
 }
 
 <script>
-    function closeCocktailPopup() {
-        document.getElementById("cocktail-popup-close-btn").click();
+    function resetCocktailPopup(cocktailId) {
+        // nothing here for now
     }
     
     function openCocktailPopup(cocktailId) {

@@ -7,11 +7,12 @@
 @implements IDisposable
 @inject BarStateService BarStateService
 @inject CocktailService CocktailService
+@inject IJSRuntime JSRuntime
 
 <div class="container text-center">
     <h2>Всі коктейлі</h2>
-    
-    @if(_loading) {
+
+    @if (_loading) {
         <p>Завантаження...</p>
     }
     else {
@@ -21,34 +22,41 @@
         else if (_ingredientsEmpty) {
             <p>Інгрідієнти недоступні.</p>
         }
-        else if(_cocktailsEmpty) {
+        else if (_cocktailsEmpty) {
             <p>Коктейлі недоступні.</p>
         }
         else {
-
             <div class="mb-3">
-                <input id="search-all-cocktail" type="text" class="form-control" placeholder="Знайти за назвою або рецептом"  @bind="_searchQuery" @oninput="OnInput">
-            </div>
-            <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
-                @foreach (var cocktail in _searchedCocktails) {
-                    <CocktailCard Cocktail="cocktail" IgnoreFavoriteAndHideIcons=true></CocktailCard>
-                }
+                <input id="search-all-cocktail" type="text" class="form-control" placeholder="Знайти за назвою або рецептом" @bind="_searchQuery" @oninput="OnInput">
             </div>
         }
     }
 </div>
 
+@if (_loading == false && _failed == false && _ingredientsEmpty == false && _cocktailsEmpty == false) {
+    <div id="all-cocktails-page-wrapper" class="all-cocktails-page-wrapper container-fluid">
+        <div class="container">
+            <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
+                @foreach (var cocktail in _searchedCocktails) {
+                    <CocktailCard Cocktail="cocktail" IgnoreFavoriteAndHideIcons=true></CocktailCard>
+                }
+            </div>
+        </div>
+        <a id="all-cocktails-to-top" href="/allcocktails/#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
+    </div>
+}
+
 @code {
     private List<Cocktail> _allCocktails = new();
     private List<Cocktail> _searchedCocktails = new();
-    
+
     private bool _ingredientsEmpty;
     private bool _cocktailsEmpty;
-    
+
     private bool _loading = true;
     private bool _failed;
     private string _errorMessage = "";
-    
+
     private string _searchQuery = "";
     private Timer? _debounceSearchTimer;
 
@@ -58,7 +66,7 @@
         BarStateService.OnCurrentBarChange += OnCurrentBarBarChanged;
         await LoadAndSetAllCocktails();
     }
-    
+
     private async Task OnCurrentBarBarChanged() {
         DataService.ClearCachedBar();
         await LoadAndSetAllCocktails();
@@ -68,7 +76,7 @@
     private async Task LoadAndSetAllCocktails() {
         Bar bar;
         List<Ingredient> allIngredients;
-        // load all ingredients
+    // load all ingredients
         try {
             allIngredients = await DataService.LoadIngredientsAsync();
             if (allIngredients.Count == 0) {
@@ -86,7 +94,7 @@
             return;
         }
 
-        // load all cocktails
+    // load all cocktails
         try {
             _allCocktails = await DataService.LoadCocktailsAsync();
             await CocktailsStateService.SetAllCocktailsCountAsync(_allCocktails.Count);
@@ -96,30 +104,31 @@
                 _loading = false;
                 return;
             }
-        } catch {
+        }
+        catch {
             _failed = true;
             _errorMessage = "Не вдалося завантажити рецепти коктейлів.";
             _loading = false;
             await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             return;
         }
-        
+
         _searchedCocktails = _allCocktails.ToList();
-        
+
         // map all cocktails
-        foreach(var cocktail in _allCocktails) {
+        foreach (var cocktail in _allCocktails) {
             cocktail.Ingredients = allIngredients
                 .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
         }
-        
+
         var currentBarId = await BarStateService.GetBarAsync();
         if (currentBarId == -1) {
             await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
             _loading = false;
             return;
         }
-        
+
         // load bar
         try {
             bar = await DataService.LoadBarAsync(currentBarId);
@@ -134,24 +143,22 @@
             _loading = false;
             return;
         }
-        
+
         bar.Ingredients = allIngredients
             .Where(ingredient => bar.Ingredients.Any(i => i.Id == ingredient.Id))
             .ToList();
-        
+
         var availableCocktails = CocktailService.GetAvailableCocktails(bar, _allCocktails);
         await CocktailsStateService.SetCalculatedCocktailsCountsAsync(availableCocktails.Count, bar.Ingredients.Count);
         _loading = false;
     }
-    
-    private void OnInput(ChangeEventArgs e)
-    {
+
+    private void OnInput(ChangeEventArgs e) {
         _searchQuery = e.Value?.ToString() ?? "";
         _debounceSearchTimer!.Change(250, Timeout.Infinite);
     }
-    
-    private async void Search(object? state)
-    {
+
+    private async void Search(object? state) {
         await InvokeAsync(() => {
             _searchedCocktails = SearchHelper.SearchCocktails(_allCocktails, _searchQuery);
             StateHasChanged();
@@ -162,4 +169,36 @@
         _debounceSearchTimer?.Dispose();
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
     }
+
+    private async Task ToTopAsync() {
+        await JSRuntime.InvokeVoidAsync("allCocktailsToTop");
+    }
 }
+
+<script>
+    setTimeout(() => {
+        let allCocktailsScrollable = document.getElementById("all-cocktails-page-wrapper");
+        let allCocktailsToTopButton = document.getElementById("all-cocktails-to-top");
+            
+        allCocktailsScrollable.onscroll = function () {
+            scrollFunction();
+        };
+        
+        function scrollFunction() {
+            if (allCocktailsScrollable.scrollTop > 200) {
+                allCocktailsToTopButton.style.display = "flex";
+            } else {
+                allCocktailsToTopButton.style.display = "none";
+            }
+        }
+    }, 1000);
+    
+    function allCocktailsToTop() {
+        let allCocktailsScrollable = document.getElementById("all-cocktails-page-wrapper");
+
+        allCocktailsScrollable.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+</script>
