@@ -10,6 +10,13 @@ html, body {
     font-family: 'Malevich', 'Helvetica', Arial, sans-serif !important;
 }
 
+.my-cocktails-page-wrapper,
+.my-ingredients-page-wrapper,
+.all-cocktails-page-wrapper {
+    position: absolute;
+}
+
+
 .my-cocktails-content-wrapper,
 .all-cocktails-content-wrapper {
     overflow: auto;
@@ -112,7 +119,7 @@ h1, h2, h3, h4 {
     margin: auto;
     display: none;
     animation: scale-up-center 0.45s both;
-    z-index: 1000;
+    z-index: 600;
 }
 
 @keyframes scale-up-center {
@@ -132,7 +139,7 @@ h1, h2, h3, h4 {
     position: absolute;
     right: 0;
     top: 0;
-    z-index: 800;
+    z-index: 500;
     width: 4rem;
     height: 4rem;
     display: flex;
@@ -149,7 +156,7 @@ h1, h2, h3, h4 {
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 800;
+    z-index: 500;
     width: 4rem;
     height: 4rem;
     display: flex;
@@ -166,7 +173,7 @@ h1, h2, h3, h4 {
     position: absolute;
     left: 0;
     bottom: 1rem;
-    z-index: 800;
+    z-index: 500;
     width: 4rem;
     display: flex;
     justify-content: center;
@@ -516,7 +523,7 @@ a, .btn-link {
     padding: 0.6rem 1.25rem 0.7rem 1.25rem;
     position: fixed;
     width: 100%;
-    z-index: 800;
+    z-index: 500;
 }
 
 #blazor-error-ui .dismiss {
