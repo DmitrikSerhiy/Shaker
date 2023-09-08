@@ -505,6 +505,10 @@ a, .btn-link {
     .to-top {
         bottom: 4rem;
     }
+
+    .to-top-ingredients {
+        bottom: 5rem !important;
+    }
 }
 
 
