@@ -10,12 +10,6 @@ html, body {
     font-family: 'Malevich', 'Helvetica', Arial, sans-serif !important;
 }
 
-.my-cocktails-page-wrapper,
-.my-ingredients-page-wrapper,
-.all-cocktails-page-wrapper {
-    position: absolute;
-}
-
 
 .my-cocktails-content-wrapper,
 .all-cocktails-content-wrapper {
@@ -506,6 +500,10 @@ a, .btn-link {
     .shaker-menu {
         max-width: unset;
         width: 100%;
+    }
+
+    .to-top {
+        bottom: 4rem;
     }
 }
 
