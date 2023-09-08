@@ -10,121 +10,124 @@
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
-<div class="container text-center">
-    <h2>Мої коктейлі</h2>
 
-    @if (_loading) {
-        <p>Завантаження...</p>
-    }
-    else {
-        if (_failed) {
-            <p>@_errorMessage</p>
-        }
-        else if (_currentBarId == -1) {
-            <button type="button" class="btn btn-link cocktails-menu-link" data-bs-toggle="offcanvas" data-bs-target="#shaker-menu">Обери бар</button>
-        }
-        else if (_ingredientsEmpty) {
-            <p>Інгрідієнти недоступні.</p>
-        }
-        else if (_myIngredientsEmpty) {
-            <p>Бар порожній. Додай інгрідієнти.</p>
-        }
-        else if (_cocktailsEmpty) {
-            <p>Коктейлі недоступні.</p>
-        }
-        else if (_availableCocktails.Count == 0) {
-            <p>Неможливо приготувати смачний коктейль із наявних інгрідієнтів. Тіко не змішуй все, що є у твоєму барі. Краще випий чаю.</p>
+<div class="container-fluid my-cocktails-page-wrapper">
+    <div class="container text-center my-cocktails-header">
+        <h2>Мої коктейлі</h2>
+
+        @if (_loading) {
+            <p>Завантаження...</p>
         }
         else {
-            <div class="input-group mb-3 cocktail-input">
-                <input id="search-available-cocktails" type="text" class="form-control" placeholder="Знайти за назвою або інгрідієнтами" aria-label="Знайти за назвою або рецептом" aria-describedby="filter-button" @bind="_searchQuery" @oninput="OnInput">
-                <button class="btn btn-outline-secondary inline-cocktails-button" type="button" @onclick="OpenRandomCocktail" title="Випадковий коктейль">
-                    <svg height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="none" stroke="#6c757d" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M448,341.37V170.61A32,32,0,0,0,432.11,143l-152-88.46a47.94,47.94,0,0,0-48.24,0L79.89,143A32,32,0,0,0,64,170.61V341.37A32,32,0,0,0,79.89,369l152,88.46a48,48,0,0,0,48.24,0l152-88.46A32,32,0,0,0,448,341.37Z"/>
-                        <polyline fill="none" stroke="#6c757d" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" points="69 153.99 256 263.99 443 153.99"/>
-                        <line fill="none" stroke="#6c757d" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" x1="256" y1="463.99" x2="256" y2="263.99"/>
-                        <ellipse cx="256" cy="152" rx="24" ry="16" fill="#6c757d"/>
-                        <ellipse cx="208" cy="296" rx="16" ry="24" fill="#6c757d"/>
-                        <ellipse cx="112" cy="328" rx="16" ry="24" fill="#6c757d"/>
-                        <ellipse cx="304" cy="296" rx="16" ry="24" fill="#6c757d"/>
-                        <ellipse cx="400" cy="240" rx="16" ry="24" fill="#6c757d"/>
-                        <ellipse cx="304" cy="384" rx="16" ry="24" fill="#6c757d"/>
-                        <ellipse cx="400" cy="328" rx="16" ry="24" fill="#6c757d"/>
-                    </svg>
-                </button>
-                <button class="btn btn-outline-secondary inline-cocktails-button" type="button" @onclick="ToggleFilters" title="Фільтри" data-bs-toggle="collapse" data-bs-target="#cocktail-filters" aria-expanded="false" aria-controls="cocktail-filters">
-                    <svg height="32" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#6c757d" d="M440-160q-17 0-28.5-11.5T400-200v-240L161-745q-14-17-4-36t31-19h584q21 0 31 19t-4 36L560-440v240q0 17-11.5 28.5T520-160h-80Zm40-276 240-304H240l240 304Zm0 0Z"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div id="cocktail-filters" class="input-group cocktails-filters collapse">
-                <div class="cocktails-filter-input-group">
-                    <div class="form-check form-check-inline">
-                        <input id="all-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 0) value="0" @onchange="@(_ => FilterCocktailsByType(0))">
-                        <label class="form-check-label" for="all-source">Всі</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input id="classic-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 1) value="1" @onchange="@(_ => FilterCocktailsByType(1))">
-                        <label class="form-check-label" for="classic-source">Лонг</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input id="my-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 2) value="2" @onchange="@(_ => FilterCocktailsByType(2))">
-                        <label class="form-check-label" for="my-source">Шот</label>
-                    </div>
+            if (_failed) {
+                <p>@_errorMessage</p>
+            }
+            else if (_currentBarId == -1) {
+                <button type="button" class="btn btn-link cocktails-menu-link" data-bs-toggle="offcanvas" data-bs-target="#shaker-menu">Обери бар</button>
+            }
+            else if (_ingredientsEmpty) {
+                <p>Інгрідієнти недоступні.</p>
+            }
+            else if (_myIngredientsEmpty) {
+                <p>Бар порожній. Додай інгрідієнти.</p>
+            }
+            else if (_cocktailsEmpty) {
+                <p>Коктейлі недоступні.</p>
+            }
+            else if (_availableCocktails.Count == 0) {
+                <p>Неможливо приготувати смачний коктейль із наявних інгрідієнтів. Тіко не змішуй все, що є у твоєму барі. Краще випий чаю.</p>
+            }
+            else {
+                <div class="input-group mb-3 cocktail-input">
+                    <input id="search-available-cocktails" type="text" class="form-control" placeholder="Знайти за назвою або інгрідієнтами" aria-label="Знайти за назвою або рецептом" aria-describedby="filter-button" @bind="_searchQuery" @oninput="OnInput">
+                    <button class="btn btn-outline-secondary inline-cocktails-button" type="button" @onclick="OpenRandomCocktail" title="Випадковий коктейль">
+                        <svg height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="none" stroke="#6c757d" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M448,341.37V170.61A32,32,0,0,0,432.11,143l-152-88.46a47.94,47.94,0,0,0-48.24,0L79.89,143A32,32,0,0,0,64,170.61V341.37A32,32,0,0,0,79.89,369l152,88.46a48,48,0,0,0,48.24,0l152-88.46A32,32,0,0,0,448,341.37Z"/>
+                            <polyline fill="none" stroke="#6c757d" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" points="69 153.99 256 263.99 443 153.99"/>
+                            <line fill="none" stroke="#6c757d" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" x1="256" y1="463.99" x2="256" y2="263.99"/>
+                            <ellipse cx="256" cy="152" rx="24" ry="16" fill="#6c757d"/>
+                            <ellipse cx="208" cy="296" rx="16" ry="24" fill="#6c757d"/>
+                            <ellipse cx="112" cy="328" rx="16" ry="24" fill="#6c757d"/>
+                            <ellipse cx="304" cy="296" rx="16" ry="24" fill="#6c757d"/>
+                            <ellipse cx="400" cy="240" rx="16" ry="24" fill="#6c757d"/>
+                            <ellipse cx="304" cy="384" rx="16" ry="24" fill="#6c757d"/>
+                            <ellipse cx="400" cy="328" rx="16" ry="24" fill="#6c757d"/>
+                        </svg>
+                    </button>
+                    <button class="btn btn-outline-secondary inline-cocktails-button" type="button" @onclick="ToggleFilters" title="Фільтри" data-bs-toggle="collapse" data-bs-target="#cocktail-filters" aria-expanded="false" aria-controls="cocktail-filters">
+                        <svg height="32" viewBox="0 -960 960 960" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#6c757d" d="M440-160q-17 0-28.5-11.5T400-200v-240L161-745q-14-17-4-36t31-19h584q21 0 31 19t-4 36L560-440v240q0 17-11.5 28.5T520-160h-80Zm40-276 240-304H240l240 304Zm0 0Z"/>
+                        </svg>
+                    </button>
                 </div>
 
-                <span class="filter-separator">|</span>
+                <div id="cocktail-filters" class="input-group cocktails-filters collapse">
+                    <div class="cocktails-filter-input-group">
+                        <div class="form-check form-check-inline">
+                            <input id="all-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 0) value="0" @onchange="@(_ => FilterCocktailsByType(0))">
+                            <label class="form-check-label" for="all-source">Всі</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="classic-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 1) value="1" @onchange="@(_ => FilterCocktailsByType(1))">
+                            <label class="form-check-label" for="classic-source">Лонг</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="my-source" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailSource" checked=@(_filteredByType == 2) value="2" @onchange="@(_ => FilterCocktailsByType(2))">
+                            <label class="form-check-label" for="my-source">Шот</label>
+                        </div>
+                    </div>
 
-                <div class="cocktails-filter-input-group">
-                    <div class="form-check form-check-inline">
-                        <input id="all-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 0) value="0" @onchange="@(_ => FilterCocktailsBySource(0))">
-                        <label class="form-check-label" for="all-type">Всі</label>
+                    <span class="filter-separator">|</span>
+
+                    <div class="cocktails-filter-input-group">
+                        <div class="form-check form-check-inline">
+                            <input id="all-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 0) value="0" @onchange="@(_ => FilterCocktailsBySource(0))">
+                            <label class="form-check-label" for="all-type">Всі</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="long-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 1) value="1" @onchange="@(_ => FilterCocktailsBySource(1))">
+                            <label class="form-check-label" for="long-type">Класичні</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="shot-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 2) value="2" @onchange="@(_ => FilterCocktailsBySource(2))">
+                            <label class="form-check-label" for="shot-type">Кастомні</label>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input id="long-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 1) value="1" @onchange="@(_ => FilterCocktailsBySource(1))">
-                        <label class="form-check-label" for="long-type">Класичні</label>
+
+                    <span class="filter-separator">|</span>
+
+                    <div class="cocktails-filter-input-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="show-hidden" @onchange="@(_ => ToggleHiddenCocktails())">
+                            <label class="form-check-label" for="show-hidden">Показати приховані</label>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input id="shot-type" class="form-check-input cocktail-filter-form-check" type="radio" name="cocktailType" checked=@(_filteredBySource == 2) value="2" @onchange="@(_ => FilterCocktailsBySource(2))">
-                        <label class="form-check-label" for="shot-type">Кастомні</label>
-                    </div>
+
+                    <div class="filters-margin"></div>
                 </div>
-
-                <span class="filter-separator">|</span>
-
-                <div class="cocktails-filter-input-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="show-hidden" @onchange="@(_ => ToggleHiddenCocktails())">
-                        <label class="form-check-label" for="show-hidden">Показати приховані</label>
-                    </div>
-                </div>
-
-                <div class="filters-margin"></div>
-            </div>
+            }
         }
-    }
-</div>
-
-@if (_loading == false && _failed == false && _currentBarId != -1 && _ingredientsEmpty == false && _myIngredientsEmpty == false && _cocktailsEmpty == false && _availableCocktails.Count != 0) {
-    <div id="my-cocktails-page-wrapper" class="cocktails-page-wrapper container-fluid">
-        <div class="container">
-            <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
-                @foreach (var cocktail in _searchedCocktails) {
-                    <CocktailCard
-                        Cocktail="cocktail"
-                        BarId="_currentBarId"
-                        OnFavoriteToggled="async () => await RefreshAsync()"
-                        OnHiddenToggled="async () => await RefreshAsync()">
-                    </CocktailCard>
-                }
-            </div>
-        </div>
-        <a id="my-cocktails-to-top" href="#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
     </div>
-}
 
+    @if (_loading == false && _failed == false && _currentBarId != -1 && _ingredientsEmpty == false && _myIngredientsEmpty == false && _cocktailsEmpty == false && _availableCocktails.Count != 0) {
+        <div id="my-cocktails-content-wrapper" class="my-cocktails-content-wrapper container-fluid">
+            <div class="container">
+                <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
+                    @foreach (var cocktail in _searchedCocktails) {
+                        <CocktailCard
+                            Cocktail="cocktail"
+                            BarId="_currentBarId"
+                            OnFavoriteToggled="async () => await RefreshAsync()"
+                            OnHiddenToggled="async () => await RefreshAsync()">
+                        </CocktailCard>
+                    }
+                </div>
+            </div>
+            <a id="my-cocktails-to-top" href="#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
+        </div>
+    }
+
+</div>
 @code {
     private List<Cocktail> _availableCocktails = new();
     private List<Cocktail> _searchedCocktails = new();
@@ -350,7 +353,7 @@
 
 <script>
     setTimeout(() => {
-        let myCocktailsScrollable = document.getElementById("my-cocktails-page-wrapper");
+        let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
         let toTopButton = document.getElementById("my-cocktails-to-top");
             
         myCocktailsScrollable.addEventListener('scroll',(event) => {
@@ -364,7 +367,7 @@
     }, 1000);
     
     function myCocktailsToTop() {
-        let myCocktailsScrollable = document.getElementById("my-cocktails-page-wrapper");
+        let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
 
         myCocktailsScrollable.scrollTo({
             top: 0,

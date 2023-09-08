@@ -10,62 +10,63 @@
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
-<div class="container text-center">
-    <h2>Інгрідієнти</h2>
+<div class="container-fluid my-ingredients-page-wrapper">
+    <div class="container text-center">
+        <h2>Інгрідієнти</h2>
 
-    @if (_loading) {
-        <p>Завантаження...</p>
-    }
-    else {
-        if (_failed) {
-            <p>@_errorMessage</p>
-        }
-        else if (_currentBarId == -1) {
-            <button type="button" class="btn btn-link cocktails-menu-link" data-bs-toggle="offcanvas" data-bs-target="#shaker-menu">Обери бар</button>
-        }
-        else if (_ingredientsEmpty) {
-            <p>Інгрідієнти недоступні.</p>
-        }
-        else if (_cocktailsEmpty) {
-            <p>Коктейлі недоступні.</p>
+        @if (_loading) {
+            <p>Завантаження...</p>
         }
         else {
-            <select id="select-ingredient" @bind="_selectedIngredientId" class="form-select form-select mb-3 cocktails-select" style="padding: 1rem" aria-label="Обрати інгрідієнт">
-                <option value="-1">Обрати інгрідієнт</option>
-                @foreach (var ingredient in _allIngredients.Except(_bar.Ingredients)) {
-                    <option value="@ingredient.Id">@ingredient.Name</option>
+            if (_failed) {
+                <p>@_errorMessage</p>
+            }
+            else if (_currentBarId == -1) {
+                <button type="button" class="btn btn-link cocktails-menu-link" data-bs-toggle="offcanvas" data-bs-target="#shaker-menu">Обери бар</button>
+            }
+            else if (_ingredientsEmpty) {
+                <p>Інгрідієнти недоступні.</p>
+            }
+            else if (_cocktailsEmpty) {
+                <p>Коктейлі недоступні.</p>
+            }
+            else {
+                <select id="select-ingredient" @bind="_selectedIngredientId" class="form-select form-select mb-3 cocktails-select" style="padding: 1rem" aria-label="Обрати інгрідієнт">
+                    <option value="-1">Обрати інгрідієнт</option>
+                    @foreach (var ingredient in _allIngredients.Except(_bar.Ingredients)) {
+                        <option value="@ingredient.Id">@ingredient.Name</option>
+                    }
+                </select>
+
+                <button type="button" class="btn btn-link mb-3 @(_selectedIngredientId == -1 ? "disabled" : "")" @onclick="async () => await AddToBarAsync(_selectedIngredientId, _currentBarId)">Додати до бару</button>
+
+                <div class="mb-3">
+                    <input id="search-ingredient" type="text" class="form-control cocktail-input" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
+                </div>
+
+                @if (_myIngredientsEmpty) {
+                    <p>Бар порожній. Додай інгрідієнти.</p>
                 }
-            </select>
-
-            <button type="button" class="btn btn-link mb-3 @(_selectedIngredientId == -1 ? "disabled" : "")" @onclick="async () => await AddToBarAsync(_selectedIngredientId, _currentBarId)">Додати до бару</button>
-
-            <div class="mb-3">
-                <input id="search-ingredient" type="text" class="form-control cocktail-input" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
-            </div>
-
-            @if (_myIngredientsEmpty) {
-                <p>Бар порожній. Додай інгрідієнти.</p>
             }
         }
+    </div>
+
+    @if (_loading == false && _failed == false && _currentBarId != -1 && _myIngredientsEmpty == false && _ingredientsEmpty == false && _cocktailsEmpty == false) {
+        <div id="my-ingredients-content-wrapper" class="my-ingredients-content-wrapper container-fluid">
+            <div class="container">
+                <ul class="list-group list-group-flush list-group-item-action">
+                    @foreach (var ingredient in _searchedIngredients) {
+                        <li class="list-group-item list-group-item-action" style="display: flex; justify-content: space-between; align-items: center">
+                            @ingredient.Name
+                            <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient, _currentBarId)">Прибрати</button>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <a id="my-ingredients-to-top" href="/ingredients/#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
+        </div>
     }
 </div>
-
-@if (_loading == false && _failed == false && _currentBarId != -1 && _myIngredientsEmpty == false && _ingredientsEmpty == false && _cocktailsEmpty == false) {
-    <div id="my-ingredients-page-wrapper" class="ingredients-page-wrapper container-fluid">
-        <div class="container">
-            <ul class="list-group list-group-flush list-group-item-action">
-                @foreach (var ingredient in _searchedIngredients) {
-                    <li class="list-group-item list-group-item-action" style="display: flex; justify-content: space-between; align-items: center">
-                        @ingredient.Name
-                        <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient, _currentBarId)">Прибрати</button>
-                    </li>
-                }
-            </ul>
-        </div>
-        <a id="my-ingredients-to-top" href="/ingredients/#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
-    </div>
-}
-
 
 @code {
     private bool _ingredientsEmpty;
@@ -241,7 +242,7 @@
 
 <script>
     setTimeout(() => {
-        let myIngredientsScrollable = document.getElementById("my-ingredients-page-wrapper");
+        let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");
         let ingredientsToTopButton = document.getElementById("my-ingredients-to-top");
           
         myIngredientsScrollable.addEventListener('scroll',(event) => {
@@ -255,7 +256,7 @@
     }, 1000);
     
     function myIngredientsToTop() {
-        let myIngredientsScrollable = document.getElementById("my-ingredients-page-wrapper");
+        let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");
 
         myIngredientsScrollable.scrollTo({
             top: 0,

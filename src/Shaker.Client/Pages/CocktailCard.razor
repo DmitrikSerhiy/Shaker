@@ -13,7 +13,7 @@
                 <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">@Cocktail.Name</h2>
                 <button type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" @onclick="async () => await ResetCocktailPopupAsync(Cocktail.Id)" aria-label="Close"></button>
             </div>
-            <div class="modal-body cocktail-popup-body row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2">
+            <div class="modal-body cocktail-popup-body row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2">
                 <div class="cocktail-popup-image-container col">
                     <img src="@Cocktail.ImageUrl" class="cocktail-popup-image" alt="cocktail">
                 </div>

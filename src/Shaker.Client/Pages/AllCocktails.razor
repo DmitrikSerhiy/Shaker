@@ -9,43 +9,45 @@
 @inject CocktailService CocktailService
 @inject IJSRuntime JSRuntime
 
-<div class="container text-center">
-    <h2>Всі коктейлі</h2>
+<div class="container-fluid all-cocktails-page-wrapper">
+    <div class="container text-center">
+        <h2>Всі коктейлі</h2>
 
-    @if (_loading) {
-        <p>Завантаження...</p>
-    }
-    else {
-        if (_failed) {
-            <p>@_errorMessage</p>
-        }
-        else if (_ingredientsEmpty) {
-            <p>Інгрідієнти недоступні.</p>
-        }
-        else if (_cocktailsEmpty) {
-            <p>Коктейлі недоступні.</p>
+        @if (_loading) {
+            <p>Завантаження...</p>
         }
         else {
-            <div class="mb-3">
-                <input id="search-all-cocktail" type="text" class="form-control cocktail-input" placeholder="Знайти за назвою або рецептом" @bind="_searchQuery" @oninput="OnInput">
-            </div>
+            if (_failed) {
+                <p>@_errorMessage</p>
+            }
+            else if (_ingredientsEmpty) {
+                <p>Інгрідієнти недоступні.</p>
+            }
+            else if (_cocktailsEmpty) {
+                <p>Коктейлі недоступні.</p>
+            }
+            else {
+                <div class="mb-3">
+                    <input id="search-all-cocktail" type="text" class="form-control cocktail-input" placeholder="Знайти за назвою або рецептом" @bind="_searchQuery" @oninput="OnInput">
+                </div>
+            }
         }
-    }
-</div>
-
-@if (_loading == false && _failed == false && _ingredientsEmpty == false && _cocktailsEmpty == false) {
-    <div id="all-cocktails-page-wrapper" class="all-cocktails-page-wrapper container-fluid">
-        <div class="container">
-            <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
-                @foreach (var cocktail in _searchedCocktails) {
-                    <CocktailCard Cocktail="cocktail" IgnoreFavoriteAndHideIcons=true></CocktailCard>
-                }
-            </div>
-        </div>
-        <a id="all-cocktails-to-top" href="/allcocktails/#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
     </div>
-}
 
+    @if (_loading == false && _failed == false && _ingredientsEmpty == false && _cocktailsEmpty == false) {
+        <div id="all-cocktails-content-wrapper" class="all-cocktails-content-wrapper container-fluid">
+            <div class="container">
+                <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3">
+                    @foreach (var cocktail in _searchedCocktails) {
+                        <CocktailCard Cocktail="cocktail" IgnoreFavoriteAndHideIcons=true></CocktailCard>
+                    }
+                </div>
+            </div>
+            <a id="all-cocktails-to-top" href="/allcocktails/#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
+        </div>
+    }
+
+</div>
 @code {
     private List<Cocktail> _allCocktails = new();
     private List<Cocktail> _searchedCocktails = new();
@@ -76,7 +78,7 @@
     private async Task LoadAndSetAllCocktails() {
         Bar bar;
         List<Ingredient> allIngredients;
-    // load all ingredients
+        // load all ingredients
         try {
             allIngredients = await DataService.LoadIngredientsAsync();
             if (allIngredients.Count == 0) {
@@ -94,7 +96,7 @@
             return;
         }
 
-    // load all cocktails
+        // load all cocktails
         try {
             _allCocktails = await DataService.LoadCocktailsAsync();
             await CocktailsStateService.SetAllCocktailsCountAsync(_allCocktails.Count);
@@ -177,7 +179,7 @@
 
 <script>
     setTimeout(() => {
-        let allCocktailsScrollable = document.getElementById("all-cocktails-page-wrapper");
+        let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
         let allCocktailsToTopButton = document.getElementById("all-cocktails-to-top");
             
         allCocktailsScrollable.addEventListener('scroll',(event) => {
@@ -190,7 +192,7 @@
     }, 1000);
     
     function allCocktailsToTop() {
-        let allCocktailsScrollable = document.getElementById("all-cocktails-page-wrapper");
+        let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
 
         allCocktailsScrollable.scrollTo({
             top: 0,

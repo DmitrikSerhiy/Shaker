@@ -8,37 +8,39 @@
 
 html, body {
     font-family: 'Malevich', 'Helvetica', Arial, sans-serif !important;
-    height: 100vh;
-    overflow: hidden;
 }
 
-.cocktails-page-wrapper {
-    overflow: auto;
-    max-height: 750px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-bottom: 50px;
-}
-
-.ingredients-page-wrapper {
-    overflow: auto;
-    max-height: 650px;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-bottom: 50px;
-}
-
+.my-cocktails-page-wrapper,
+.my-ingredients-page-wrapper,
 .all-cocktails-page-wrapper {
+    position: fixed;
+}
+
+.my-cocktails-content-wrapper {
     overflow: auto;
-    max-height: 950px;
+    height: 70vh;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.my-ingredients-content-wrapper {
+    overflow: auto;
+    height: 65vh;
     scrollbar-width: none;
     -ms-overflow-style: none;
     padding-bottom: 50px;
 }
 
-.cocktails-page-wrapper::-webkit-scrollbar,
-.ingredients-page-wrapper::-webkit-scrollbar,
-.all-cocktails-page-wrapper::-webkit-scrollbar
+.all-cocktails-content-wrapper {
+    overflow: auto;
+    height: 70vh;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.my-cocktails-content-wrapper::-webkit-scrollbar,
+.my-ingredients-content-wrapper::-webkit-scrollbar,
+.all-cocktails-content-wrapper::-webkit-scrollbar
 {
     width: 0;
     height: 0;
@@ -113,12 +115,12 @@ h1, h2, h3, h4 {
 
 .to-top {
     position: sticky;
-    bottom: 0;
+    bottom: 1rem;
     width: fit-content;
     margin: auto;
     display: none;
     /*animation: slide-top 0.5s both;*/
-    z-index: 3000;
+    z-index: 1000;
 }
 
 
@@ -139,7 +141,7 @@ h1, h2, h3, h4 {
     position: absolute;
     right: 0;
     top: 0;
-    z-index: 1000;
+    z-index: 800;
     width: 4rem;
     height: 4rem;
     display: flex;
@@ -156,7 +158,7 @@ h1, h2, h3, h4 {
     position: absolute;
     left: 0;
     top: 0;
-    z-index: 1000;
+    z-index: 800;
     width: 4rem;
     height: 4rem;
     display: flex;
@@ -173,7 +175,7 @@ h1, h2, h3, h4 {
     position: absolute;
     left: 0;
     bottom: 1rem;
-    z-index: 1000;
+    z-index: 800;
     width: 4rem;
     display: flex;
     justify-content: center;
@@ -355,6 +357,7 @@ a, .btn-link {
     display: flex;
     flex-direction: column;
     align-items: center;
+    /*margin-bottom: 155px;*/
 }
 
 .theme-switcher {
@@ -441,19 +444,19 @@ a, .btn-link {
     }
 }
 
-@media (max-width: 990px) {
+@media (max-width: 960px) {
     .cocktail-popup-image {
         width: 400px;
     }
 }
 
-@media (max-width: 540px) {
+@media (max-width: 580px) {
     .cocktail-popup-image{
         width: 300px;
     }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 960px) {
     .cocktail-popup-image-container {
         display: flex;
     }
@@ -467,9 +470,9 @@ a, .btn-link {
     }
 }
 
-@media (min-width: 990px) {
+@media (min-width: 960px) {
     .cocktail-popup-info-container {
-        padding-left: 2rem;
+        padding-left: 5rem;
     }
 }
 
@@ -495,14 +498,6 @@ a, .btn-link {
     .cocktail-input {
         margin: auto;
     }
-
-    #my-cocktails-page-wrapper, #all-cocktails-page-wrapper {
-        max-height: 540px;
-    }
-
-    #my-ingredients-page-wrapper {
-        max-height: 420px;
-    }
 }
 
 
@@ -519,7 +514,7 @@ a, .btn-link {
     padding: 0.6rem 1.25rem 0.7rem 1.25rem;
     position: fixed;
     width: 100%;
-    z-index: 1000;
+    z-index: 800;
 }
 
 #blazor-error-ui .dismiss {
