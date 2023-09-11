@@ -45,6 +45,14 @@ html, body {
     display: none;
 }
 
+.top-menu-minified button {
+    margin-top: 0 !important;
+    padding: 0 6px;
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
 .menu-minified-with-header {
     display: none;
 }
