@@ -53,12 +53,15 @@
                                 else
                                 {
                                     <ul class="list-group list-group-flush ingredients-list-to-add">
-                                        @foreach (var ingredient in _ingredientsToShowForAdd)
+                                        @foreach (var ingredientGroup in _ingredientsToShowForAdd)
                                         {
-                                            <li class="list-group-item list-group-item-action">
-                                                <input class="form-check-input me-1 ingredient-checkbox" type="checkbox" id="@($"ingredient-{ingredient.Id}")" @onchange="() => OnIngredientsToAdd(ingredient.Id, _currentBarId)">
-                                                <label class="form-check-label stretched-link" for="@($"ingredient-{ingredient.Id}")">@ingredient.Name</label>
-                                            </li>
+                                            <p class="mt-3">@ingredientGroup.Key.GetGroupName()</p>
+                                            @foreach (var ingredient in ingredientGroup) {
+                                                <li class="list-group-item list-group-item-action">
+                                                    <input class="form-check-input me-1 ingredient-checkbox" type="checkbox" id="@($"ingredient-{ingredient.Id}")" @onchange="() => OnIngredientsToAdd(ingredient.Id, _currentBarId)">
+                                                    <label class="form-check-label stretched-link" for="@($"ingredient-{ingredient.Id}")">@ingredient.Name</label>
+                                                </li>
+                                            }
                                         }
                                     </ul>
                                 }
@@ -83,14 +86,17 @@
     @if (_loading == false && _failed == false && _currentBarId != -1 && _myIngredientsEmpty == false && _ingredientsEmpty == false && _cocktailsEmpty == false) {
         <div id="my-ingredients-content-wrapper" class="my-ingredients-content-wrapper container-fluid">
             <div class="container">
-                <ul class="list-group list-group-flush list-group-item-action">
-                    @foreach (var ingredient in _searchedIngredients) {
-                        <li class="list-group-item list-group-item-action my-added-ingredients">
-                            @ingredient.Name
-                            <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient, _currentBarId)">Прибрати</button>
-                        </li>
-                    }
-                </ul>
+                 @foreach (var ingredientGroup in _searchedIngredients) {
+                     <p class="mt-3">@ingredientGroup.Key.GetGroupName()</p>
+                     <ul class="list-group list-group-flush list-group-item-action">
+                         @foreach (var ingredient in ingredientGroup.ToList()) {
+                             <li class="list-group-item list-group-item-action my-added-ingredients">
+                                 @ingredient.Name
+                                 <button type="button" class="btn btn-link" @onclick="async () => await RemoveFromBarAsync(ingredient, _currentBarId)">Прибрати</button>
+                             </li>
+                         }
+                     </ul>
+                 }
             </div>
             <a id="my-ingredients-to-top" href="/ingredients/#" type="button" class="btn btn-secondary to-top to-top-ingredients" @onclick="ToTopAsync">На початок &#8593;</a>
         </div>
@@ -109,9 +115,9 @@
 
     private int _currentBarId = -1;
     private List<Ingredient> _allIngredients = new();
-    private List<Ingredient> _searchedIngredients = new();
+    private List<IGrouping<IngredientGroup,Ingredient>> _searchedIngredients = new();
     private List<Ingredient> _ingredientsToAdd = new();
-    private List<Ingredient> _ingredientsToShowForAdd = new();
+    private List<IGrouping<IngredientGroup,Ingredient>> _ingredientsToShowForAdd = new();
     private Bar _bar = new();
 
     private string _searchQuery = "";
@@ -221,7 +227,7 @@
             .Where(ingredient => _bar.Ingredients.Any(i => i.Id == ingredient.Id))
             .ToList();
 
-        _searchedIngredients = _bar.Ingredients.ToList();
+        _searchedIngredients = GroupIngredients(_bar.Ingredients);
         var availableCocktails = CocktailService.GetAvailableCocktails(_bar, allCocktails);
 
         await CocktailsStateService.SetCalculatedCocktailsCountsAsync(availableCocktails.Count, _bar.Ingredients.Count);
@@ -231,7 +237,7 @@
 
     private void ResetSearch() {
         _searchQuery = "";
-        _searchedIngredients = _bar.Ingredients;
+        _searchedIngredients = GroupIngredients(_bar.Ingredients);
     }
     
     private async Task RemoveFromBarAsync(Ingredient ingredientToRemove, int barId) {
@@ -251,8 +257,7 @@
 
     private async void Search(object? state) {
         await InvokeAsync(() => {
-            _searchedIngredients = SearchHelper.SearchIngredients(_bar.Ingredients, _searchQuery);
-            StateHasChanged();
+            _searchedIngredients = GroupIngredients(SearchHelper.SearchIngredients(_bar.Ingredients, _searchQuery));
         });
     }
 
@@ -265,6 +270,10 @@
         await JSRuntime.InvokeVoidAsync("myIngredientsToTop");
     }
 
+    private List<IGrouping<IngredientGroup, Ingredient>> GroupIngredients(List<Ingredient> ingredients) {
+        return ingredients.GroupBy(i => i.Group).OrderBy(g => (int)g.Key).ToList();
+    }
+    
     private void OnIngredientsToAdd(int ingredientToAddId, int barId) {
         if (barId == -1) {
             return;
@@ -297,7 +306,7 @@
     private async Task OnIngredientsPopupOpenAsync() {
         await JSRuntime.InvokeVoidAsync("clearCheckboxes");
         _ingredientsToAdd = new();
-        _ingredientsToShowForAdd = _allIngredients.Except(_bar.Ingredients).ToList();
+        _ingredientsToShowForAdd = GroupIngredients(_allIngredients.Except(_bar.Ingredients).ToList());
     }
 }
 
