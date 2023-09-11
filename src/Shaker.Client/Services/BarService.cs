@@ -20,6 +20,27 @@ public sealed class BarService {
         SelectIds(bar);
         await _dataService.UpdateBarAsync(bar, barId);
     }
+    
+    public async Task AddToBarAsync(List<Ingredient> ingredients, int barId) {
+        var bar = await _dataService.LoadBarAsync(barId);
+        var currentIngredientIds = bar.Ingredients.Select(i => i.Id).ToList();
+        var ingredientIds = ingredients.Select(i => i.Id).ToList();
+
+        var ingredientsToAdd = ingredientIds
+            .Where(i => !currentIngredientIds.Contains(i))
+            .ToList();
+        
+        if (ingredientsToAdd.Count == 0) {
+            return;
+        }
+
+        foreach (var ingredientToAdd in ingredientsToAdd) {
+            bar.Ingredients.Add(new Ingredient {Id = ingredientToAdd});
+        }
+        
+        SelectIds(bar);
+        await _dataService.UpdateBarAsync(bar, barId);
+    }
 
     public async Task RemoveFromBarAsync(Ingredient ingredient, int barId) {
         var bar = await _dataService.LoadBarAsync(barId);

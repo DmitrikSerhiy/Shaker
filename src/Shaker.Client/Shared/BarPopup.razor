@@ -6,7 +6,7 @@
 @inject BarStateService BarStateService
 
 <div class="modal fade cocktail-popup" data-bs-backdrop="static" data-bs-keyboard="false" id="manage-bars" tabindex="-1" aria-labelledby="Новий бар" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-lg-down">
         <div class="modal-content">
             <div class="modal-header cocktail-popup-header">
                 <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">Мої бари</h2>
@@ -30,13 +30,12 @@
                 </div>
                 <div class="modal-footer popup-bar-footer p-3">
                     @if (_editMode == false) {
-                        <input type="text" class="form-control m-0" id="bar-name" placeholder="новий бар" @bind="_barName">
-                        <button type="button" class="btn btn-link m-0 p-0" style="margin-left: 1rem !important;" @onclick="async () => await AddProfileAsync()">Додати</button>
+                        <input type="text" class="form-control m-0" id="bar-name" placeholder="новий бар" @bind="_barName" @oninput="OnNewBarInput">
+                        <button type="button" class="btn btn-link m-0 p-0 @(_invalid || string.IsNullOrWhiteSpace(_barName) ? "disabled" : "")" style="margin-left: 1rem !important;" @onclick="async () => await AddProfileAsync()">Додати</button>
                     }
                     else {
-                        <input type="text" class="form-control m-0" id="bar-name" placeholder="@($"Редагувати {_barNameToEdit}")" @bind="_barNameToEdit">
-                        <button type="button" class="btn btn-link m-0 p-0" style="margin-left: 1rem !important;" @onclick="async () => await EditProfileAsync()">Зберегти</button>
-
+                        <input type="text" class="form-control m-0" id="bar-name" placeholder="@($"Редагувати {_barNameToEdit}")" @bind="_barNameToEdit" @oninput="OnEditBarInput">
+                        <button type="button" class="btn btn-link m-0 p-0 @(_invalid  ? "disabled" : "")" style="margin-left: 1rem !important;" @onclick="async () => await EditProfileAsync()">Зберегти</button>
                     }
                     @if (_invalid) {
                         <p class="text-danger mt-3">@_validationMessage</p>
@@ -68,27 +67,6 @@
     private const int MaxBarNameLength = 40;
     
     private async Task AddProfileAsync() {
-        if (_barName.Length > MaxBarNameLength) {
-            _invalid = true;
-            _validationMessage = "Менше креативу.";
-            return;
-        }
-        
-        if (string.IsNullOrWhiteSpace(_barName)) {
-            _invalid = true;
-            _validationMessage = "Введи назву бару.";
-            return;
-        }
-
-        if (_profiles.Any(p => p.Name.Equals(_barName, StringComparison.InvariantCultureIgnoreCase))) {
-            _invalid = true;
-            _validationMessage = "Придумай креативнішу назву.";
-            return;
-        }
-
-        _invalid = false;
-        _validationMessage = "";
-
         await ProfileService.AddProfileAsync(_barName);
         _profiles = await DataService.LoadProfilesAsync();
         await BarStateService.RefreshBarListAsync();
@@ -96,29 +74,6 @@
     }
 
     private async Task EditProfileAsync() {
-        if (_barNameToEdit.Length > MaxBarNameLength) {
-            _invalid = true;
-            _validationMessage = "Менше креативу.";
-            return;
-        }
-        
-        if (string.IsNullOrWhiteSpace(_barNameToEdit)) {
-            _invalid = true;
-            _validationMessage = "Введи назву бару.";
-            return;
-        }
-        
-        if (_profiles.Any(p => p.Name.Equals(_barNameToEdit, StringComparison.InvariantCultureIgnoreCase) && p.Id != _barIdToEdit)) {
-            _invalid = true;
-            _validationMessage = "Придумай креативнішу назву.";
-            return;
-        }
-        
-        _invalid = false;
-        _validationMessage = "";
-        
-        
-        
         await ProfileService.EditProfileAsync(_barNameToEdit, _barIdToEdit);
         _profiles = await DataService.LoadProfilesAsync();
         await BarStateService.RefreshBarListAsync();
@@ -144,6 +99,7 @@
     }
     
     private void EditName(Profile profile) {
+        ResetPopup();
         _editMode = true;
         _barNameToEdit = profile.Name;
         _barIdToEdit = profile.Id;
@@ -154,6 +110,39 @@
         _barIdToEdit = 0;
         _barNameToEdit = "";
         _editMode = false;
+        _invalid = false;
+        _validationMessage = "";
+    }
+
+    public void OnNewBarInput(ChangeEventArgs e) {
+        var inputValue = e.Value?.ToString() ?? "";
+        Validate(inputValue);
+    }
+
+    public void OnEditBarInput(ChangeEventArgs e) {
+        var inputValue = e.Value?.ToString() ?? "";
+        Validate(inputValue);
+    }
+
+    private void Validate(string input) {
+        if (input.Length > MaxBarNameLength) {
+            _invalid = true;
+            _validationMessage = "Менше креативу.";
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(input)) {
+            _invalid = true;
+            _validationMessage = "Введи назву бару.";
+            return;
+        }
+        
+        if (_profiles.Any(p => p.Name.Equals(input, StringComparison.InvariantCultureIgnoreCase) && p.Id != _barIdToEdit)) {
+            _invalid = true;
+            _validationMessage = "Придумай креативнішу назву.";
+            return;
+        }
+        
         _invalid = false;
         _validationMessage = "";
     }

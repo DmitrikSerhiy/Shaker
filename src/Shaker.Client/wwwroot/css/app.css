@@ -330,6 +330,34 @@ a, .btn-link {
     text-align: unset;
 }
 
+.my-added-ingredients {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center
+}
+
+.ingredients-popup-body {
+    padding: 0;
+}
+
+.ingredients-list-to-add {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.ingredients-list-to-add .list-group-item {
+    display: flex;
+    cursor: pointer;
+}
+
+.popup-ingredients-footer {
+    display: flex;
+}
+
+.popup-ingredients-footer button {
+    margin: auto;
+}
+
 #bar-name {
     flex: 1 1 60%;
 }
