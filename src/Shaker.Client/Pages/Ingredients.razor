@@ -57,9 +57,12 @@
                                         {
                                             <p class="mt-3">@ingredientGroup.Key.GetGroupName()</p>
                                             @foreach (var ingredient in ingredientGroup) {
-                                                <li class="list-group-item list-group-item-action">
+                                                <li class="list-group-item list-group-item-action ingredients-to-add">
                                                     <input class="form-check-input me-1 ingredient-checkbox" type="checkbox" id="@($"ingredient-{ingredient.Id}")" @onchange="() => OnIngredientsToAdd(ingredient.Id, _currentBarId)">
                                                     <label class="form-check-label stretched-link" for="@($"ingredient-{ingredient.Id}")">@ingredient.Name</label>
+                                                    @if (ingredient.CocktailsAmountToIncrease != 0) {
+                                                        <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill ingredient-badge">+@ingredient.CocktailsAmountToIncrease</span>
+                                                    }
                                                 </li>
                                             }
                                         }
@@ -115,7 +118,9 @@
 
     private int _currentBarId = -1;
     private List<Ingredient> _allIngredients = new();
+    private List<Cocktail> _allCocktails = new();
     private List<IGrouping<IngredientGroup,Ingredient>> _searchedIngredients = new();
+    private List<Cocktail> _availableCocktails = new();
     private List<Ingredient> _ingredientsToAdd = new();
     private List<IGrouping<IngredientGroup,Ingredient>> _ingredientsToShowForAdd = new();
     private Bar _bar = new();
@@ -139,6 +144,8 @@
         _loading = true;
         _searchedIngredients = new();
         _ingredientsToAdd = new();
+        _availableCocktails = new();
+        _ingredientsToShowForAdd = new();
         _bar = new Bar();
         _ingredientsEmpty = false;
         _myIngredientsEmpty = false;
@@ -160,7 +167,6 @@
             _loading = false;
             return;
         }
-        List<Cocktail> allCocktails;
 
         // load all ingredients
         try {
@@ -182,9 +188,9 @@
 
         // load all cocktails
         try {
-            allCocktails = await DataService.LoadCocktailsAsync();
-            await CocktailsStateService.SetAllCocktailsCountAsync(allCocktails.Count);
-            if (allCocktails.Count == 0) {
+            _allCocktails = await DataService.LoadCocktailsAsync();
+            await CocktailsStateService.SetAllCocktailsCountAsync(_allCocktails.Count);
+            if (_allCocktails.Count == 0) {
                 _cocktailsEmpty = true;
                 await CocktailsStateService.SetCalculatedCocktailsCountsAsync(0, 0);
                 _loading = false;
@@ -200,7 +206,7 @@
         }
 
         // map all cocktails
-        foreach (var cocktail in allCocktails) {
+        foreach (var cocktail in _allCocktails) {
             cocktail.Ingredients = _allIngredients
                 .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
@@ -228,9 +234,9 @@
             .ToList();
 
         _searchedIngredients = GroupIngredients(_bar.Ingredients);
-        var availableCocktails = CocktailService.GetAvailableCocktails(_bar, allCocktails);
+        _availableCocktails = CocktailService.GetAvailableCocktails(_bar, _allCocktails);
 
-        await CocktailsStateService.SetCalculatedCocktailsCountsAsync(availableCocktails.Count, _bar.Ingredients.Count);
+        await CocktailsStateService.SetCalculatedCocktailsCountsAsync(_availableCocktails.Count, _bar.Ingredients.Count);
         _loading = false;
     }
 
@@ -306,7 +312,34 @@
     private async Task OnIngredientsPopupOpenAsync() {
         await JSRuntime.InvokeVoidAsync("clearCheckboxes");
         _ingredientsToAdd = new();
-        _ingredientsToShowForAdd = GroupIngredients(_allIngredients.Except(_bar.Ingredients).ToList());
+        var ingredients = _allIngredients.Except(_bar.Ingredients).ToList();
+        CalculateCocktailsAmountToIncrease(ingredients);
+        _ingredientsToShowForAdd = GroupIngredients(ingredients);
+    }
+
+    private void CalculateCocktailsAmountToIncrease(List<Ingredient> ingredientsToAdd) {
+        var cocktailsCantBeMade = _allCocktails.Except(_availableCocktails).ToList();
+        var availableIngredients = _bar.Ingredients.ToList();
+        foreach (var ingredient in ingredientsToAdd) {
+            var cocktailsWithCurrentIngredient = cocktailsCantBeMade
+                .Where(cocktail => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
+                .ToList();
+            
+            if (cocktailsWithCurrentIngredient.Count == 0) {
+                continue;
+            }
+
+            foreach (var cocktailWithCurrentIngredient in cocktailsWithCurrentIngredient) {
+                var allExceptCurrentIngredients = cocktailWithCurrentIngredient.Ingredients
+                    .Where(i => i.Id != ingredient.Id)
+                    .ToList();
+
+                if (allExceptCurrentIngredients.All(ing => availableIngredients.Any(availableIngredient => availableIngredient.Id == ing.Id))) {
+                    ingredient.CocktailsAmountToIncrease++;
+                }
+            }
+            
+        }
     }
 }
 

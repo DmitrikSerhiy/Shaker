@@ -114,6 +114,11 @@ h1, h2, h3, h4 {
     margin-left: .5rem;
 }
 
+.ingredient-badge {
+    line-height: unset !important;
+    margin-left: auto;
+}
+
 .to-top {
     position: sticky;
     bottom: 1rem;
@@ -347,6 +352,10 @@ a, .btn-link {
 
 .ingredients-list-to-add .list-group-item {
     display: flex;
+    cursor: pointer;
+}
+
+.ingredients-to-add label {
     cursor: pointer;
 }
 
