@@ -15,7 +15,12 @@
             </div>
             <div class="modal-body cocktail-popup-body row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2">
                 <div class="cocktail-popup-image-container col">
-                    <img src="@Cocktail.ImageUrl" class="cocktail-popup-image" alt="cocktail">
+                    @if (string.IsNullOrWhiteSpace(Cocktail.ImageUrl)) {
+                        <DefaultCocktailImage></DefaultCocktailImage>
+                    }
+                    else {
+                        <img src="@Cocktail.ImageUrl" class="cocktail-popup-image" alt="cocktail">
+                    }
                 </div>
                 <div class="cocktail-popup-info-container col">
                     <div class="accordion accordion-flush open" id="@($"cocktails-info-accordion-{Cocktail.Id}")">
@@ -94,7 +99,14 @@
             <div class="icons-container-left-down" title="@(Cocktail.GlassType.GetGlassName())">
                 <CocktailGlass GlassId="@Cocktail.GlassType"></CocktailGlass>
             </div>
-            <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image cocktail-image-in-card" alt="cocktail" data-bs-toggle="modal" data-bs-target=@($"#{Cocktail.Id}-cocktail-modal")>
+            <div data-bs-toggle="modal" data-bs-target=@($"#{Cocktail.Id}-cocktail-modal")>
+                @if (string.IsNullOrWhiteSpace(Cocktail.ImageUrl)) {
+                    <DefaultCocktailImage></DefaultCocktailImage>
+                }
+                else {
+                    <img src="@Cocktail.ImageUrl" class="card-img-top cocktail-image cocktail-image-in-card" alt="cocktail">
+                }
+            </div>
         </div>
     </div>
 </div>

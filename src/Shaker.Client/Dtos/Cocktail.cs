@@ -6,7 +6,7 @@ public sealed record Cocktail : IComparable<Cocktail> {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
     public string Recipe { get; set; } = null!;
-    public string ImageUrl { get; set; } = null!;
+    public string? ImageUrl { get; set; } = null!;
     public CocktailType Type { get; set; }
     public bool IsClassic { get; set; }
     public bool IsMine { get; set; }
