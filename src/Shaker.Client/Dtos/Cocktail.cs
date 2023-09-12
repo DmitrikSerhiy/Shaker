@@ -13,6 +13,7 @@ public sealed record Cocktail : IComparable<Cocktail> {
     public GlassType GlassType { get; set; }
     public List<Ingredient> Ingredients { get; set; } = new();
     public List<Ingredient>? OptionalIngredients { get; set; }
+    public string? Story { get; set; }
     public bool IsFavorite { get; set; }
     public bool IsHidden { get; set; }
 

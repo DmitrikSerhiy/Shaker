@@ -122,6 +122,11 @@
             cocktail.Ingredients = allIngredients
                 .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
+            if (cocktail.OptionalIngredients != null) {
+                cocktail.OptionalIngredients = allIngredients
+                    .Where(ingredient => cocktail.OptionalIngredients.Any(i => i.Id == ingredient.Id))
+                    .ToList();
+            }
         }
 
         var currentBarId = await BarStateService.GetBarAsync();

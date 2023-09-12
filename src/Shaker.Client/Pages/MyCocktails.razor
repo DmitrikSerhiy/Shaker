@@ -247,6 +247,11 @@
             cocktail.Ingredients = _allIngredients
                 .Where(ingredient => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
+            if (cocktail.OptionalIngredients != null) {
+                cocktail.OptionalIngredients = _allIngredients
+                    .Where(ingredient => cocktail.OptionalIngredients.Any(i => i.Id == ingredient.Id))
+                    .ToList();
+            }
         }
 
         // load bar

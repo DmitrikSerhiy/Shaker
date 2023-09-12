@@ -521,7 +521,7 @@ a, .btn-link {
         display: flex;
         justify-content: center;
     }
-    
+
     .menu-minified-with-header {
         display: flex;
         flex-direction: column;
@@ -533,11 +533,11 @@ a, .btn-link {
         margin-top: .5rem;
         margin-bottom: .5rem;
     }
-    
+
     .top-nav-bar {
         margin-top: 0 !important;
     }
-    
+
     .cocktail-input {
         margin: auto;
     }
@@ -548,11 +548,11 @@ a, .btn-link {
     }
 
     .to-top {
-        bottom: 4rem;
+        bottom: 2rem;
     }
 
     .to-top-ingredients {
-        bottom: 5rem !important;
+        bottom: -3rem !important;
     }
 }
 
