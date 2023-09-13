@@ -15,7 +15,7 @@ public static class GlassTypeHelper {
             GlassType.ShotGlass => "Шот",
             GlassType.Tumbler => "Тумблер",
             GlassType.CoffeeGlass => "Айріш кава",
-            GlassType.ChampainGlass => "Флюте",
+            GlassType.FluteGlass => "Флюте",
             GlassType.SnifterGlass => "Сніфтер",
             GlassType.HurricaneGlass => "Гарікейн",
             GlassType.ZombieGlass => "Зомбі",

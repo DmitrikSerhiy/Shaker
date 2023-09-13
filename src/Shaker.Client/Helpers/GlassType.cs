@@ -12,7 +12,7 @@ public enum GlassType {
     ShotGlass = 8,
     Tumbler = 9,
     CoffeeGlass = 10,
-    ChampainGlass = 11,
+    FluteGlass = 11,// під шампусік
     SnifterGlass = 12, // під коньяк
     HurricaneGlass = 13,
     ZombieGlass = 14,

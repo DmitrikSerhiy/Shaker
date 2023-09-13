@@ -99,7 +99,7 @@
             <div class="icons-container-left-down" title="@(Cocktail.GlassType.GetGlassName())">
                 <CocktailGlass GlassId="@Cocktail.GlassType"></CocktailGlass>
             </div>
-            <div class="cocktail-image-in-card"data-bs-toggle="modal" data-bs-target=@($"#{Cocktail.Id}-cocktail-modal")>
+            <div class="cocktail-image-in-card" data-bs-toggle="modal" data-bs-target=@($"#{Cocktail.Id}-cocktail-modal")>
                 @if (string.IsNullOrWhiteSpace(Cocktail.ImageUrl)) {
                     <DefaultCocktailImage></DefaultCocktailImage>
                 }

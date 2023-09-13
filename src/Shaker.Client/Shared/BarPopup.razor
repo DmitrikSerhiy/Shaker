@@ -13,7 +13,7 @@
                 <button id="close-manage-bar-popup" type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close" @onclick="ResetPopup"></button>
             </div>
             
-            @if (!Loading) {
+            @if (!_loading) {
                 <div class="modal-body add-bar-form pb-0">
                     <ul class="list-group list-group-flush list-group-item-action">
                         @foreach (var profile in _profiles) {
@@ -30,12 +30,12 @@
                 </div>
                 <div class="modal-footer popup-bar-footer p-3">
                     @if (_editMode == false) {
-                        <input type="text" class="form-control m-0" id="bar-name" placeholder="новий бар" @bind="_barName" @oninput="OnNewBarInput">
-                        <button type="button" class="btn btn-link m-0 p-0 @(_invalid || string.IsNullOrWhiteSpace(_barName) ? "disabled" : "")" style="margin-left: 1rem !important;" @onclick="async () => await AddProfileAsync()">Додати</button>
+                        <input type="text" class="form-control m-0" id="bar-name" placeholder="новий бар" @bind="_barName" @oninput="OnNewBarInput" @onkeydown="() => { _pristine = false; }">
+                        <button type="button" class="btn btn-link m-0 p-0 @(_invalid || _pristine ? "disabled" : "")" style="margin-left: 1rem !important;" @onclick="async () => await AddProfileAsync()">Додати</button>
                     }
                     else {
-                        <input type="text" class="form-control m-0" id="bar-name" placeholder="@($"Редагувати {_barNameToEdit}")" @bind="_barNameToEdit" @oninput="OnEditBarInput">
-                        <button type="button" class="btn btn-link m-0 p-0 @(_invalid  ? "disabled" : "")" style="margin-left: 1rem !important;" @onclick="async () => await EditProfileAsync()">Зберегти</button>
+                        <input type="text" class="form-control m-0" id="bar-name" placeholder="@($"Редагувати {_barNameToEdit}")" @bind="_barNameToEdit" @oninput="OnEditBarInput" @onkeydown="() => { _pristine = false; }">
+                        <button type="button" class="btn btn-link m-0 p-0 @(_invalid || _pristine ? "disabled" : "")" style="margin-left: 1rem !important;" @onclick="async () => await EditProfileAsync()">Зберегти</button>
                     }
                     @if (_invalid) {
                         <p class="text-danger mt-3">@_validationMessage</p>
@@ -48,39 +48,33 @@
 
 @code {
     private List<Profile> _profiles = null!;
-    private bool Loading { get; set; } = true;
-    private string _barName { get; set; } = "";
-    private string _barNameToEdit { get; set; } = "";
-    private int _barIdToEdit { get; set; }
-
+    private const int MaxBarNameLength = 40;
+    private bool _loading = true;
+    private string _barName = "";
+    private string _barNameToEdit = "";
+    private int _barIdToEdit = 0;
+    private bool _editMode = false;
+    private string _validationMessage = "";
+    private bool _invalid = false;
+    private bool _pristine = true;
 
     protected override async Task OnInitializedAsync() {
         _profiles = await DataService.LoadProfilesAsync();
-        Loading = false;
+        _loading = false;
     }
-    
-    private bool _editMode;
-
-    private string _validationMessage = "";
-    private bool _invalid;
-    
-    private const int MaxBarNameLength = 40;
     
     private async Task AddProfileAsync() {
         await ProfileService.AddProfileAsync(_barName);
         _profiles = await DataService.LoadProfilesAsync();
         await BarStateService.RefreshBarListAsync();
-        _barName = "";
+        ResetPopup();
     }
 
     private async Task EditProfileAsync() {
         await ProfileService.EditProfileAsync(_barNameToEdit, _barIdToEdit);
         _profiles = await DataService.LoadProfilesAsync();
         await BarStateService.RefreshBarListAsync();
-        
-        _barIdToEdit = 0;
-        _barNameToEdit = "";
-        _editMode = false;
+        ResetPopup();
     }
 
     private async Task DeleteBarAsync(Profile profile) {
@@ -93,24 +87,25 @@
         }
 
         _profiles = await DataService.LoadProfilesAsync();
-        _invalid = false;
-        _validationMessage = "";
-        _barName = "";
+        ResetPopup();
     }
     
     private void EditName(Profile profile) {
         ResetPopup();
+        _pristine = true;
         _editMode = true;
         _barNameToEdit = profile.Name;
         _barIdToEdit = profile.Id;
     }
 
     private void ResetPopup() {
+        _loading = false;
         _barName = "";
         _barIdToEdit = 0;
         _barNameToEdit = "";
         _editMode = false;
         _invalid = false;
+        _pristine = true;
         _validationMessage = "";
     }
 
