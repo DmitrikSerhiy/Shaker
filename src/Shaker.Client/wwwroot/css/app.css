@@ -458,6 +458,11 @@ a, .btn-link {
     width: 450px
 }
 
+.recipe-separator {
+    margin: .25rem 0 !important;
+    border-top: unset !important;
+}
+
 
 @media (max-width: 1400px) {
     .cocktail-name {

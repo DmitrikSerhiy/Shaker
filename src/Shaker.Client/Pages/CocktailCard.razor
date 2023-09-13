@@ -1,6 +1,7 @@
 ﻿@using Shaker.Client.Dtos
 @using Shaker.Client.Helpers
 @using Shaker.Client.Services
+@using System.Text.RegularExpressions
 @inject IJSRuntime JSRuntime
 @inject BarService BarService
 @inject RandomCocktailService RandomCocktailService
@@ -32,7 +33,7 @@
                             </h2>
                             <div id="@($"flush-collapse-recipe-{Cocktail.Id}")" class="accordion-collapse collapse show" aria-labelledby="@($"flush-heading-recipe-{Cocktail.Id}")" data-bs-parent="@($"#cocktails-info-accordion-{Cocktail.Id}")">
                                 <div class="accordion-body">
-                                    <p class="card-text my-3">@Cocktail.Recipe</p>
+                                    <p class="card-text my-3">@ModifyRecipe(Cocktail.Recipe)</p>
                                 </div>
                             </div>
                         </div>
@@ -163,6 +164,15 @@
         RandomCocktailService.OnRandomCocktailPopupOpened += OpenCocktailPopupAsync;
     }
 
+    private MarkupString ModifyRecipe(string recipe) {
+        var withMethod = Regex.Replace(recipe, @"\(method\)([^\s]+)", m => $"<u>{m.Groups[1].Value}</u>:");
+        var spacedRecipe = Regex.Replace(withMethod, @"\.|\:", m => @$"<hr class=""recipe-separator""/>- ");
+        var spacedCleanedRecipe = Regex.Replace(spacedRecipe, @"<hr class=""recipe-separator""\/>- $", m => "");
+        var garnished = Regex.Replace(spacedCleanedRecipe, @"\(garnish\)", @"🌸");
+        var caught = Regex.Replace(garnished, @"\(catch\)", @"😂");
+        return (MarkupString)Regex.Replace(caught, @"(\(\d+\))", m => $"<b>{m.Groups[1].Value}</b> ");
+    }
+    
     private async Task OpenCocktailPopupAsync(int cocktailId) {
         if (cocktailId == Cocktail.Id) {
             await JSRuntime.InvokeVoidAsync("openCocktailPopup", Cocktail.Id.ToString());
@@ -194,15 +204,21 @@
         const glassTypeTooltipTrigger = document.getElementById(cocktailId + '-cocktail-glass-type')
         const glassTypeTooltip = new bootstrap.Tooltip(glassTypeTooltipTrigger, {trigger: 'click', offset: [0, -14]});
         
-        glassTypeTooltipTrigger.addEventListener('shown.bs.tooltip', () => {
-          setTimeout(() => {glassTypeTooltip.hide();}, 600)
-        });
+        if (glassTypeTooltipTrigger) {
+            glassTypeTooltipTrigger.addEventListener('shown.bs.tooltip', () => {
+              setTimeout(() => {glassTypeTooltip.hide();}, 600)
+            });
+        }
         
         const favoriteTooltipTrigger = document.getElementById(cocktailId + '-cocktail-favorite')
-        new bootstrap.Tooltip(favoriteTooltipTrigger);
+        if (favoriteTooltipTrigger) {
+            new bootstrap.Tooltip(favoriteTooltipTrigger);
+        }
         
         const cocktailHideTooltipTrigger = document.getElementById(cocktailId + '-cocktail-hide')
-        new bootstrap.Tooltip(cocktailHideTooltipTrigger);
+        if (cocktailHideTooltipTrigger) {
+            new bootstrap.Tooltip(cocktailHideTooltipTrigger);
+        }
     }
     
 </script>
