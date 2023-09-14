@@ -344,25 +344,24 @@
 }
 
 <script>
+   function clearCheckboxes() {
+       const checkboxes = document.querySelectorAll('.ingredient-checkbox');
+       
+       checkboxes.forEach((checkbox) => {
+           checkbox.checked = false;
+       });
+   }
+   
+   function closeIngredientsPopup() {
+       let closeButton = document.getElementById("ingredients-popup");
+       closeButton.click();
+   }
+   
     (() => {
         let ingredientsToTopButton = document.getElementById("to-top");
         if (ingredientsToTopButton) {
            ingredientsToTopButton.style.display = "none";
         }
-   
-        
-       function clearCheckboxes() {
-           const checkboxes = document.querySelectorAll('.ingredient-checkbox');
-           
-           checkboxes.forEach((checkbox) => {
-               checkbox.checked = false;
-           });
-       }
-       
-       function closeIngredientsPopup() {
-           let closeButton = document.getElementById("ingredients-popup");
-           closeButton.click();
-       }
    
        setTimeout(() => {
            let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");

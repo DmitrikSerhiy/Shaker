@@ -206,7 +206,10 @@
         
         if (glassTypeTooltipTrigger) {
             glassTypeTooltipTrigger.addEventListener('shown.bs.tooltip', () => {
-              setTimeout(() => {glassTypeTooltip.hide();}, 600)
+              setTimeout(() => {
+                  glassTypeTooltip.hide(); 
+                  glassTypeTooltipTrigger.blur();
+                  }, 600)
             });
         }
         
@@ -220,5 +223,4 @@
             new bootstrap.Tooltip(cocktailHideTooltipTrigger);
         }
     }
-    
 </script>
