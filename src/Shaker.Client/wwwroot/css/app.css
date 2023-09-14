@@ -12,20 +12,14 @@ html, body {
 
 
 .my-cocktails-content-wrapper,
-.all-cocktails-content-wrapper {
+.all-cocktails-content-wrapper,
+.my-ingredients-content-wrapper {
     overflow: auto;
     height: 70vh;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
 
-.my-ingredients-content-wrapper {
-    overflow: auto;
-    height: 65vh;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding-bottom: 50px;
-}
 
 .my-cocktails-content-wrapper::-webkit-scrollbar,
 .my-ingredients-content-wrapper::-webkit-scrollbar,
@@ -121,12 +115,16 @@ h1, h2, h3, h4 {
 
 .to-top {
     position: sticky;
-    bottom: 1rem;
+    bottom: 0;
     width: fit-content;
     margin: auto;
     display: none;
     animation: scale-up-center 0.45s both;
     z-index: 600;
+}
+
+.to-top::after {
+    content: "На початок \2191";
 }
 
 @keyframes scale-up-center {
@@ -586,12 +584,8 @@ a, .btn-link {
         width: 100%;
     }
 
-    .to-top {
-        bottom: 2rem;
-    }
-
-    .to-top-ingredients {
-        bottom: -3rem !important;
+    .to-top::after {
+        content: "\2191";
     }
     
     .all-cocktails-page-wrapper, .my-ingredients-page-wrapper, .my-cocktails-page-wrapper {

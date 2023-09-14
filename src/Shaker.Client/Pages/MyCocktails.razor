@@ -123,7 +123,6 @@
                     }
                 </div>
             </div>
-            <a id="my-cocktails-to-top" href="#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
         </div>
     }
 
@@ -350,33 +349,27 @@
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
         _debounceSearchTimer?.Dispose();
     }
-    
-    private async Task ToTopAsync() {
-        await JSRuntime.InvokeVoidAsync("myCocktailsToTop");
-    }
 }
 
 <script>
-    setTimeout(() => {
-        let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
-        let toTopButton = document.getElementById("my-cocktails-to-top");
-            
-        myCocktailsScrollable.addEventListener('scroll',(event) => {
-            if (event.target.scrollTop > 400) {
-                toTopButton.style.display = "flex";
-            } else {
-                toTopButton.style.display = "none";
-            }
-        });
-
-    }, 1000);
+    (() => {
+        let toTopButton = document.getElementById("to-top");
+        if (toTopButton) {
+           toTopButton.style.display = "none";
+        }
     
-    function myCocktailsToTop() {
-        let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
-
-        myCocktailsScrollable.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }
+        setTimeout(() => {
+            let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
+            let toTopButton = document.getElementById("to-top");
+                
+            myCocktailsScrollable.addEventListener('scroll',(event) => {
+                if (event.target.scrollTop > 400) {
+                    toTopButton.style.display = "flex";
+                } else {
+                    toTopButton.style.display = "none";
+                }
+            });
+    
+        }, 1000);
+    })()
 </script>

@@ -5,6 +5,9 @@
 <TopMenu/>
 @Body
 
+<button id="to-top" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync"></button>
+
+
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -13,4 +16,34 @@
             await JSRuntime.InvokeVoidAsync("setThemeManager");
         }
     }
+    
+    private async Task ToTopAsync() {
+        await JSRuntime.InvokeVoidAsync("toTop");
+    }
 }
+
+
+<script>
+
+    function toTop() {
+        if (location.pathname === "/allcocktails") {
+            let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
+            allCocktailsScrollable.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        } else if (location.pathname === "/") {
+            let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
+            myCocktailsScrollable.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        } else if (location.pathname === "/ingredients") {
+            let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");
+            myIngredientsScrollable.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    }
+</script>

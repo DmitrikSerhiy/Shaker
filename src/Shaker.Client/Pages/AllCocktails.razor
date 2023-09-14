@@ -43,7 +43,6 @@
                     }
                 </div>
             </div>
-            <a id="all-cocktails-to-top" href="/allcocktails/#" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок &#8593;</a>
         </div>
     }
 
@@ -176,32 +175,27 @@
         _debounceSearchTimer?.Dispose();
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
     }
-
-    private async Task ToTopAsync() {
-        await JSRuntime.InvokeVoidAsync("allCocktailsToTop");
-    }
 }
 
 <script>
-    setTimeout(() => {
-        let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
-        let allCocktailsToTopButton = document.getElementById("all-cocktails-to-top");
-            
-        allCocktailsScrollable.addEventListener('scroll',(event) => {
-            if (event.target.scrollTop > 400) {
-                allCocktailsToTopButton.style.display = "flex";
-            } else {
-                allCocktailsToTopButton.style.display = "none";
-            }
-        });
-    }, 1000);
+    (() => {
+        let allCocktailsToTopButton = document.getElementById("to-top");
+        if (allCocktailsToTopButton) {
+           allCocktailsToTopButton.style.display = "none";
+        }
     
-    function allCocktailsToTop() {
-        let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
+        setTimeout(() => {
+            let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
+            let allCocktailsToTopButton = document.getElementById("to-top");
+                
+            allCocktailsScrollable.addEventListener('scroll',(event) => {
+                if (event.target.scrollTop > 400) {
+                    allCocktailsToTopButton.style.display = "flex";
+                } else {
+                    allCocktailsToTopButton.style.display = "none";
+                }
+            });
+        }, 1000);
+    })();
 
-        allCocktailsScrollable.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }
 </script>

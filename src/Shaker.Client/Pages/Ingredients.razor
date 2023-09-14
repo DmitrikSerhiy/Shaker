@@ -101,7 +101,6 @@
                      </ul>
                  }
             </div>
-            <a id="my-ingredients-to-top" href="/ingredients/#" type="button" class="btn btn-secondary to-top to-top-ingredients" @onclick="ToTopAsync">На початок &#8593;</a>
         </div>
     }
 </div>
@@ -277,10 +276,6 @@
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
     }
     
-    private async Task ToTopAsync() {
-        await JSRuntime.InvokeVoidAsync("myIngredientsToTop");
-    }
-
     private List<IGrouping<IngredientGroup, Ingredient>> GroupIngredients(List<Ingredient> ingredients) {
         return ingredients.GroupBy(i => i.Group).OrderBy(g => (int)g.Key).ToList();
     }
@@ -349,39 +344,38 @@
 }
 
 <script>
-    function clearCheckboxes() {
-        const checkboxes = document.querySelectorAll('.ingredient-checkbox');
+    (() => {
+        let ingredientsToTopButton = document.getElementById("to-top");
+        if (ingredientsToTopButton) {
+           ingredientsToTopButton.style.display = "none";
+        }
+   
         
-        checkboxes.forEach((checkbox) => {
-            checkbox.checked = false;
-        });
-    }
-    
-    function closeIngredientsPopup() {
-        let closeButton = document.getElementById("ingredients-popup");
-        closeButton.click();
-    }
-
-    setTimeout(() => {
-        let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");
-        let ingredientsToTopButton = document.getElementById("my-ingredients-to-top");
-          
-        myIngredientsScrollable.addEventListener('scroll',(event) => {
-            if (event.target.scrollTop > 400) {
-                ingredientsToTopButton.style.display = "flex";
-            } else {
-                ingredientsToTopButton.style.display = "none";
-            }
-        });
-                
-    }, 1000);
-    
-    function myIngredientsToTop() {
-        let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");
-
-        myIngredientsScrollable.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }
+       function clearCheckboxes() {
+           const checkboxes = document.querySelectorAll('.ingredient-checkbox');
+           
+           checkboxes.forEach((checkbox) => {
+               checkbox.checked = false;
+           });
+       }
+       
+       function closeIngredientsPopup() {
+           let closeButton = document.getElementById("ingredients-popup");
+           closeButton.click();
+       }
+   
+       setTimeout(() => {
+           let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");
+           let ingredientsToTopButton = document.getElementById("to-top");
+             
+           myIngredientsScrollable.addEventListener('scroll',(event) => {
+               if (event.target.scrollTop > 400) {
+                   ingredientsToTopButton.style.display = "flex";
+               } else {
+                   ingredientsToTopButton.style.display = "none";
+               }
+           });
+                   
+       }, 1000); 
+    })();
 </script>
