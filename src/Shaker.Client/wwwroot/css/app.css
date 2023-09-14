@@ -185,6 +185,8 @@ h1, h2, h3, h4 {
     margin-top: auto;
 }
 
+.icons-container-left-down:focus,
+.icons-container-left-down:active,
 .icons-container-left-down:hover {
     filter: opacity(1);
 }
