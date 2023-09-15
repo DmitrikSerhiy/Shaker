@@ -635,35 +635,26 @@ a, .btn-link {
     content: "An error has occurred."
 }
 
-.loading-progress {
-    position: relative;
-    display: block;
-    width: 8rem;
-    height: 8rem;
+.initial-logo {
+    display: flex;
+    margin: auto;
+}
+
+.cocktails-loader-container {
+    display: flex;
     margin: 20vh auto 1rem auto;
+    flex-direction: column;
+    align-items: center;
 }
 
-.loading-progress circle {
-    fill: none;
-    stroke: #e0e0e0;
-    stroke-width: 0.6rem;
-    transform-origin: 50% 50%;
-    transform: rotate(-90deg);
+.initial-progress {
+    margin-top: 1rem;
+    width: 250px;
+    height: .5rem;
 }
 
-.loading-progress circle:last-child {
-    stroke: #1b6ec2;
-    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-    transition: stroke-dasharray 0.05s ease-in-out;
+.progress-bar {
+    width: var(--blazor-load-percentage, 0%);
+    transition: width 0.3s ease-in-out;
 }
 
-.loading-progress-text {
-    position: absolute;
-    text-align: center;
-    font-weight: bold;
-    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
-}
-
-.loading-progress-text:after {
-    content: var(--blazor-load-percentage-text, "Завантаження");
-}
