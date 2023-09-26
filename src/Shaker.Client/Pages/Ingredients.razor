@@ -321,6 +321,7 @@
         var cocktailsCantBeMade = _allCocktails.Except(_availableCocktails).ToList();
         var availableIngredients = _bar.Ingredients.ToList();
         foreach (var ingredient in ingredientsToAdd) {
+            ingredient.CocktailsAmountToIncrease = 0;
             var cocktailsWithCurrentIngredient = cocktailsCantBeMade
                 .Where(cocktail => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
