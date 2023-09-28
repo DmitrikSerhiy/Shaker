@@ -7,7 +7,6 @@
 @inject RandomCocktailService RandomCocktailService
 @inject CocktailsStateService CocktailsStateService
 @inject BarStateService BarStateService
-@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 
@@ -99,7 +98,7 @@
                     <div class="cocktails-filter-input-group">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="show-hidden" @onchange="@(_ => ToggleHiddenCocktails())">
-                            <label class="form-check-label" for="show-hidden">Показати приховані</label>
+                            <label class="form-check-label" for="show-hidden">Тільки приховані</label>
                         </div>
                     </div>
 
@@ -330,7 +329,7 @@
     private void ToggleHiddenCocktails() {
         _showHiddenCocktails = !_showHiddenCocktails;
         _searchedCocktails = _showHiddenCocktails
-            ? _availableCocktails
+            ? _availableCocktails.Where(c => c.IsHidden).ToList()
             : _availableCocktails.Where(c => c.IsHidden == false).ToList();
     }
 

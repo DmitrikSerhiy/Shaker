@@ -58,7 +58,7 @@
                                             <p class="mt-3">@ingredientGroup.Key.GetGroupName()</p>
                                             @foreach (var ingredient in ingredientGroup) {
                                                 <li class="list-group-item list-group-item-action ingredients-to-add">
-                                                    <input class="form-check-input me-1 ingredient-checkbox" type="checkbox" id="@($"ingredient-{ingredient.Id}")" @onchange="() => OnIngredientsToAdd(ingredient.Id, _currentBarId)">
+                                                    <input class="form-check-input me-1 ingredient-checkbox" type="checkbox" id="@($"ingredient-{ingredient.Id}")" @onchange="async () => await OnIngredientsToAdd(ingredient.Id, _currentBarId)">
                                                     <label class="form-check-label stretched-link" for="@($"ingredient-{ingredient.Id}")">@ingredient.Name</label>
                                                     @if (ingredient.CocktailsAmountToIncrease != 0 && !_ingredientsToAdd.Contains(ingredient)) {
                                                         <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill ingredient-badge">+@ingredient.CocktailsAmountToIncrease</span>
@@ -74,7 +74,7 @@
                                 <div class="modal-footer popup-ingredients-footer p-3">
                                     <button type="button" class="btn btn-link p-0 @(_ingredientsToAdd.Count == 0 ? "disabled" : "")" @onclick="async () => await AddIngredientsToBarAsync(_currentBarId)">Додати до бару</button>
                                     @if (_generalCocktailsToBeIncreased.Count != 0) {
-                                        <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill ingredient-badge general-ingredients-badge">+@_generalCocktailsToBeIncreased.Count</span>
+                                        <span id="general-ingredient-ingredients-counter" style="text-decoration: none" data-bs-toggle="tooltip" class="badge text-bg-secondary rounded-pill ingredient-badge general-ingredients-badge" title="Зможеш приготувати більше коктейлів!" @onclick="async () => await ShowGeneralCounterTooltipAsync()">+@_generalCocktailsToBeIncreased.Count</span>
                                     }
                                 </div>
                             }
@@ -285,7 +285,7 @@
         return ingredients.GroupBy(i => i.Group).OrderBy(g => (int)g.Key).ToList();
     }
     
-    private void OnIngredientsToAdd(int ingredientToAddId, int barId) {
+    private async Task OnIngredientsToAdd(int ingredientToAddId, int barId) {
         if (barId == -1) {
             return;
         }
@@ -296,7 +296,7 @@
             _ingredientsToAdd.Add(_allIngredients.First(i => i.Id == ingredientToAddId));
         }
 
-        SetIngredientsPopupData();
+        await SetIngredientsPopupDataAsync();
     }
 
     private async Task AddIngredientsToBarAsync(int barId){
@@ -321,10 +321,10 @@
         await JSRuntime.InvokeVoidAsync("clearCheckboxes");
         _ingredientsToAdd = new();
         _generalCocktailsToBeIncreased = new List<Cocktail>();
-        SetIngredientsPopupData();
+        await SetIngredientsPopupDataAsync();
     }
 
-    private void SetIngredientsPopupData() {
+    private async Task SetIngredientsPopupDataAsync() {
         var ingredients = _allIngredients.Except(_bar.Ingredients).ToList();
         CalculateCocktailsCounters(ingredients);
         _ingredientsToShowForAdd = GroupIngredients(ingredients);
@@ -373,6 +373,10 @@
         potentiallyAvailableCocktails.RemoveAll(c => _availableCocktails.Any(ac => ac.Id == c.Id));
         _generalCocktailsToBeIncreased = potentiallyAvailableCocktails;
     }
+
+    private async Task ShowGeneralCounterTooltipAsync() {
+        await JSRuntime.InvokeVoidAsync("initAndShowGeneralCounterTooltip", _generalCocktailsToBeIncreased.Select(c => c.Name).ToArray());
+    }
 }
 
 <script>
@@ -387,6 +391,20 @@
    function closeIngredientsPopup() {
        let closeButton = document.getElementById("ingredients-popup");
        closeButton.click();
+   }
+   
+   function initAndShowGeneralCounterTooltip(cocktails) {
+       // todo: maybe add cocktails to tooltip
+       const ingredientCounterTrigger = document.getElementById('general-ingredient-ingredients-counter');
+       if (ingredientCounterTrigger) {
+           const ingredientCounterTooltip = new bootstrap.Tooltip(ingredientCounterTrigger, {trigger: 'click'});
+           ingredientCounterTrigger.addEventListener('shown.bs.tooltip', () => {
+             setTimeout(() => {
+                 ingredientCounterTooltip.hide(); 
+             }, 1500)
+           });
+           ingredientCounterTooltip.show();
+       }
    }
    
     (() => {

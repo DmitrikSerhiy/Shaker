@@ -71,7 +71,7 @@
         <h2 class="card-title cocktail-name">@Cocktail.Name</h2>
         <div class="image-wrapper">
             @if (!IgnoreFavoriteAndHideIcons) {
-                <div id="@($"{Cocktail.Id}-cocktail-favorite")" class="icons-container-left" @onclick="async () => await HideUnHideCocktailAsync()" data-bs-toggle="tooltip"  title="@(Cocktail.IsHidden ? "За цим я вже заскучав, показувати знову" : "Приховати")">
+                <div id="@($"{Cocktail.Id}-cocktail-favorite")" class="icons-container-left" @onclick="async () => await HideUnHideCocktailAsync()" data-bs-toggle="tooltip" title="@(Cocktail.IsHidden ? "За цим я вже заскучав, показувати знову" : "Приховати")">
                     @if (Cocktail.IsHidden) {
                         <svg class="cocktail-icon" width="32" height="29" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
                             <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/>
@@ -84,7 +84,7 @@
                     }
                 </div>
 
-                <div id="@($"{Cocktail.Id}-cocktail-hide")" class="icons-container-right" @onclick="async () => await ToggleFavoriteAsync()" data-bs-toggle="tooltip"  title="@(Cocktail.IsFavorite ? "Обожнюю!" : "Пройшла любов, зав'яли помідори")">
+                <div id="@($"{Cocktail.Id}-cocktail-hide")" class="icons-container-right" @onclick="async () => await ToggleFavoriteAsync()" data-bs-toggle="tooltip" title="@(Cocktail.IsFavorite ? "Пройшла любов, зав'яли помідори" : "Обожнюю!")">
                     @if (Cocktail.IsFavorite) {
                         <svg class="cocktail-icon" width="32" height="29" viewBox="0 0 32 29" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M16 1.61804L19.1167 11.2102L19.229 11.5557H19.5922H29.6781L21.5184 17.484L21.2246 17.6976L21.3368 18.0431L24.4535 27.6353L16.2939 21.7069L16 21.4934L15.7061 21.7069L7.54649 27.6353L10.6632 18.0431L10.7754 17.6976L10.4816 17.484L2.32194 11.5557H12.4078H12.771L12.8833 11.2102L16 1.61804Z" fill="#CB500B" stroke="black"/>
@@ -97,7 +97,7 @@
                     }
                 </div>
             }
-            <div id="@($"{Cocktail.Id}-cocktail-glass-type")" class="icons-container-left-down" data-bs-toggle="tooltip" data-bs-placement="right" title="@(Cocktail.GlassType.GetGlassName())">
+            <div id="@($"{Cocktail.Id}-cocktail-glass-type")" class="icons-container-left-down" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="@(Cocktail.GlassType.GetGlassName())">
                 <CocktailGlass GlassId="@Cocktail.GlassType"></CocktailGlass>
             </div>
             <div class="cocktail-image-in-card" data-bs-toggle="modal" data-bs-target=@($"#{Cocktail.Id}-cocktail-modal")>
@@ -202,25 +202,16 @@
     
     function initTooltips(cocktailId) {
         const glassTypeTooltipTrigger = document.getElementById(cocktailId + '-cocktail-glass-type')
-        const glassTypeTooltip = new bootstrap.Tooltip(glassTypeTooltipTrigger, {trigger: 'click', offset: [0, -14]});
         
         if (glassTypeTooltipTrigger) {
+            const glassTypeTooltip = new bootstrap.Tooltip(glassTypeTooltipTrigger, {trigger: 'click hover', offset: [0, -7]});
+
             glassTypeTooltipTrigger.addEventListener('shown.bs.tooltip', () => {
               setTimeout(() => {
                   glassTypeTooltip.hide(); 
                   glassTypeTooltipTrigger.blur();
                   }, 600)
             });
-        }
-        
-        const favoriteTooltipTrigger = document.getElementById(cocktailId + '-cocktail-favorite')
-        if (favoriteTooltipTrigger) {
-            new bootstrap.Tooltip(favoriteTooltipTrigger);
-        }
-        
-        const cocktailHideTooltipTrigger = document.getElementById(cocktailId + '-cocktail-hide')
-        if (cocktailHideTooltipTrigger) {
-            new bootstrap.Tooltip(cocktailHideTooltipTrigger);
         }
     }
 </script>
