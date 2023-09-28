@@ -169,7 +169,7 @@ h1, h2, h3, h4 {
     bottom: 2rem;
     padding: 0.5rem 1rem;
     margin-left: auto;
-    margin-right: .8rem;
+    margin-right: 1rem;
     width: fit-content;
     display: none;
     animation: scale-up-center 0.45s both;
@@ -663,6 +663,11 @@ a, .btn-link {
         width: 100%;
     }
 
+    .to-top {
+        bottom: 1rem;
+        margin-right: .8rem;
+    }
+    
     .to-top::after {
         content: "\2191";
     }
