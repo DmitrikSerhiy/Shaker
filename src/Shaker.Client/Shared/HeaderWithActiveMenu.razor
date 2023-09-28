@@ -1,0 +1,15 @@
+﻿@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<div class="shaker-header" data-bs-toggle="offcanvas" data-bs-target="#shaker-menu" aria-controls="shaker-menu">
+    <h1 class="shaker-title" @onclick="async () => await NavigateToHomeAsync()">Шейкер</h1>
+    <MainLogo></MainLogo>
+</div>
+<Slogan></Slogan>
+
+@code {
+    private async Task NavigateToHomeAsync() {
+        await Task.Delay(400);
+        NavigationManager.NavigateTo("/");
+    }
+}

@@ -1,0 +1,17 @@
+﻿<h2 id="shaker-subtitle"></h2>
+
+<script>
+    (() => {
+        if (location.pathname === "/allcocktails") {
+            document.querySelectorAll("#shaker-subtitle").forEach(e => e.innerHTML = "Всі коктейлі");
+        } else if (location.pathname === "/mycocktails") {
+            document.querySelectorAll("#shaker-subtitle").forEach(e => e.innerHTML = "Мої коктейлі");
+        } else if (location.pathname === "/ingredients") {
+            document.querySelectorAll("#shaker-subtitle").forEach(e => e.innerHTML = "Інгрідієнти");
+        } else if (location.pathname === "/") {
+            document.querySelectorAll("#shaker-subtitle").forEach(e => e.innerHTML = "");
+        } else  {
+            document.querySelectorAll("#shaker-subtitle").forEach(e => e.innerHTML = "");
+        }
+    })();
+</script>

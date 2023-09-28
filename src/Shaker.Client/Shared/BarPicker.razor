@@ -35,7 +35,6 @@
     
     private async Task ReloadProfilesAsync() {
         Loading = true;
-        Console.WriteLine("Changed");
         _profiles = await DataService.LoadProfilesAsync();
         Loading = false;
         StateHasChanged();

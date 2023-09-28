@@ -1,8 +1,12 @@
 ﻿@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
 
 @inherits LayoutComponentBase
 
-<TopMenu/>
+@if (new Uri(Navigation.Uri).AbsolutePath != "/") {
+    <TopMenu/>
+}
 @Body
 
 <button id="to-top" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync"></button>
@@ -47,10 +51,13 @@
     }
     
     function setMenuButton() {
-        if (location.pathname === '/') {
-            document.getElementById('cocktails-menu-button').style.display = 'none';
-        } else {
-            document.getElementById('cocktails-menu-button').style.display = 'block';
+        const menuButton = document.getElementById('cocktails-menu-button');
+        if (menuButton) {
+            if (location.pathname === '/') {
+                menuButton.style.display = 'none';
+            } else {
+                menuButton.style.display = 'block';
+            }
         }
     }
 </script>
