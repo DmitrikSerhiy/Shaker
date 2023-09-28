@@ -11,19 +11,19 @@
     <div class="top-menu-minified">
         <MenuButton></MenuButton>
     </div>
-    
+
     <BarPopup></BarPopup>
 
     <div id="shaker-menu" class="list-group offcanvas offcanvas-top shaker-menu">
         <div class="offcanvas-body">
             <div class="shaker-menu-container">
-                
+
                 <div class="menu-minified-with-header">
                     <Header></Header>
                 </div>
-                
+
                 <div data-bs-dismiss="offcanvas">
-                    <NavLink class="list-group-item list-group-item-action btn btn-link nav-list-group-item cocktail-nav-item" ActiveClass="active" Match="NavLinkMatch.All" href="/">
+                    <NavLink class="list-group-item list-group-item-action btn btn-link nav-list-group-item cocktail-nav-item" ActiveClass="active" href="mycocktails">
                         Мої коктейлі
                         @if (availableCocktailsCount != 0) {
                             <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill cocktails-badge">@availableCocktailsCount</span>

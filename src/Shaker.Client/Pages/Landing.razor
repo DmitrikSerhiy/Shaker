@@ -1,0 +1,46 @@
+﻿@page "/"
+@inject IJSRuntime JSRuntime
+
+
+<div class="container-fluid landing-page-wrapper">
+    <div class="container text-center">
+        <div class="into-block">
+            <p class="mt-3">Вітаю в шейкері!</p>
+            <p>Що ти можеш тут робити?</p>
+            <ul>
+                <li>Створи свій домашній бар (або навіть декілька)</li>
+                <li>Додай до бару інгрідієнти та отримай рецепти коктелей</li>
+                <li>Відмічай улюблені коктейлі щоб не загубити рецепт</li>
+                <li>Ховай рецепти, котрі не сподобалися</li>
+                <li>Плануй розширення бару лише дійсно потрібними інгрідієнтами</li>
+                <li>Запам'ятай: твій бар - твої правила!</li>
+            </ul>
+        </div>
+        
+        <div id="landing-content-wrapper" class="landing-content-wrapper container-fluid">
+            <div class="container">
+                <div class="row gx-3 row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-1 initial-navigation-block">
+                    <NavLink class="btn btn-link" ActiveClass="active" href="ingredients">
+                        Наповни бар інгрідієнтами
+                    </NavLink>
+                    
+                    <NavLink class="btn btn-link" ActiveClass="active" href="mycocktails">
+                        Приготуй коктейлі
+                    </NavLink>
+                    
+                    <NavLink class="btn btn-link" ActiveClass="active" href="allcocktails">
+                        Бібліотека усіх коктейлів
+                    </NavLink>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        await JSRuntime.InvokeVoidAsync("setMenuButton");
+    }
+}
+

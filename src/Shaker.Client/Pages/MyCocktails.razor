@@ -1,4 +1,4 @@
-@page "/"
+@page "/mycocktails"
 @using Shaker.Client.Services
 @using Shaker.Client.Dtos
 @using Shaker.Client.Helpers
@@ -7,6 +7,7 @@
 @inject RandomCocktailService RandomCocktailService
 @inject CocktailsStateService CocktailsStateService
 @inject BarStateService BarStateService
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 
@@ -157,6 +158,10 @@
         BarStateService.OnCurrentBarChange += OnCurrentBarBarChanged;
         await LoadAndSetBarAsync();
         _loading = false;
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        await JSRuntime.InvokeVoidAsync("setMenuButton");
     }
 
     private async Task OnCurrentBarBarChanged() {

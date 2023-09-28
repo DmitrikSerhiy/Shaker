@@ -136,6 +136,10 @@
         BarStateService.OnCurrentBarChange += OnCurrentBarBarChanged;
         await LoadAndSetIngredientsAsync();
     }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        await JSRuntime.InvokeVoidAsync("setMenuButton");
+    }
 
     private async Task OnCurrentBarBarChanged() {
         DataService.ClearCachedBar();

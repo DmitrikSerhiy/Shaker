@@ -24,7 +24,6 @@
 
 
 <script>
-
     function toTop() {
         if (location.pathname === "/allcocktails") {
             let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
@@ -32,7 +31,7 @@
                 top: 0,
                 behavior: 'smooth'
             });
-        } else if (location.pathname === "/") {
+        } else if (location.pathname === "/mycocktails") {
             let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
             myCocktailsScrollable.scrollTo({
                 top: 0,
@@ -44,6 +43,14 @@
                 top: 0,
                 behavior: 'smooth'
             });
+        }
+    }
+    
+    function setMenuButton() {
+        if (location.pathname === '/') {
+            document.getElementById('cocktails-menu-button').style.display = 'none';
+        } else {
+            document.getElementById('cocktails-menu-button').style.display = 'block';
         }
     }
 </script>
