@@ -33,7 +33,7 @@
             else {
                 <div class="input-group mb-3">
                     <input id="search-ingredient" type="text" class="form-control cocktail-input" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
-                    <button class="btn btn-outline-secondary inline-cocktails-button" type="button" data-bs-toggle="modal" data-bs-target="#my-ingredients-popup" @onclick="async () => await OnIngredientsPopupOpenAsync()" title="Мої інгрідієнти">
+                    <button class="btn btn-outline-secondary inline-cocktails-button" type="button" data-bs-toggle="modal" data-bs-target="#my-ingredients-popup" @onclick="async () => await OnIngredientsPopupOpenAsync()" title="Додати інгрідієнти">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="32"><path fill="#6c757d" d="M480-120v-71l216-216 71 71-216 216h-71ZM120-330v-60h300v60H120Zm690-49-71-71 29-29q8-8 21-8t21 8l29 29q8 8 8 21t-8 21l-29 29ZM120-495v-60h470v60H120Zm0-165v-60h470v60H120Z"/></svg>
                     </button>
                 </div>
@@ -42,7 +42,7 @@
                     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-lg-down modal-lg">
                         <div class="modal-content">
                             <div class="modal-header cocktail-popup-header">
-                                <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">Мої інгрідієнти</h2>
+                                <h2 class="modal-title cocktail-popup-title" id="exampleModalLabel">Додати інгрідієнти</h2>
                                 <button id="ingredients-popup" type="button" class="btn-close cocktail-popup-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body ingredients-popup-body">
@@ -60,7 +60,7 @@
                                                 <li class="list-group-item list-group-item-action ingredients-to-add">
                                                     <input class="form-check-input me-1 ingredient-checkbox" type="checkbox" id="@($"ingredient-{ingredient.Id}")" @onchange="() => OnIngredientsToAdd(ingredient.Id, _currentBarId)">
                                                     <label class="form-check-label stretched-link" for="@($"ingredient-{ingredient.Id}")">@ingredient.Name</label>
-                                                    @if (ingredient.CocktailsAmountToIncrease != 0) {
+                                                    @if (ingredient.CocktailsAmountToIncrease != 0 && !_ingredientsToAdd.Contains(ingredient)) {
                                                         <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill ingredient-badge">+@ingredient.CocktailsAmountToIncrease</span>
                                                     }
                                                 </li>
@@ -73,6 +73,9 @@
                             @if (_ingredientsToShowForAdd.Any()) {
                                 <div class="modal-footer popup-ingredients-footer p-3">
                                     <button type="button" class="btn btn-link p-0 @(_ingredientsToAdd.Count == 0 ? "disabled" : "")" @onclick="async () => await AddIngredientsToBarAsync(_currentBarId)">Додати до бару</button>
+                                    @if (_generalCocktailsToBeIncreased.Count != 0) {
+                                        <span style="text-decoration: none" class="badge text-bg-secondary rounded-pill ingredient-badge general-ingredients-badge">+@_generalCocktailsToBeIncreased.Count</span>
+                                    }
                                 </div>
                             }
                         </div>
@@ -116,6 +119,7 @@
     private string _errorMessage = "";
 
     private int _currentBarId = -1;
+    private List<Cocktail> _generalCocktailsToBeIncreased = new();
     private List<Ingredient> _allIngredients = new();
     private List<Cocktail> _allCocktails = new();
     private List<IGrouping<IngredientGroup,Ingredient>> _searchedIngredients = new();
@@ -152,6 +156,7 @@
 
         _failed = false;
         _errorMessage = "";
+        _generalCocktailsToBeIncreased = new List<Cocktail>();
 
         ResetSearch();
         _currentBarId = await BarStateService.GetBarAsync();
@@ -288,8 +293,10 @@
             _ingredientsToAdd.RemoveAll(i => i.Id == ingredientToAddId);
         }
         else {
-            _ingredientsToAdd.Add(new Ingredient {Id = ingredientToAddId});
+            _ingredientsToAdd.Add(_allIngredients.First(i => i.Id == ingredientToAddId));
         }
+
+        SetIngredientsPopupData();
     }
 
     private async Task AddIngredientsToBarAsync(int barId){
@@ -304,6 +311,7 @@
         await BarService.AddToBarAsync(_ingredientsToAdd.ToList(), barId);
         DataService.ClearCachedBar();
         _ingredientsToAdd = new();
+        _generalCocktailsToBeIncreased = new List<Cocktail>();
         await JSRuntime.InvokeVoidAsync("clearCheckboxes");
         await JSRuntime.InvokeVoidAsync("closeIngredientsPopup");
         await RefreshAsync();
@@ -312,16 +320,28 @@
     private async Task OnIngredientsPopupOpenAsync() {
         await JSRuntime.InvokeVoidAsync("clearCheckboxes");
         _ingredientsToAdd = new();
+        _generalCocktailsToBeIncreased = new List<Cocktail>();
+        SetIngredientsPopupData();
+    }
+
+    private void SetIngredientsPopupData() {
         var ingredients = _allIngredients.Except(_bar.Ingredients).ToList();
-        CalculateCocktailsAmountToIncrease(ingredients);
+        CalculateCocktailsCounters(ingredients);
         _ingredientsToShowForAdd = GroupIngredients(ingredients);
     }
 
-    private void CalculateCocktailsAmountToIncrease(List<Ingredient> ingredientsToAdd) {
+    private void CalculateCocktailsCounters(List<Ingredient> ingredientsCanBeAdded) {
+        CalculateCocktailsToBeIncreased(ingredientsCanBeAdded);
+        CalculateGeneralCocktailsToBeIncreased();
+    }
+
+    private void CalculateCocktailsToBeIncreased(List<Ingredient> ingredientsCanBeAdded) {
         var cocktailsCantBeMade = _allCocktails.Except(_availableCocktails).ToList();
-        var availableIngredients = _bar.Ingredients.ToList();
-        foreach (var ingredient in ingredientsToAdd) {
+        var availableIngredients = _bar.Ingredients.Union(_ingredientsToAdd).ToList();
+        
+        foreach (var ingredient in ingredientsCanBeAdded) {
             ingredient.CocktailsAmountToIncrease = 0;
+
             var cocktailsWithCurrentIngredient = cocktailsCantBeMade
                 .Where(cocktail => cocktail.Ingredients.Any(i => i.Id == ingredient.Id))
                 .ToList();
@@ -339,8 +359,19 @@
                     ingredient.CocktailsAmountToIncrease++;
                 }
             }
-            
         }
+    }
+
+    private void CalculateGeneralCocktailsToBeIncreased() {
+        _generalCocktailsToBeIncreased = new List<Cocktail>();
+
+        var newBar = new Bar {
+            Ingredients = _bar.Ingredients.Union(_ingredientsToAdd).ToList()
+        };
+        
+        var potentiallyAvailableCocktails = CocktailService.GetAvailableCocktails(newBar, _allCocktails);
+        potentiallyAvailableCocktails.RemoveAll(c => _availableCocktails.Any(ac => ac.Id == c.Id));
+        _generalCocktailsToBeIncreased = potentiallyAvailableCocktails;
     }
 }
 
