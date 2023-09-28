@@ -166,9 +166,11 @@ h1, h2, h3, h4 {
 
 .to-top {
     position: sticky;
-    bottom: 0;
+    bottom: 2rem;
+    padding: 0.5rem 1rem;
+    margin-left: auto;
+    margin-right: .8rem;
     width: fit-content;
-    margin: auto;
     display: none;
     animation: scale-up-center 0.45s both;
     z-index: 600;
@@ -629,7 +631,7 @@ a, .btn-link {
     }
     
     .cocktails-menu-button {
-        margin: .5rem 1rem .5rem 1rem;
+        margin: .5rem .8rem .5rem 1rem;
     }
 
     .top-nav-bar {
@@ -649,7 +651,7 @@ a, .btn-link {
     
     .minified-page-subheader #shaker-subtitle {
         margin-bottom: 0 !important;
-        margin-left: 1rem;
+        margin-left: .8rem;
     }
 
     .cocktail-input {
