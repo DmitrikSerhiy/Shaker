@@ -32,4 +32,10 @@
       <_ContentIncludedByDefault Remove="wwwroot\glasses\9_round_old_fashioned.svg" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="..\..\deployment_token.txt">
+        <Link>deployment_token.txt</Link>
+      </Content>
+    </ItemGroup>
+
 </Project>
