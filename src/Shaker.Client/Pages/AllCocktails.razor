@@ -44,11 +44,15 @@
                         <CocktailCard Cocktail="cocktail" IgnoreFavoriteAndHideIcons=true></CocktailCard>
                     }
                 </div>
+
+                <button id="to-top" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок ↑</button>
+
             </div>
         </div>
     }
 
 </div>
+
 @code {
     private List<Cocktail> _allCocktails = new();
     private List<Cocktail> _searchedCocktails = new();
@@ -77,7 +81,13 @@
     private async Task OnCurrentBarBarChanged() {
         DataService.ClearCachedBar();
         await LoadAndSetAllCocktails();
+
         StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("setupToTopButtonForAllCocktails");
+    }
+
+    private async Task ToTopAsync() {
+        await JSRuntime.InvokeVoidAsync("toTop");
     }
 
     private async Task LoadAndSetAllCocktails() {
@@ -180,27 +190,44 @@
     public void Dispose() {
         _debounceSearchTimer?.Dispose();
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
+        JSRuntime.InvokeVoidAsync("cleanupToTopButtonForAllCocktails");
     }
 }
 
 <script>
-    (() => {
+
+    function setupToTopButtonForAllCocktails() {
+        let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
         let allCocktailsToTopButton = document.getElementById("to-top");
-        if (allCocktailsToTopButton) {
-           allCocktailsToTopButton.style.display = "none";
-        }
-    
-        setTimeout(() => {
-            let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
-            let allCocktailsToTopButton = document.getElementById("to-top");
-                
-            allCocktailsScrollable.addEventListener('scroll',(event) => {
+
+        if (allCocktailsScrollable && allCocktailsToTopButton) {
+            window.allCocktailsScrollHandler = function(event) {
                 if (event.target.scrollTop > 400) {
                     allCocktailsToTopButton.style.display = "flex";
                 } else {
                     allCocktailsToTopButton.style.display = "none";
                 }
-            });
+            };
+            allCocktailsScrollable.addEventListener('scroll', window.allCocktailsScrollHandler);
+        }
+    }
+
+    function cleanupToTopButtonForAllCocktails() {
+        let allCocktailsScrollable = document.getElementById("all-cocktails-content-wrapper");
+        if (allCocktailsScrollable && window.allCocktailsScrollHandler) {
+            allCocktailsScrollable.removeEventListener('scroll', window.allCocktailsScrollHandler);
+            window.allCocktailsScrollHandler = null;
+        }
+    }
+
+    (() => {
+        let allCocktailsToTopButton = document.getElementById("to-top");
+        if (allCocktailsToTopButton) {
+           allCocktailsToTopButton.style.display = "none";
+        }
+
+        setTimeout(() => {
+            setupToTopButtonForAllCocktails();
         }, 1000);
     })();
 

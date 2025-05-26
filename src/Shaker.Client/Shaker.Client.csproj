@@ -1,16 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>12</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Storage.Blobs" Version="12.17.0" />
-        <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.5" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.5" PrivateAssets="all" />
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
+        <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.16" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.16" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>

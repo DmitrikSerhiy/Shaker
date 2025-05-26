@@ -124,11 +124,15 @@
                         </CocktailCard>
                     }
                 </div>
+
+                <button id="to-top" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок ↑</button> 
+
             </div>
         </div>
     }
 
 </div>
+
 @code {
     private List<Cocktail> _availableCocktails = new();
     private List<Cocktail> _searchedCocktails = new();
@@ -169,7 +173,13 @@
     private async Task OnCurrentBarBarChanged() {
         DataService.ClearCachedBar();
         await RefreshAsync();
+
         StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("setupToTopButtonForMyCocktails");
+    }
+
+    private async Task ToTopAsync() {
+        await JSRuntime.InvokeVoidAsync("toTop");
     }
 
     private void OnInput(ChangeEventArgs e) {
@@ -354,10 +364,38 @@
     public void Dispose() {
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
         _debounceSearchTimer?.Dispose();
+        JSRuntime.InvokeVoidAsync("cleanupToTopButtonForMyCocktails");
     }
 }
 
 <script>
+
+    function setupToTopButtonForMyCocktails() { 
+        let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
+        let toTopButton = document.getElementById("to-top");
+
+        cleanupToTopButtonForMyCocktails();
+                
+        if (myCocktailsScrollable && toTopButton) {
+            window.myCocktailsScrollHandler = function(event) {
+                if (event.target.scrollTop > 400) {
+                    toTopButton.style.display = "flex";
+                } else {
+                    toTopButton.style.display = "none";
+                }
+            };
+            myCocktailsScrollable.addEventListener('scroll', window.myCocktailsScrollHandler);
+        }
+    }
+
+    function cleanupToTopButtonForMyCocktails() {
+        let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
+        if (myCocktailsScrollable && window.myCocktailsScrollHandler) {
+            myCocktailsScrollable.removeEventListener('scroll', window.myCocktailsScrollHandler);
+            window.myCocktailsScrollHandler = null;
+        }
+    }
+
     (() => {
         let toTopButton = document.getElementById("to-top");
         if (toTopButton) {
@@ -365,17 +403,8 @@
         }
     
         setTimeout(() => {
-            let myCocktailsScrollable = document.getElementById("my-cocktails-content-wrapper");
-            let toTopButton = document.getElementById("to-top");
-                
-            myCocktailsScrollable.addEventListener('scroll',(event) => {
-                if (event.target.scrollTop > 400) {
-                    toTopButton.style.display = "flex";
-                } else {
-                    toTopButton.style.display = "none";
-                }
-            });
-    
+            setupToTopButtonForMyCocktails();
         }, 1000);
     })()
+
 </script>

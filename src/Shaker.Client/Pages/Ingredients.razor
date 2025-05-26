@@ -106,8 +106,11 @@
                      </ul>
                  }
             </div>
+
+            <button id="to-top" type="button" class="btn btn-secondary to-top" @onclick="ToTopAsync">На початок ↑</button> 
         </div>
     }
+
 </div>
 
 @code {
@@ -146,7 +149,9 @@
     private async Task OnCurrentBarBarChanged() {
         DataService.ClearCachedBar();
         await RefreshAsync();
+
         StateHasChanged();
+        await JSRuntime.InvokeVoidAsync("setupToTopButtonForIngredients");
     }
 
     private async Task RefreshAsync() {
@@ -168,6 +173,10 @@
         _currentBarId = await BarStateService.GetBarAsync();
         await LoadAndSetIngredientsAsync();
         _loading = false;
+    }
+
+    private async Task ToTopAsync() {
+        await JSRuntime.InvokeVoidAsync("toTop");
     }
 
     private async Task LoadAndSetIngredientsAsync() {
@@ -285,6 +294,7 @@
     public void Dispose() {
         _debounceSearchTimer?.Dispose();
         BarStateService.OnCurrentBarChange -= OnCurrentBarBarChanged;
+        JSRuntime.InvokeVoidAsync("cleanupToTopButtonForIngredients");
     }
     
     private List<IGrouping<IngredientGroup, Ingredient>> GroupIngredients(List<Ingredient> ingredients) {
@@ -412,7 +422,33 @@
            ingredientCounterTooltip.show();
        }
    }
+
+    function setupToTopButtonForIngredients() { 
+        let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");
+        let ingredientsToTopButton = document.getElementById("to-top");
+             
+        cleanupToTopButtonForIngredients();
+
+        if (myIngredientsScrollable && ingredientsToTopButton) {
+            window.ingredientsScrollHandler = function(event) {
+                if (event.target.scrollTop > 400) {
+                    ingredientsToTopButton.style.display = "flex";
+                } else {
+                    ingredientsToTopButton.style.display = "none";
+                }
+            };
+            myIngredientsScrollable.addEventListener('scroll', window.ingredientsScrollHandler);
+        } 
+    }
    
+    function cleanupToTopButtonForIngredients() {
+        let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");
+        if (myIngredientsScrollable && window.ingredientsScrollHandler) {
+            myIngredientsScrollable.removeEventListener('scroll', window.ingredientsScrollHandler);
+            window.ingredientsScrollHandler = null;
+        }
+    }
+
     (() => {
         let ingredientsToTopButton = document.getElementById("to-top");
         if (ingredientsToTopButton) {
@@ -420,17 +456,8 @@
         }
    
        setTimeout(() => {
-           let myIngredientsScrollable = document.getElementById("my-ingredients-content-wrapper");
-           let ingredientsToTopButton = document.getElementById("to-top");
-             
-           myIngredientsScrollable.addEventListener('scroll',(event) => {
-               if (event.target.scrollTop > 400) {
-                   ingredientsToTopButton.style.display = "flex";
-               } else {
-                   ingredientsToTopButton.style.display = "none";
-               }
-           });
-                   
+           setupToTopButtonForIngredients();
        }, 1000); 
     })();
+
 </script>

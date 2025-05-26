@@ -8,6 +8,7 @@
 
 html, body {
     font-family: 'Malevich', 'Helvetica', Arial, sans-serif !important;
+    overflow-y: hidden;
 }
 
 .shaker-title a {
@@ -47,7 +48,8 @@ html, body {
 .my-ingredients-content-wrapper,
 .landing-content-wrapper {
     overflow: auto;
-    height: 70vh;
+    height: 100vh;
+    padding-bottom: 26vh;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -165,19 +167,17 @@ h1, h2, h3, h4 {
 }
 
 .to-top {
-    position: sticky;
-    bottom: 2rem;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 24px;
     padding: 0.5rem 1rem;
     margin-left: auto;
-    margin-right: 1rem;
+    margin-right: auto;
     width: fit-content;
     display: none;
     animation: scale-up-center 0.45s both;
     z-index: 600;
-}
-
-.to-top::after {
-    content: "На початок \2191";
 }
 
 @keyframes scale-up-center {
@@ -663,14 +663,6 @@ a, .btn-link {
         width: 100%;
     }
 
-    .to-top {
-        bottom: 1rem;
-        margin-right: .8rem;
-    }
-    
-    .to-top::after {
-        content: "\2191";
-    }
     
     .all-cocktails-page-wrapper, 
     .my-ingredients-page-wrapper, 
@@ -679,13 +671,14 @@ a, .btn-link {
         padding-left: 0 !important;
         padding-right: 0 !important;
     }
-    
-    .my-cocktails-content-wrapper, 
-    .all-cocktails-content-wrapper, 
-    .my-ingredients-content-wrapper, 
+
+    .my-cocktails-content-wrapper,
+    .all-cocktails-content-wrapper,
+    .my-ingredients-content-wrapper,
     .landing-content-wrapper {
         padding-left: 0 !important;
         padding-right: 0 !important;
+        padding-bottom: 14vh;
     }
 }
 
