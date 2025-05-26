@@ -36,6 +36,7 @@ jobs:
           action: "upload"
           app_location: "src/Shaker.Client"
           api_location: "Api"
+          output_location: "src/Shaker.Client/bin/Release/net8.0/wwwroot" 
           # output_location: "src/Shaker.Client/bin/Release/net8.0/wwwroot"
 
   close_pull_request_job:
