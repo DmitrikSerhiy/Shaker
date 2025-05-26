@@ -400,4 +400,3 @@ FodyWeavers.xsd
 
 deployment_token.txt
 .env
-/src/Shaker.Client/wwwroot/staticwebapp.config.json
