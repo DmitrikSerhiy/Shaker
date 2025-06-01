@@ -13,7 +13,7 @@
     <script src="scripts/themeManager.js"></script>
     <script src="scripts/toTop.js"></script>
     <script src="swRegistrator.js"></script>
-    <script>if ('serviceWorker' in navigator) { window.addEventListener('DOMContentLoaded', registerServiceWorker); }</script>
+    <script>if ('serviceWorker' in navigator) { window.addEventListener('DOMContentLoaded', () => { registerServiceWorker().then(() => { setThemeManager(); } ); }); }</script>
 </head>
 
 <body>

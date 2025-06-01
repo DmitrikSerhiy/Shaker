@@ -1,6 +1,7 @@
 @using Shaker.Client.Services
 @inject CocktailsStateService CocktailsStateService
 @inject BarStateService BarStateService
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <div class="container mt-3 top-nav-bar">
@@ -54,7 +55,7 @@
                 </div>
 
                 <div class="form-check form-switch list-group-item list-group-item-action nav-list-group-item ">
-                    <input id="dark-switch" type="checkbox" class="form-check-input theme-switcher">
+                    <input id="dark-switch" type="checkbox" class="form-check-input theme-switcher" @onchange=OnThemeChange>
                     <label id="dark-switch-label" for="dark-switch"></label>
                 </div>
 
@@ -76,9 +77,15 @@
         CocktailsStateService.OnIngredientsChange += IngredientsStateChangedAsync;
         BarStateService.OnCurrentBarChange += BarListChange;
         BarStateService.OnCurrentBarChange += CurrentBarChange;
-        
+
         _currentBarId = await BarStateService.GetBarAsync();
     }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     await JSRuntime.InvokeVoidAsync("initThemeSwitcher");
+    //     await base.OnAfterRenderAsync(firstRender);
+    // }
 
     public void Dispose() {
         CocktailsStateService.OnCocktailsChange -= CocktailStateChangedAsync;
@@ -92,7 +99,7 @@
         availableCocktailsCount = await CocktailsStateService.GetAvailableCocktailsCountAsync();
         StateHasChanged();
     }
-    
+
     private async Task IngredientsStateChangedAsync() {
         ingredientsCount = await CocktailsStateService.GetIngredientsCountAsync();
         StateHasChanged();
@@ -106,5 +113,11 @@
     private Task CurrentBarChange() {
         StateHasChanged();
         return Task.CompletedTask;
+    }
+
+
+    private async Task OnThemeChange(ChangeEventArgs e)
+    {
+        await JSRuntime.InvokeVoidAsync("onThemeChanged");
     }
 }

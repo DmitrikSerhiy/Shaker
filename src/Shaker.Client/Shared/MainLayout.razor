@@ -1,5 +1,4 @@
-﻿@inject IJSRuntime JSRuntime
-@inject NavigationManager Navigation
+﻿@inject NavigationManager Navigation
 
 
 @inherits LayoutComponentBase
@@ -8,17 +7,6 @@
     <TopMenu/>
 }
 @Body
-
-@code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JSRuntime.InvokeVoidAsync("setThemeManager");
-        }
-    }
-}
-
 
 <script>
 
