@@ -629,7 +629,7 @@ a, .btn-link {
 
     .top-menu-minified-block {
         margin-bottom: 0px;
-        border-bottom: 2px double black;
+        border-bottom: 2px solid black;
         min-height: 44px
     }
 
@@ -652,7 +652,7 @@ a, .btn-link {
 
     .cocktails-search {
         margin-bottom: 0px !important;
-        border-bottom: 2px double black;
+        border-bottom: 2px solid black;
     }
 
     .cocktails-filters {
@@ -670,7 +670,8 @@ a, .btn-link {
     .cocktail-card-wrapper {
         margin: 0px;
         padding: 0px;
-        border: 1px double black;
+        border: 1px solid black;
+        border-radius: 6px
     }
 
     .cocktail-card {
