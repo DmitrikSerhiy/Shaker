@@ -762,7 +762,7 @@ a, .btn-link {
     .landing-content-wrapper {
         padding-left: 0 !important;
         padding-right: 0 !important;
-        padding-bottom: 14vh;
+        /*padding-bottom: 14vh;*/
 
         overflow-x: hidden;
         margin-top: -1px;
