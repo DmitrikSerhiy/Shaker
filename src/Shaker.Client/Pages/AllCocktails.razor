@@ -10,7 +10,7 @@
     @inject IJSRuntime JSRuntime
 
 <div class="container-fluid all-cocktails-page-wrapper">
-    <div class="container text-center">
+    <div class="container text-center all-cocktails-header">
         <div class="page-subheader">
             <SubHeader></SubHeader>
         </div>
@@ -29,7 +29,7 @@
                 <p>Коктейлі недоступні.</p>
             }
             else {
-                <div class="mb-3">
+                <div class="cocktails-search">
                     <input id="search-all-cocktail" type="text" class="form-control cocktail-input" placeholder="Знайти за назвою або рецептом" @bind="_searchQuery" @oninput="OnInput">
                 </div>
             }
@@ -38,7 +38,7 @@
 
     @if (_loading == false && _failed == false && _ingredientsEmpty == false && _cocktailsEmpty == false) {
         <div id="all-cocktails-content-wrapper" class="all-cocktails-content-wrapper container-fluid">
-            <div class="container">
+            <div class="container all-cocktails-content">
                 <div class="row gx-3 row-cols-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-3">
                     @foreach (var cocktail in _searchedCocktails) {
                         <CocktailCard Cocktail="cocktail" IgnoreFavoriteAndHideIcons=true></CocktailCard>

@@ -11,7 +11,7 @@
 @implements IDisposable
 
 <div class="container-fluid my-ingredients-page-wrapper">
-    <div class="container text-center">
+    <div class="container text-center ingredients-header">
         <div class="page-subheader">
             <SubHeader></SubHeader>
         </div>
@@ -33,9 +33,9 @@
                 <p>Коктейлі недоступні.</p>
             }
             else {
-                <div class="input-group mb-3">
+                <div class="input-group cocktails-search">
                     <input id="search-ingredient" type="text" class="form-control cocktail-input" placeholder="Знайти інгрідієнт" @bind="_searchQuery" @oninput="OnInput">
-                    <button class="btn btn-outline-secondary inline-cocktails-button" type="button" data-bs-toggle="modal" data-bs-target="#my-ingredients-popup" @onclick="async () => await OnIngredientsPopupOpenAsync()" title="Додати інгрідієнти">
+                    <button class="btn btn-outline-secondary inline-cocktails-button edit-ingredients-button" type="button" data-bs-toggle="modal" data-bs-target="#my-ingredients-popup" @onclick="async () => await OnIngredientsPopupOpenAsync()" title="Додати інгрідієнти">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" width="32"><path fill="#6c757d" d="M480-120v-71l216-216 71 71-216 216h-71ZM120-330v-60h300v60H120Zm690-49-71-71 29-29q8-8 21-8t21 8l29 29q8 8 8 21t-8 21l-29 29ZM120-495v-60h470v60H120Zm0-165v-60h470v60H120Z"/></svg>
                     </button>
                 </div>

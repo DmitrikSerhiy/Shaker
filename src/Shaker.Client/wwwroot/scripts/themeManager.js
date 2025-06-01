@@ -25,7 +25,7 @@ function initThemeSwitcher() {
 
 const setTheme = (theme) => {
     if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-bs-theme', 'dark')
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
     } else {
         document.documentElement.setAttribute('data-bs-theme', theme)
     }
@@ -68,12 +68,22 @@ const muteImages = () => {
         .forEach(image => {
             image.classList.add('cocktail-image-dark');
         });
+
+    document.querySelectorAll('.cocktail-card')
+        .forEach(card => {
+            card.classList.add('cocktail-card-night');
+        });
 }
 
 const unmuteImages = () => {
     document.querySelectorAll('.cocktail-image')
         .forEach(image => {
             image.classList.remove('cocktail-image-dark')
+        });
+
+    document.querySelectorAll('.cocktail-card')
+        .forEach(card => {
+            card.classList.remove('cocktail-card-night');
         });
 }
 

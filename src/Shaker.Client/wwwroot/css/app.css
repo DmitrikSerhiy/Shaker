@@ -148,6 +148,22 @@ h1, h2, h3, h4 {
     align-items: start;
 }
 
+.cocktails-search {
+    margin-bottom: 1rem;
+}
+
+.cocktail-card-wrapper {
+    margin-bottom: 1rem;
+}
+
+#dark-switch {
+    font-size: 1.3rem;
+}
+
+#dark-switch-label {
+    margin-top: 4px
+}
+
 .cocktails-badge {
     top: unset !important;
     position: unset !important;
@@ -225,7 +241,7 @@ h1, h2, h3, h4 {
 .icons-container-left-down {
     position: absolute;
     left: 0;
-    bottom: 1rem;
+    bottom: 0.5rem;
     z-index: 500;
     width: 4rem;
     display: flex;
@@ -506,6 +522,15 @@ a, .btn-link {
     border-top: unset !important;
 }
 
+
+.cocktail-card-night {
+    background: #c8cccb !important;
+
+    .cocktail-name {
+        color: black;
+    }
+}
+
 @media (max-width: 1400px) {
     .cocktail-name {
         width: 300px;
@@ -564,6 +589,107 @@ a, .btn-link {
 }
 
 @media (max-width: 600px) {
+
+    /* mobile special design */
+
+    input[type=text] {
+        box-shadow: none !important;
+        outline: none !important;
+        border: none !important;
+    }
+
+    input[type=checkbox] {
+        box-shadow: none !important;
+        outline: none !important;
+        /*border: none !important;*/
+    }
+
+    button {
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    select {
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    #select-profile {
+        padding: 0 !important;
+    }
+
+    .input-group-text {
+        background: transparent !important;
+        border: none !important;
+    }
+
+    .list-group-item-action:focus, .list-group-item-action:hover {
+        background: transparent !important;
+    }
+
+    .top-menu-minified-block {
+        margin-bottom: 0px;
+        border-bottom: 2px double black;
+        min-height: 44px
+    }
+
+    .cocktails-menu-button {
+        margin: 0 !important;
+        /*background-color: transparent !important;*/
+
+        position: absolute;
+        border-radius: 0;
+        bottom: 0px;
+        right: 0px;
+        z-index: 2000;
+    }
+
+    .to-top {
+        bottom: 0;
+        border-radius: 0;
+        height: 44px;
+    }
+
+    .cocktails-search {
+        margin-bottom: 0px !important;
+        border-bottom: 2px double black;
+    }
+
+    .cocktails-filters {
+        padding: 10px;
+    }
+
+    .my-cocktails-header, .all-cocktails-header, .ingredients-header {
+        padding: 0px;
+    }
+
+    .my-cocktails-content, .all-cocktails-content {
+        padding: 0px;
+    }
+
+    .cocktail-card-wrapper {
+        margin: 0px;
+        padding: 0px;
+        border: 1px double black;
+    }
+
+    .cocktail-card {
+        border: 0px;
+    }
+
+    .edit-ingredients-button {
+        padding: 5px;
+    }
+
+    .cocktails-filters-button {
+        padding-right: 8px;
+    }
+
+    /* mobile special design */
+
+
+
+
     .top-menu-default {
         display: none;
     }
@@ -587,6 +713,9 @@ a, .btn-link {
 
     .cocktails-menu-button {
         margin: .5rem .8rem .5rem 1rem;
+        svg {
+            fill: var(--bs-btn-color)
+        }
     }
 
     .top-nav-bar {
@@ -634,6 +763,9 @@ a, .btn-link {
         padding-left: 0 !important;
         padding-right: 0 !important;
         padding-bottom: 14vh;
+
+        overflow-x: hidden;
+        margin-top: -1px;
     }
 }
 
@@ -650,8 +782,8 @@ a, .btn-link {
     }
 
     .icons-container-left, .icons-container-right, .icons-container-left-down {
-        width: 2rem;
-        height: 2rem;
+        width: 3rem;
+        height: 3rem;
 
         svg {
             width: 28px;
