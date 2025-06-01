@@ -479,9 +479,6 @@ a, .btn-link {
     height: 45px;
 }
 
-.cocktail-card {
-    
-}
 
 .accordion-header {
     margin-bottom: 0 !important;
@@ -500,17 +497,6 @@ a, .btn-link {
     text-align: center;
 }
 
-.cocktail-popup-body {
-}
-
-.cocktail-popup-image-container {
-    
-}
-
-.cocktail-popup-info-container {
-
-}
-
 .cocktail-popup-image {
     width: 450px
 }
@@ -519,7 +505,6 @@ a, .btn-link {
     margin: .25rem 0 !important;
     border-top: unset !important;
 }
-
 
 @media (max-width: 1400px) {
     .cocktail-name {
@@ -533,21 +518,25 @@ a, .btn-link {
     }
 }
 
-@media (max-width: 768px) {
-    .cocktail-name {
+@media (max-width: 960px) {
+    .cocktail-popup-image {
         width: 400px;
-        white-space: break-spaces;
     }
-    .cocktail-popup-title {
-        white-space: break-spaces;
-        padding-right: 50px;
-    }
-}
 
-@media (max-width: 500px) {
-    .cocktail-name {
-        width: 250px;
-        font-size: 1.1rem !important;
+    .cocktail-popup-image-container {
+        display: flex;
+    }
+
+    .cocktail-popup-info-container {
+        margin-top: 1rem;
+    }
+
+    .cocktail-popup-image {
+        margin: auto;
+    }
+
+    .cocktail-popup-info-container {
+        padding-left: 5rem;
     }
 }
 
@@ -562,49 +551,15 @@ a, .btn-link {
     }
 }
 
-@media (max-width: 400px) {
-    .form-check.form-check-inline {
-        margin-right: 1rem;
-        padding-left: 1.2rem;
+@media (max-width: 768px) {
+    .cocktail-name {
+        width: auto;
+        font-size: 1rem !important;
+        white-space: break-spaces;
     }
-}
-
-@media (max-width: 400px) {
-    .cocktails-filter-input-group {
-        min-width: 300px;
-        margin-left: 1rem !important;
-    }
-}
-
-@media (max-width: 960px) {
-    .cocktail-popup-image {
-        width: 400px;
-    }
-}
-
-@media (max-width: 580px) {
-    .cocktail-popup-image{
-        width: 300px;
-    }
-}
-
-@media (max-width: 960px) {
-    .cocktail-popup-image-container {
-        display: flex;
-    }
-
-    .cocktail-popup-info-container {
-        margin-top: 1rem;
-    }
-    
-    .cocktail-popup-image {
-        margin: auto;
-    }
-}
-
-@media (min-width: 960px) {
-    .cocktail-popup-info-container {
-        padding-left: 5rem;
+    .cocktail-popup-title {
+        white-space: break-spaces;
+        padding-right: 50px;
     }
 }
 
@@ -629,7 +584,7 @@ a, .btn-link {
         display: flex;
         justify-content: space-between;
     }
-    
+
     .cocktails-menu-button {
         margin: .5rem .8rem .5rem 1rem;
     }
@@ -639,7 +594,7 @@ a, .btn-link {
         padding-left: 0;
         padding-right: 0;
     }
-    
+
     .page-subheader {
         display: none;
     }
@@ -648,7 +603,7 @@ a, .btn-link {
         display: flex;
         align-items: center;
     }
-    
+
     .minified-page-subheader #shaker-subtitle {
         margin-bottom: 0 !important;
         margin-left: .8rem;
@@ -663,10 +618,10 @@ a, .btn-link {
         width: 100%;
     }
 
-    
-    .all-cocktails-page-wrapper, 
-    .my-ingredients-page-wrapper, 
-    .my-cocktails-page-wrapper, 
+
+    .all-cocktails-page-wrapper,
+    .my-ingredients-page-wrapper,
+    .my-cocktails-page-wrapper,
     .landing-page-wrapper {
         padding-left: 0 !important;
         padding-right: 0 !important;
@@ -682,9 +637,49 @@ a, .btn-link {
     }
 }
 
+@media (max-width: 580px) {
+    .cocktail-popup-image {
+        width: 300px;
+    }
+}
 
+@media (max-width: 500px) {
+    .cocktail-name {
+        width: auto;
+        font-size: 0.9rem !important;
+    }
 
+    .icons-container-left, .icons-container-right, .icons-container-left-down {
+        width: 2rem;
+        height: 2rem;
 
+        svg {
+            width: 28px;
+            height: 28px;
+        }
+    }
+
+    .icons-container-left-down svg {
+        margin-top: 12px !important;
+    }
+}
+
+@media (max-width: 400px) {
+    .cocktails-filter-input-group {
+        min-width: 300px;
+        margin-left: 1rem !important;
+    }
+
+    .form-check.form-check-inline {
+        margin-right: 1rem;
+        padding-left: 1.2rem;
+    }
+
+    .cocktail-name {
+        width: auto;
+        font-size: 0.8rem !important;
+    }
+}
 
 
 #blazor-error-ui {
