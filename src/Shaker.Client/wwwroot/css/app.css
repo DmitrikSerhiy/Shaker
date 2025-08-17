@@ -9,6 +9,18 @@
 html, body {
     font-family: 'Malevich', 'Helvetica', Arial, sans-serif !important;
     overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 .shaker-title a {
@@ -191,6 +203,7 @@ h1, h2, h3, h4 {
     width: fit-content;
     display: none;
     align-items: end;
+    touch-action: none;
     animation: scale-up-center 0.45s both;
     z-index: 600;
 }
@@ -271,6 +284,10 @@ h1:focus {
 .cocktail-popup {
     padding-left: unset !important;
     padding-right: unset !important;
+}
+
+.cocktail-popup-body {
+    flex: 0 0 auto;
 }
 
 .cocktail-popup-header {
@@ -516,7 +533,7 @@ a, .btn-link {
 }
 
 .cocktail-popup-image {
-    width: 450px
+    width: 350px
 }
 
 .recipe-separator {
@@ -547,7 +564,13 @@ a, .btn-link {
 
 @media (max-width: 960px) {
     .cocktail-popup-image {
-        width: 400px;
+        width: 300px;
+    }
+
+    .cocktail-popup-info-container {
+        margin-top: 1rem;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .cocktail-popup-image-container {
