@@ -27,6 +27,10 @@ body::-webkit-scrollbar {
     text-decoration: none;
 }
 
+.shaker-title {
+    color: #0071c1;
+}
+
 .minified-page-subheader {
     display: none;
 }
