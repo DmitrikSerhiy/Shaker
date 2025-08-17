@@ -792,6 +792,11 @@ a, .btn-link {
 }
 
 @media (max-width: 580px) {
+
+    .cocktail-popup-image-container {
+        touch-action: none;
+    }
+
     .cocktail-popup-image {
         width: 220px;
     }
