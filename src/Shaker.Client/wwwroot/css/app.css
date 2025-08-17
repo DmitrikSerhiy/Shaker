@@ -790,7 +790,12 @@ a, .btn-link {
 
 @media (max-width: 580px) {
     .cocktail-popup-image {
-        width: 300px;
+        width: 220px;
+    }
+
+    .cocktail-popup-body {
+        height: 600px;
+        overflow-y: auto;
     }
 }
 
