@@ -41,8 +41,6 @@ html, body {
     width: fit-content;
 }
 
-
-
 .my-cocktails-content-wrapper,
 .all-cocktails-content-wrapper,
 .my-ingredients-content-wrapper,
@@ -192,6 +190,7 @@ h1, h2, h3, h4 {
     margin-right: auto;
     width: fit-content;
     display: none;
+    align-items: end;
     animation: scale-up-center 0.45s both;
     z-index: 600;
 }
@@ -276,6 +275,7 @@ h1:focus {
 
 .cocktail-popup-header {
     justify-content: center !important;
+    touch-action: none;
 }
 
 .cocktail-popup-title {
@@ -433,6 +433,7 @@ a, .btn-link {
 
 .popup-ingredients-footer {
     display: flex;
+    touch-action: none;
 }
 
 .popup-ingredients-footer button {
@@ -466,6 +467,7 @@ a, .btn-link {
     display: flex;
     flex-direction: column;
     align-items: center;
+    touch-action: none;
 }
 
 .theme-switcher {
@@ -552,16 +554,8 @@ a, .btn-link {
         display: flex;
     }
 
-    .cocktail-popup-info-container {
-        margin-top: 1rem;
-    }
-
     .cocktail-popup-image {
         margin: auto;
-    }
-
-    .cocktail-popup-info-container {
-        padding-left: 5rem;
     }
 }
 
@@ -635,13 +629,12 @@ a, .btn-link {
 
     .cocktails-menu-button {
         margin: 0 !important;
-        /*background-color: transparent !important;*/
-
         position: absolute;
         border-radius: 0;
         bottom: 0px;
         right: 0px;
-        z-index: 2000;
+        z-index: 1000;
+        touch-action: none;
     }
 
     .to-top {
@@ -661,6 +654,7 @@ a, .btn-link {
 
     .my-cocktails-header, .all-cocktails-header, .ingredients-header {
         padding: 0px;
+        touch-action: none;
     }
 
     .my-cocktails-content, .all-cocktails-content {
@@ -723,6 +717,7 @@ a, .btn-link {
         margin-top: 0 !important;
         padding-left: 0;
         padding-right: 0;
+        touch-action: none;
     }
 
     .page-subheader {
